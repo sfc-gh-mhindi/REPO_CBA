@@ -71,6 +71,8 @@ def init_session_state():
         st.session_state.last_migration_info = None
     if 'data_loaded_at_least_once' not in st.session_state:
         st.session_state.data_loaded_at_least_once = False
+    if 'pending_migration' not in st.session_state:
+        st.session_state.pending_migration = None
 
 def run_snowflake_query(query_str, user_friendly_context=""):
     """Executes a SQL query using the Snowpark session and returns result with user-friendly error handling."""
@@ -352,9 +354,22 @@ def main():
     
     # Handle form submissions
     if migration_submitted or generate_sql_submitted:
-        # Set migration in progress for Execute Migration
-        if migration_submitted:
+        # Immediately set migration in progress and rerun to disable form
+        if migration_submitted and not st.session_state.migration_in_progress:
             st.session_state.migration_in_progress = True
+            # Store migration parameters for execution
+            st.session_state.pending_migration = {
+                'source_db': source_db,
+                'source_table': source_table,
+                'target_db': target_db,
+                'target_schema': target_schema,
+                'target_table': target_table,
+                'chunking_enabled': chunking_enabled,
+                'chunking_column': chunking_column,
+                'chunking_value': chunking_value,
+                'chunking_type': chunking_type
+            }
+            st.rerun()
         
         # Update session state with current values
         st.session_state.current_source_db = source_db
@@ -410,91 +425,125 @@ def main():
                 4. **Monitor the results** in the worksheet
                 """)
             
-            elif migration_submitted:
-                # Execute Migration
-                with st.spinner("🔄 Executing migration procedure..."):
-                    result, error, sql_executed = execute_migration(
-                        source_db, source_table, target_db, target_schema, target_table,
-                        chunking_enabled, chunking_column, chunking_value, chunking_type
-                    )
+
+    
+    # Execute pending migration when form is disabled
+    if st.session_state.migration_in_progress and 'pending_migration' in st.session_state:
+        params = st.session_state.pending_migration
+        
+        # Parameter Validation
+        validation_errors = validate_parameters(
+            params['source_db'], params['source_table'], params['target_db'], 
+            params['target_schema'], params['target_table'], params['chunking_enabled'], 
+            params['chunking_column'], params['chunking_value'], params['chunking_type']
+        )
+        
+        if validation_errors:
+            st.error("❌ **Parameter Validation Errors:**")
+            for error in validation_errors:
+                st.write(f"• {error}")
+            # Reset migration state on validation error
+            st.session_state.migration_in_progress = False
+            if 'pending_migration' in st.session_state:
+                del st.session_state.pending_migration
+        else:
+            # Migration Configuration Summary
+            st.markdown("---")
+            st.subheader("📊 Migration Configuration")
+            
+            config_col1, config_col2 = st.columns(2)
+            with config_col1:
+                st.markdown(f"**📊 Source:** `{params['source_db']}.{params['source_table']}`")
+                st.markdown(f"**⚡ Chunking:** `{'Enabled' if params['chunking_enabled'] else 'Disabled'}`")
+            with config_col2:
+                st.markdown(f"**🎯 Target:** `{params['target_db']}.{params['target_schema']}.{params['target_table']}`")
+                if params['chunking_enabled']:
+                    st.markdown(f"**🔧 Chunking Method:** `{params['chunking_type']} ({params['chunking_column']})`")
+            
+            # Execute Migration
+            with st.spinner("🔄 Executing migration procedure..."):
+                result, error, sql_executed = execute_migration(
+                    params['source_db'], params['source_table'], params['target_db'], 
+                    params['target_schema'], params['target_table'], params['chunking_enabled'], 
+                    params['chunking_column'], params['chunking_value'], params['chunking_type']
+                )
+                
+                if result:
+                    st.session_state.last_result = result
+                    migration_info = parse_migration_result(result)
                     
-                    if result:
-                        st.session_state.last_result = result
-                        migration_info = parse_migration_result(result)
-                        
-                        # Store migration info in session state for results display
-                        migration_info_enriched = {
-                            **migration_info,
-                            'source_db': source_db,
-                            'source_table': source_table,
-                            'target_db': target_db,
-                            'target_schema': target_schema,
-                            'target_table': target_table,
-                            'chunking_enabled': chunking_enabled,
-                            'chunking_column': chunking_column if chunking_enabled else None,
-                            'chunking_type': chunking_type if chunking_enabled else None,
-                            'chunking_value': chunking_value if chunking_enabled else None
-                        }
-                        st.session_state.last_migration_info = migration_info_enriched
-                        
-                        # Add to history
-                        history_entry = {
-                            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                            'source': f"{source_db}.{source_table}",
-                            'target': f"{target_db}.{target_schema}.{target_table}",
-                            'chunking': chunking_enabled,
-                            'status': migration_info.get('status', 'Unknown'),
-                            'result': result
-                        }
-                        st.session_state.migration_history.append(history_entry)
-                        
-                        # Display result based on status
-                        if 'ERROR:' in result:
-                            st.error("❌ **Migration Failed**")
-                            st.error("Please check the migration log below for details.")
-                        elif migration_info.get('status') in ['Completed', 'Success']:
-                            st.success("✅ **Migration Completed Successfully**")
-                            st.success("The migration procedure has finished. Please verify your data.")
-                        else:
-                            st.info("ℹ️ **Migration Status**: Please check the detailed results below.")
-                        
-                        # Reset migration in progress flag after completion
-                        st.session_state.migration_in_progress = False
+                    # Store migration info in session state for results display
+                    migration_info_enriched = {
+                        **migration_info,
+                        'source_db': params['source_db'],
+                        'source_table': params['source_table'],
+                        'target_db': params['target_db'],
+                        'target_schema': params['target_schema'],
+                        'target_table': params['target_table'],
+                        'chunking_enabled': params['chunking_enabled'],
+                        'chunking_column': params['chunking_column'] if params['chunking_enabled'] else None,
+                        'chunking_type': params['chunking_type'] if params['chunking_enabled'] else None,
+                        'chunking_value': params['chunking_value'] if params['chunking_enabled'] else None
+                    }
+                    st.session_state.last_migration_info = migration_info_enriched
+                    
+                    # Add to history
+                    history_entry = {
+                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'source': f"{params['source_db']}.{params['source_table']}",
+                        'target': f"{params['target_db']}.{params['target_schema']}.{params['target_table']}",
+                        'chunking': params['chunking_enabled'],
+                        'status': migration_info.get('status', 'Unknown'),
+                        'result': result
+                    }
+                    st.session_state.migration_history.append(history_entry)
+                    
+                    # Display result based on status
+                    if 'ERROR:' in result:
+                        st.error("❌ **Migration Failed**")
+                        st.error("Please check the migration log below for details.")
+                    elif migration_info.get('status') in ['Completed', 'Success']:
+                        st.success("✅ **Migration Completed Successfully**")
+                        st.success("The migration procedure has finished. Please verify your data.")
                     else:
-                        st.error(error)
-                        # Reset migration in progress flag after error
-                        st.session_state.migration_in_progress = False
-                        # Clear migration info on error
-                        st.session_state.last_migration_info = None
+                        st.info("ℹ️ **Migration Status**: Please check the detailed results below.")
+                else:
+                    st.error(error)
+                    # Show alternative execution option for certain errors
+                    if "streamlit limitation" in error.lower() or "temporary table" in error.lower():
+                        generated_sql = generate_migration_sql(
+                            params['source_db'], params['source_table'], params['target_db'], 
+                            params['target_schema'], params['target_table'], params['chunking_enabled'], 
+                            params['chunking_column'], params['chunking_value'], params['chunking_type']
+                        )
+                        st.markdown("---")
+                        st.subheader("🔧 Alternative Execution Method")
+                        st.info("💡 **Workaround**: The procedure can be executed directly in a Snowflake worksheet. Use the SQL below:")
+                        st.code(generated_sql, language="sql")
                         
-                        # Show alternative execution option
-                        if "streamlit limitation" in error.lower() or "temporary table" in error.lower():
-                            st.markdown("---")
-                            st.subheader("🔧 Alternative Execution Method")
-                            st.info("💡 **Workaround**: The procedure can be executed directly in a Snowflake worksheet. Use the SQL below:")
-                            st.code(generated_sql, language="sql")
-                            
-                            with st.expander("📋 Manual Execution Instructions", expanded=True):
-                                st.markdown("""
-                                **Steps to execute manually:**
-                                1. **Copy the SQL statement** shown above
-                                2. **Open Snowflake Web UI** and navigate to Worksheets
-                                3. **Create a new worksheet** or use an existing one
-                                4. **Paste the SQL** into the worksheet
-                                5. **Execute the statement** and monitor the results
-                                6. **The procedure will run** with full functionality including temporary tables
-                                
-                                **Why this happens:**
-                                - Streamlit apps in Snowflake have certain limitations
-                                - Stored procedures using temporary tables cannot be executed from Streamlit
-                                - Direct execution in worksheets bypasses these limitations
-                                """)
+                        with st.expander("📋 Manual Execution Instructions", expanded=True):
+                            st.markdown("""
+                            **Steps to execute manually:**
+                            1. **Copy the SQL statement** shown above
+                            2. **Open Snowflake Web UI** and navigate to Worksheets
+                            3. **Create a new worksheet** or use an existing one
+                            4. **Paste the SQL** into the worksheet
+                            5. **Execute the statement** and monitor the results
+                            6. **The procedure will run** with full functionality including temporary tables
+                            """)
+                
+                # Reset migration state after completion
+                st.session_state.migration_in_progress = False
+                if 'pending_migration' in st.session_state:
+                    del st.session_state.pending_migration
     
     # Add reset button if migration was in progress
     if st.session_state.migration_in_progress:
         st.markdown("---")
         if st.button("🔄 Start New Migration", help="Reset the form to configure a new migration"):
             st.session_state.migration_in_progress = False
+            if 'pending_migration' in st.session_state:
+                del st.session_state.pending_migration
             st.rerun()
     
     # --- Results Display Section ---
