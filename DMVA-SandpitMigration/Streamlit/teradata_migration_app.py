@@ -67,6 +67,8 @@ def init_session_state():
         st.session_state.migration_history = []
     if 'last_result' not in st.session_state:
         st.session_state.last_result = None
+    if 'last_migration_info' not in st.session_state:
+        st.session_state.last_migration_info = None
     if 'data_loaded_at_least_once' not in st.session_state:
         st.session_state.data_loaded_at_least_once = False
 
@@ -417,6 +419,21 @@ def main():
                         st.session_state.last_result = result
                         migration_info = parse_migration_result(result)
                         
+                        # Store migration info in session state for results display
+                        migration_info_enriched = {
+                            **migration_info,
+                            'source_db': source_db,
+                            'source_table': source_table,
+                            'target_db': target_db,
+                            'target_schema': target_schema,
+                            'target_table': target_table,
+                            'chunking_enabled': chunking_enabled,
+                            'chunking_column': chunking_column if chunking_enabled else None,
+                            'chunking_type': chunking_type if chunking_enabled else None,
+                            'chunking_value': chunking_value if chunking_enabled else None
+                        }
+                        st.session_state.last_migration_info = migration_info_enriched
+                        
                         # Add to history
                         history_entry = {
                             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -444,6 +461,8 @@ def main():
                         st.error(error)
                         # Reset migration in progress flag after error
                         st.session_state.migration_in_progress = False
+                        # Clear migration info on error
+                        st.session_state.last_migration_info = None
                         
                         # Show alternative execution option
                         if "streamlit limitation" in error.lower() or "temporary table" in error.lower():
