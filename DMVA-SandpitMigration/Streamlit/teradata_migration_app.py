@@ -124,12 +124,15 @@ def validate_parameters(source_db, source_table, target_db, target_schema, targe
         if chunking_type not in ['by_integer', 'by_date', 'by_substr']:
             errors.append("Invalid chunking data type selected")
         
-        # Validate chunking value is numeric for relevant types
-        if chunking_type in ['by_integer', 'by_date', 'by_substr']:
+        # Validate chunking value based on chunking type
+        if chunking_type == 'by_integer' or chunking_type == 'by_substr':
             try:
                 int(chunking_value)
             except ValueError:
                 errors.append("Chunking Value must be numeric")
+        elif chunking_type == 'by_date':
+            if chunking_value not in ['day', 'month']:
+                errors.append("Chunking Value for by_date must be 'day' or 'month'")
     
     return errors
 
@@ -226,8 +229,8 @@ def main():
     col_status1, col_status2 = st.columns([2, 1])
     with col_status1:
         st.success("🟢 **Connected to Snowflake** - Using active session")
-    with col_status2:
-        st.warning("⚠️ **Note**: Some procedures may need manual execution due to Streamlit limitations")
+    # with col_status2:
+    #     st.warning("⚠️ **Note**: Some procedures may need manual execution due to Streamlit limitations")
     
     # Initialize session state for migration parameters
     if 'current_source_db' not in st.session_state:
