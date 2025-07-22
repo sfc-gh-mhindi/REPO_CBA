@@ -73,6 +73,8 @@ def init_session_state():
         st.session_state.data_loaded_at_least_once = False
     if 'pending_migration' not in st.session_state:
         st.session_state.pending_migration = None
+    if 'migration_executing' not in st.session_state:
+        st.session_state.migration_executing = False
 
 def run_snowflake_query(query_str, user_friendly_context=""):
     """Executes a SQL query using the Snowpark session and returns result with user-friendly error handling."""
@@ -246,7 +248,7 @@ def main():
     if 'current_target_table' not in st.session_state:
         st.session_state.current_target_table = "SANDPIT_DEMO_TBL001"
     if 'current_chunking_enabled' not in st.session_state:
-        st.session_state.current_chunking_enabled = False
+        st.session_state.current_chunking_enabled = True
     if 'current_chunking_column' not in st.session_state:
         st.session_state.current_chunking_column = "CODE1"
     if 'current_chunking_value' not in st.session_state:
@@ -268,78 +270,80 @@ def main():
             source_db = st.text_input("Source Database Name", 
                                       value=st.session_state.current_source_db,
                                       help="Teradata schema/database name",
-                                      disabled=st.session_state.migration_in_progress)
+                                      disabled=st.session_state.migration_executing)
             source_table = st.text_input("Source Table Name", 
                                         value=st.session_state.current_source_table,
                                         help="Table name in Teradata",
-                                        disabled=st.session_state.migration_in_progress)
+                                        disabled=st.session_state.migration_executing)
         
         with col2:
             st.markdown("**🎯 Target Configuration**")
             target_db = st.text_input("Target Database Name", 
                                       value=st.session_state.current_target_db,
                                       help="Snowflake database name",
-                                      disabled=st.session_state.migration_in_progress)
+                                      disabled=st.session_state.migration_executing)
             target_schema = st.text_input("Target Schema Name", 
                                          value=st.session_state.current_target_schema,
                                          help="Snowflake schema name",
-                                         disabled=st.session_state.migration_in_progress)
+                                         disabled=st.session_state.migration_executing)
             target_table = st.text_input("Target Table Name", 
                                         value=st.session_state.current_target_table,
                                         help="Target table name in Snowflake",
-                                        disabled=st.session_state.migration_in_progress)
+                                                                                disabled=st.session_state.migration_executing)
         
         # Chunking Configuration
         st.markdown("**⚡ Chunking Configuration**")
         chunking_enabled = st.checkbox("Enable Chunking Optimization", 
                                        value=st.session_state.current_chunking_enabled,
                                        help="Recommended for large tables (millions of rows)",
-                                       disabled=st.session_state.migration_in_progress)
+                                       disabled=st.session_state.migration_executing)
+        
+        col3, col4, col5 = st.columns(3)
+        with col3:
+            chunking_column = st.text_input("Chunking Column", 
+                                           value=st.session_state.current_chunking_column,
+                                           help="Column to use for data chunking",
+                                           disabled=st.session_state.migration_executing)
+        with col4:
+            chunking_type = st.selectbox("Chunking Data Type", 
+                                        ["by_integer", "by_date", "by_substr"],
+                                        index=["by_integer", "by_date", "by_substr"].index(st.session_state.current_chunking_type),
+                                        help="Type of chunking method",
+                                        disabled=st.session_state.migration_executing)
+        with col5:
+            # Dynamic label and input based on chunking type
+            if chunking_type == "by_integer":
+                chunking_value = st.text_input("Chunking Value (Integer Value)", 
+                                              value=st.session_state.current_chunking_value,
+                                              help="Modulus value for integer chunking",
+                                              disabled=st.session_state.migration_executing)
+            elif chunking_type == "by_substr":
+                chunking_value = st.text_input("Chunking Value (Nbr of Characters)", 
+                                              value=st.session_state.current_chunking_value,
+                                              help="Number of characters for substring chunking",
+                                              disabled=st.session_state.migration_executing)
+            elif chunking_type == "by_date":
+                # For date type, use dropdown with day/month options
+                date_options = ["day", "month"]
+                current_date_value = st.session_state.current_chunking_value if st.session_state.current_chunking_value in date_options else "day"
+                chunking_value = st.selectbox("Chunking Value (Period)", 
+                                             options=date_options,
+                                             index=date_options.index(current_date_value),
+                                             help="Time period for date chunking",
+                                             disabled=st.session_state.migration_executing)
+        
+        # Chunking explanation
+        chunking_info = {
+            "by_integer": "Integer column chunking using modulus operation",
+            "by_date": "Date column chunking by time period (days or months)",
+            "by_substr": "String column chunking by substring length"
+        }
+        st.info(f"ℹ️ **{chunking_type}**: {chunking_info[chunking_type]}")
         
         if chunking_enabled:
-            col3, col4, col5 = st.columns(3)
-            with col3:
-                chunking_column = st.text_input("Chunking Column", 
-                                               value=st.session_state.current_chunking_column,
-                                               help="Column to use for data chunking",
-                                               disabled=st.session_state.migration_in_progress)
-            with col4:
-                chunking_type = st.selectbox("Chunking Data Type", 
-                                            ["by_integer", "by_date", "by_substr"],
-                                            index=["by_integer", "by_date", "by_substr"].index(st.session_state.current_chunking_type),
-                                            help="Type of chunking method",
-                                            disabled=st.session_state.migration_in_progress)
-            with col5:
-                # Dynamic label and input based on chunking type
-                if chunking_type == "by_integer":
-                    chunking_value = st.text_input("Chunking Value (Integer Value)", 
-                                                  value=st.session_state.current_chunking_value,
-                                                  help="Modulus value for integer chunking",
-                                                  disabled=st.session_state.migration_in_progress)
-                elif chunking_type == "by_substr":
-                    chunking_value = st.text_input("Chunking Value (Nbr of Characters)", 
-                                                  value=st.session_state.current_chunking_value,
-                                                  help="Number of characters for substring chunking",
-                                                  disabled=st.session_state.migration_in_progress)
-                elif chunking_type == "by_date":
-                    # For date type, use dropdown with day/month options
-                    date_options = ["day", "month"]
-                    current_date_value = st.session_state.current_chunking_value if st.session_state.current_chunking_value in date_options else "day"
-                    chunking_value = st.selectbox("Chunking Value (Period)", 
-                                                 options=date_options,
-                                                 index=date_options.index(current_date_value),
-                                                 help="Time period for date chunking",
-                                                 disabled=st.session_state.migration_in_progress)
-            
-            # Chunking explanation
-            chunking_info = {
-                "by_integer": "Integer column chunking using modulus operation",
-                "by_date": "Date column chunking by time period (days or months)",
-                "by_substr": "String column chunking by substring length"
-            }
-            st.info(f"ℹ️ **{chunking_type}**: {chunking_info[chunking_type]}")
+            st.success("✅ **Chunking is ENABLED** - The migration will use the chunking configuration above")
         else:
-            chunking_column = chunking_value = chunking_type = ""
+            st.warning("⚠️ **Chunking is DISABLED** - The migration will process the entire table without chunking")
         
         # Submit buttons
         col_execute, col_generate = st.columns([1, 1])
@@ -350,7 +354,7 @@ def main():
         with col_generate:
             generate_sql_submitted = st.form_submit_button("📝 Generate SQL", 
                                                           help="Generate SQL for manual execution",
-                                                          disabled=st.session_state.migration_in_progress)
+                                                          disabled=st.session_state.migration_executing)
     
     # Handle form submissions
     if migration_submitted or generate_sql_submitted:
@@ -444,6 +448,7 @@ def main():
                 st.write(f"• {error}")
             # Reset migration state on validation error
             st.session_state.migration_in_progress = False
+            st.session_state.migration_executing = False
             if 'pending_migration' in st.session_state:
                 del st.session_state.pending_migration
         else:
@@ -461,6 +466,7 @@ def main():
                     st.markdown(f"**🔧 Chunking Method:** `{params['chunking_type']} ({params['chunking_column']})`")
             
             # Execute Migration
+            st.session_state.migration_executing = True
             with st.spinner("🔄 Executing migration procedure..."):
                 result, error, sql_executed = execute_migration(
                     params['source_db'], params['source_table'], params['target_db'], 
@@ -534,6 +540,7 @@ def main():
                 
                 # Reset migration state after completion
                 st.session_state.migration_in_progress = False
+                st.session_state.migration_executing = False
                 if 'pending_migration' in st.session_state:
                     del st.session_state.pending_migration
     
@@ -542,6 +549,7 @@ def main():
         st.markdown("---")
         if st.button("🔄 Start New Migration", help="Reset the form to configure a new migration"):
             st.session_state.migration_in_progress = False
+            st.session_state.migration_executing = False
             if 'pending_migration' in st.session_state:
                 del st.session_state.pending_migration
             st.rerun()
@@ -590,7 +598,7 @@ def main():
     # Show data button - disabled during migration
     show_data_clicked = st.button("🔍 Show Data in Target Table", 
                                   help="Display top 1000 rows from the target table",
-                                  disabled=st.session_state.migration_in_progress)
+                                  disabled=st.session_state.migration_executing)
     
     if show_data_clicked:
         try:
