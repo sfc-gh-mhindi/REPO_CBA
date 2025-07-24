@@ -298,47 +298,47 @@ def main():
                                        help="Recommended for large tables (millions of rows)",
                                        disabled=st.session_state.migration_executing)
         
-        col3, col4, col5 = st.columns(3)
-        with col3:
-            chunking_column = st.text_input("Chunking Column", 
-                                           value=st.session_state.current_chunking_column,
-                                           help="Column to use for data chunking",
+            col3, col4, col5 = st.columns(3)
+            with col3:
+                chunking_column = st.text_input("Chunking Column", 
+                                               value=st.session_state.current_chunking_column,
+                                               help="Column to use for data chunking",
                                            disabled=st.session_state.migration_executing)
-        with col4:
-            chunking_type = st.selectbox("Chunking Data Type", 
-                                        ["by_integer", "by_date", "by_substr"],
-                                        index=["by_integer", "by_date", "by_substr"].index(st.session_state.current_chunking_type),
-                                        help="Type of chunking method",
+            with col4:
+                chunking_type = st.selectbox("Chunking Data Type", 
+                                            ["by_integer", "by_date", "by_substr"],
+                                            index=["by_integer", "by_date", "by_substr"].index(st.session_state.current_chunking_type),
+                                            help="Type of chunking method",
                                         disabled=st.session_state.migration_executing)
-        with col5:
-            # Dynamic label and input based on chunking type
-            if chunking_type == "by_integer":
-                chunking_value = st.text_input("Chunking Value (Integer Value)", 
-                                              value=st.session_state.current_chunking_value,
-                                              help="Modulus value for integer chunking",
+            with col5:
+                # Dynamic label and input based on chunking type
+                if chunking_type == "by_integer":
+                    chunking_value = st.text_input("Chunking Value (Integer Value)", 
+                                                  value=st.session_state.current_chunking_value,
+                                                  help="Modulus value for integer chunking",
                                               disabled=st.session_state.migration_executing)
-            elif chunking_type == "by_substr":
-                chunking_value = st.text_input("Chunking Value (Nbr of Characters)", 
-                                              value=st.session_state.current_chunking_value,
-                                              help="Number of characters for substring chunking",
+                elif chunking_type == "by_substr":
+                    chunking_value = st.text_input("Chunking Value (Nbr of Characters)", 
+                                                  value=st.session_state.current_chunking_value,
+                                                  help="Number of characters for substring chunking",
                                               disabled=st.session_state.migration_executing)
-            elif chunking_type == "by_date":
-                # For date type, use dropdown with day/month options
-                date_options = ["day", "month"]
-                current_date_value = st.session_state.current_chunking_value if st.session_state.current_chunking_value in date_options else "day"
-                chunking_value = st.selectbox("Chunking Value (Period)", 
-                                             options=date_options,
-                                             index=date_options.index(current_date_value),
-                                             help="Time period for date chunking",
+                elif chunking_type == "by_date":
+                    # For date type, use dropdown with day/month options
+                    date_options = ["day", "month"]
+                    current_date_value = st.session_state.current_chunking_value if st.session_state.current_chunking_value in date_options else "day"
+                    chunking_value = st.selectbox("Chunking Value (Period)", 
+                                                 options=date_options,
+                                                 index=date_options.index(current_date_value),
+                                                 help="Time period for date chunking",
                                              disabled=st.session_state.migration_executing)
-        
-        # Chunking explanation
-        chunking_info = {
-            "by_integer": "Integer column chunking using modulus operation",
-            "by_date": "Date column chunking by time period (days or months)",
-            "by_substr": "String column chunking by substring length"
-        }
-        st.info(f"ℹ️ **{chunking_type}**: {chunking_info[chunking_type]}")
+            
+            # Chunking explanation
+            chunking_info = {
+                "by_integer": "Integer column chunking using modulus operation",
+                "by_date": "Date column chunking by time period (days or months)",
+                "by_substr": "String column chunking by substring length"
+            }
+            st.info(f"ℹ️ **{chunking_type}**: {chunking_info[chunking_type]}")
         
         if chunking_enabled:
             st.success("✅ **Chunking is ENABLED** - The migration will use the chunking configuration above")
@@ -465,18 +465,18 @@ def main():
                 if params['chunking_enabled']:
                     st.markdown(f"**🔧 Chunking Method:** `{params['chunking_type']} ({params['chunking_column']})`")
             
-            # Execute Migration
+                # Execute Migration
             st.session_state.migration_executing = True
-            with st.spinner("🔄 Executing migration procedure..."):
-                result, error, sql_executed = execute_migration(
+                with st.spinner("🔄 Executing migration procedure..."):
+                    result, error, sql_executed = execute_migration(
                     params['source_db'], params['source_table'], params['target_db'], 
                     params['target_schema'], params['target_table'], params['chunking_enabled'], 
                     params['chunking_column'], params['chunking_value'], params['chunking_type']
-                )
-                
-                if result:
-                    st.session_state.last_result = result
-                    migration_info = parse_migration_result(result)
+                    )
+                    
+                    if result:
+                        st.session_state.last_result = result
+                        migration_info = parse_migration_result(result)
                     
                     # Store migration info in session state for results display
                     migration_info_enriched = {
@@ -492,50 +492,50 @@ def main():
                         'chunking_value': params['chunking_value'] if params['chunking_enabled'] else None
                     }
                     st.session_state.last_migration_info = migration_info_enriched
-                    
-                    # Add to history
-                    history_entry = {
-                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        
+                        # Add to history
+                        history_entry = {
+                            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                         'source': f"{params['source_db']}.{params['source_table']}",
                         'target': f"{params['target_db']}.{params['target_schema']}.{params['target_table']}",
                         'chunking': params['chunking_enabled'],
-                        'status': migration_info.get('status', 'Unknown'),
-                        'result': result
-                    }
-                    st.session_state.migration_history.append(history_entry)
-                    
-                    # Display result based on status
-                    if 'ERROR:' in result:
-                        st.error("❌ **Migration Failed**")
-                        st.error("Please check the migration log below for details.")
-                    elif migration_info.get('status') in ['Completed', 'Success']:
-                        st.success("✅ **Migration Completed Successfully**")
-                        st.success("The migration procedure has finished. Please verify your data.")
+                            'status': migration_info.get('status', 'Unknown'),
+                            'result': result
+                        }
+                        st.session_state.migration_history.append(history_entry)
+                        
+                        # Display result based on status
+                        if 'ERROR:' in result:
+                            st.error("❌ **Migration Failed**")
+                            st.error("Please check the migration log below for details.")
+                        elif migration_info.get('status') in ['Completed', 'Success']:
+                            st.success("✅ **Migration Completed Successfully**")
+                            st.success("The migration procedure has finished. Please verify your data.")
+                        else:
+                            st.info("ℹ️ **Migration Status**: Please check the detailed results below.")
                     else:
-                        st.info("ℹ️ **Migration Status**: Please check the detailed results below.")
-                else:
-                    st.error(error)
+                        st.error(error)
                     # Show alternative execution option for certain errors
-                    if "streamlit limitation" in error.lower() or "temporary table" in error.lower():
+                        if "streamlit limitation" in error.lower() or "temporary table" in error.lower():
                         generated_sql = generate_migration_sql(
                             params['source_db'], params['source_table'], params['target_db'], 
                             params['target_schema'], params['target_table'], params['chunking_enabled'], 
                             params['chunking_column'], params['chunking_value'], params['chunking_type']
                         )
-                        st.markdown("---")
-                        st.subheader("🔧 Alternative Execution Method")
-                        st.info("💡 **Workaround**: The procedure can be executed directly in a Snowflake worksheet. Use the SQL below:")
-                        st.code(generated_sql, language="sql")
-                        
-                        with st.expander("📋 Manual Execution Instructions", expanded=True):
-                            st.markdown("""
-                            **Steps to execute manually:**
-                            1. **Copy the SQL statement** shown above
-                            2. **Open Snowflake Web UI** and navigate to Worksheets
-                            3. **Create a new worksheet** or use an existing one
-                            4. **Paste the SQL** into the worksheet
-                            5. **Execute the statement** and monitor the results
-                            6. **The procedure will run** with full functionality including temporary tables
+                            st.markdown("---")
+                            st.subheader("🔧 Alternative Execution Method")
+                            st.info("💡 **Workaround**: The procedure can be executed directly in a Snowflake worksheet. Use the SQL below:")
+                            st.code(generated_sql, language="sql")
+                            
+                            with st.expander("📋 Manual Execution Instructions", expanded=True):
+                                st.markdown("""
+                                **Steps to execute manually:**
+                                1. **Copy the SQL statement** shown above
+                                2. **Open Snowflake Web UI** and navigate to Worksheets
+                                3. **Create a new worksheet** or use an existing one
+                                4. **Paste the SQL** into the worksheet
+                                5. **Execute the statement** and monitor the results
+                                6. **The procedure will run** with full functionality including temporary tables
                             """)
                 
                 # Reset migration state after completion
