@@ -1,0 +1,16 @@
+{{ config(materialized='view', tags=['IdentifyDeltaFrmPrevFaPropClntOra']) }}
+
+WITH 
+,
+SrcFAPropClientPrevOra AS (SELECT
+		FA_PROPOSED_CLIENT_ID,
+		COIN_ENTITY_ID,
+		CLIENT_CORRELATION_ID,
+		COIN_ENTITY_NAME,
+		FA_ENTITY_CAT_ID,
+		FA_UNDERTAKING_ID,
+		FA_PROPOSED_CLIENT_CAT_ID
+	FROM )
+
+
+SELECT * FROM SrcFAPropClientPrevOra

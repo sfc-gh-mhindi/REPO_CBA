@@ -1,0 +1,12 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_FEAT_OVRD_REAS_HLLkp']) }}
+
+WITH XfmConversions AS (
+	SELECT
+		-- *SRC*: trim(InMAP_CSE_FEAT_OVRD_REAS_HLTera.HL_PROD_INT_MARG_CAT_ID),
+		TRIM({{ ref('SrcMAP_CSE_FEAT_OVRD_REAS_HLTera') }}.HL_PROD_INT_MARG_CAT_ID) AS HL_PROD_INT_MARGIN_CAT_ID,
+		{{ ref('SrcMAP_CSE_FEAT_OVRD_REAS_HLTera') }}.OVRD_REAS_C AS FEAT_OVRD_REAS_C
+	FROM {{ ref('SrcMAP_CSE_FEAT_OVRD_REAS_HLTera') }}
+	WHERE 
+)
+
+SELECT * FROM XfmConversions

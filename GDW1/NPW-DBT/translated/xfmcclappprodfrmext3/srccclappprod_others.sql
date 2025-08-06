@@ -1,0 +1,48 @@
+{{ config(materialized='view', tags=['XfmCclAppProdFrmExt3']) }}
+
+WITH 
+_cba__app_csel4_dev_dataset_cse__ccl__bus__app__prod__premap__others AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_csel4_dev_dataset_cse__ccl__bus__app__prod__premap__others")  }})
+SrcCclAppProd_OTHERS AS (
+	SELECT APP_PROD_ID,
+		PARENT_CCL_APP_PROD_ID,
+		ACCOUNT_NUMBER,
+		ACTUAL_RATE,
+		BALLOON_PAY_AMT,
+		BASIS_TYPE_CAT_ID,
+		INTEREST_RATE_MARGIN,
+		LOAN_TERM_MTH_NUM,
+		CURRENT_LIMIT,
+		INC_DEC_AMT,
+		POST_APP_AMT,
+		NEW_PROD_FLAG,
+		INDEX_RATE,
+		INTEREST_ADV_FLAG,
+		INTERESTONLY_TERM_MTH_NUM,
+		CAPPED_TERM_MTH_NUM,
+		CAPPED_RATE,
+		CRIS_PRODUCT_ID,
+		CCL_LOAN_PURPOSE_ID,
+		NEW_PROD_SUBTYPE_FLAG,
+		TEMP_EXCESS_MTHS,
+		LOAN_PURPOSE_CLASS_CODE,
+		CCL_INTEREST_RATE_CAT_ID,
+		CRR,
+		AD_TUC_INC_AMT,
+		CCL_RATE_TYPE_CAT_ID,
+		LINK_CCL_APP_ID,
+		LINK_CCL_APP_PROD_ID,
+		CHL_LMI_AMT,
+		USED_IN_EXPOSURE_VIEW_FLAG,
+		CCL_APP_BROKER_CIF_CODE,
+		APP_ID,
+		FIXED_INT_START_DATE,
+		CHILD_PRODUCT_LEVEL_CAT_ID,
+		PARENT_PRODUCT_LEVEL_CAT_ID,
+		ORIG_ETL_D
+	FROM _cba__app_csel4_dev_dataset_cse__ccl__bus__app__prod__premap__others
+)
+
+SELECT * FROM SrcCclAppProd_OTHERS

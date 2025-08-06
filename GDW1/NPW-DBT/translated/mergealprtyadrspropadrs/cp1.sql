@@ -1,0 +1,20 @@
+{{ config(materialized='view', tags=['MergeAlPrtyAdrsPropAdrs']) }}
+
+WITH cp1 AS (
+	SELECT
+		CHL_APP_HL_APP_ID,
+		CHL_APP_SUBTYPE_CODE,
+		CHL_APP_SECURITY_ID,
+		CHL_ASSET_LIABILITY_ID,
+		CHL_PRINCIPAL_SECURITY_FLAG,
+		CHL_ADDRESS_LINE_1,
+		CHL_ADDRESS_LINE_2,
+		CHL_SUBURB,
+		CHL_STATE,
+		CHL_POSTCODE,
+		CHL_DPID,
+		CHL_COUNTRY_ID
+	FROM {{ ref('SrcAlPrtyAdrs') }}
+)
+
+SELECT * FROM cp1

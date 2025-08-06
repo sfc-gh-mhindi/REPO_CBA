@@ -1,0 +1,8 @@
+{{ config(materialized='view', tags=['DltAPPT_PDCT_RELFrmAPPT_PDCT']) }}
+
+WITH 
+,
+SrcApptPdctRelTera AS (SELECT a.APPT_PDCT_I, a.RELD_APPT_PDCT_I, b.EFFT_D, COALESCE(b.APPT_PDCT_I, 'I') AS INSUPD FROM TMP_GDW_APPT_PDCT LEFT OUTER JOIN APPT_PDCT_REL ON TRIM(a.APPT_PDCT_I) = TRIM(b.APPT_PDCT_I) AND TRIM(a.RELD_APPT_PDCT_I) = (b.RELD_APPT_PDCT_I) AND b.EXPY_D = '9999-12-31' WHERE a.EXPY_FLAG = 'N' UNION SELECT gdw.APPT_PDCT_I, gdw.RELD_APPT_PDCT_I, gdw.efft_d, 'U' AS INSUPD FROM APPT_PDCT_REL, (SELECT a.APPT_PDCT_I, a.RELD_APPT_PDCT_I FROM APPT_PDCT_REL, (SELECT DISTINCT appt_pdct_i AS tmp_pdct_i FROM TMP_GDW_APPT_PDCT) AS b WHERE TRIM(a.APPT_PDCT_I) IN TRIM(b.tmp_PDCT_I) AND a.expy_d = '9999-12-31' EXCEPT SELECT appt_pdct_i, reld_appt_pdct_i FROM TMP_GDW_APPT_PDCT) AS tx WHERE tx.appt_pdct_i = gdw.appt_pdct_i AND tx.reld_appt_pdct_i = gdw.reld_appt_pdct_i)
+
+
+SELECT * FROM SrcApptPdctRelTera

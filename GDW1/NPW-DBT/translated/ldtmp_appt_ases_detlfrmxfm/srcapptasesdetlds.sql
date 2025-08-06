@@ -1,0 +1,22 @@
+{{ config(materialized='view', tags=['LdTMP_APPT_ASES_DETLFrmXfm']) }}
+
+WITH 
+_cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__ases__detl AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__ases__detl")  }})
+SrcApptAsesDetlDS AS (
+	SELECT APPT_I,
+		AMT_TYPE_C,
+		EFFT_D,
+		EXPY_D,
+		CNCY_C,
+		APPT_ASES_A,
+		PROS_KEY_EFFT_I,
+		PROS_KEY_EXPY_I,
+		EROR_SEQN_I,
+		RUN_STRM
+	FROM _cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__ases__detl
+)
+
+SELECT * FROM SrcApptAsesDetlDS

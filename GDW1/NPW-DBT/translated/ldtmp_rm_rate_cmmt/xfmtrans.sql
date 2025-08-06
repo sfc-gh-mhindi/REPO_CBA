@@ -1,0 +1,17 @@
+{{ config(materialized='view', tags=['LdTmp_Rm_Rate_Cmmt']) }}
+
+WITH XfmTrans AS (
+	SELECT
+		-- *SRC*: 'CSE' : 'A5' : FrmSrc.OL_CLIENT_RM_RATING_ID,
+		CONCAT(CONCAT('CSE', 'A5'), {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE_CMMT') }}.OL_CLIENT_RM_RATING_ID) AS svAntnI,
+		-- *SRC*: 'CSE' : 'A7' : FrmSrc.OL_CLIENT_RM_RATING_ID,
+		CONCAT(CONCAT('CSE', 'A7'), {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE_CMMT') }}.OL_CLIENT_RM_RATING_ID) AS svEvntI,
+		-- *SRC*: \(20)IF IsNull(FrmSrc.OL_CLIENT_RM_RATING_ID) THEN "Y" ELSE  IF FrmSrc.OL_CLIENT_RM_RATING_ID = '' THEN "Y" ELSE "N",
+		IFF({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE_CMMT') }}.OL_CLIENT_RM_RATING_ID IS NULL, 'Y', IFF({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE_CMMT') }}.OL_CLIENT_RM_RATING_ID = '', 'Y', 'N')) AS svNull,
+		svAntnI AS ANTN_I,
+		svEvntI AS EVNT_I
+	FROM {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE_CMMT') }}
+	WHERE svNull = 'N'
+)
+
+SELECT * FROM XfmTrans

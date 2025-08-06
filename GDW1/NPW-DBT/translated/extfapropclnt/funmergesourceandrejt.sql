@@ -1,0 +1,29 @@
+{{ config(materialized='view', tags=['ExtFaPropClnt']) }}
+
+WITH FunMergeSourceAndRejt AS (
+	SELECT
+		FA_PROPOSED_CLIENT_ID as FA_PROPOSED_CLIENT_ID,
+		COIN_ENTITY_ID as COIN_ENTITY_ID,
+		CLIENT_CORRELATION_ID as CLIENT_CORRELATION_ID,
+		COIN_ENTITY_NAME as COIN_ENTITY_NAME,
+		FA_ENTITY_CAT_ID as FA_ENTITY_CAT_ID,
+		FA_UNDERTAKING_ID as FA_UNDERTAKING_ID,
+		FA_PROPOSED_CLIENT_CAT_ID as FA_PROPOSED_CLIENT_CAT_ID,
+		ORIG_ETL_D as ORIG_ETL_D,
+		change_code as change_code
+	FROM {{ ref('XfmSeparateRejectWithoutSourceAndTheRest__InSourceRec') }}
+	UNION ALL
+	SELECT
+		FA_PROPOSED_CLIENT_ID,
+		COIN_ENTITY_ID,
+		CLIENT_CORRELATION_ID,
+		COIN_ENTITY_NAME,
+		FA_ENTITY_CAT_ID,
+		FA_UNDERTAKING_ID,
+		FA_PROPOSED_CLIENT_CAT_ID,
+		ORIG_ETL_D,
+		change_code
+	FROM {{ ref('XfmSeparateRejectWithoutSourceAndTheRest__InRejectWithoutSourceRec') }}
+)
+
+SELECT * FROM FunMergeSourceAndRejt

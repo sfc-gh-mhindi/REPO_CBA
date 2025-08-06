@@ -1,0 +1,64 @@
+{{ config(materialized='view', tags=['ExtPlFeePlMargin']) }}
+
+WITH XfmSeparateRejectWithoutSourceAndTheRest AS (
+	SELECT
+		-- *SRC*: \(20)If (Len(Trim(( IF IsNotNull((XfmSeparateRejects.PL_FEE_ID)) THEN (XfmSeparateRejects.PL_FEE_ID) ELSE ""))) = 0) Then 'R' Else 'S',
+		IFF(LEN(TRIM(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_ID IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_ID, ''))) = 0, 'R', 'S') AS DeltaFlag,
+		-- *SRC*: \(20)If DeltaFlag = 'S' Then XfmSeparateRejects.PL_FEE_ID Else XfmSeparateRejects.PL_FEE_ID_R,
+		IFF(DeltaFlag = 'S', {{ ref('JoinSrcSortReject') }}.PL_FEE_ID, {{ ref('JoinSrcSortReject') }}.PL_FEE_ID_R) AS PL_FEE_ID,
+		-- *SRC*: \(20)If (Len(Trim(( IF IsNotNull((XfmSeparateRejects.PL_APP_PROD_ID)) THEN (XfmSeparateRejects.PL_APP_PROD_ID) ELSE ""))) = 0) Then XfmSeparateRejects.PL_APP_PROD_ID_R Else XfmSeparateRejects.PL_APP_PROD_ID,
+		IFF(LEN(TRIM(IFF({{ ref('JoinSrcSortReject') }}.PL_APP_PROD_ID IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_APP_PROD_ID, ''))) = 0, {{ ref('JoinSrcSortReject') }}.PL_APP_PROD_ID_R, {{ ref('JoinSrcSortReject') }}.PL_APP_PROD_ID) AS PL_APP_PROD_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_PL_FEE_ID Else XfmSeparateRejects.PL_FEE_PL_FEE_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_FEE_ID, {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_FEE_ID_R) AS PL_FEE_PL_FEE_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_ADD_TO_TOTAL_FLAG Else XfmSeparateRejects.PL_FEE_ADD_TO_TOTAL_FLAG_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_ADD_TO_TOTAL_FLAG, {{ ref('JoinSrcSortReject') }}.PL_FEE_ADD_TO_TOTAL_FLAG_R) AS PL_FEE_ADD_TO_TOTAL_FLAG,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_FEE_AMT Else XfmSeparateRejects.PL_FEE_FEE_AMT_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_AMT, {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_AMT_R) AS PL_FEE_FEE_AMT,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_BASE_FEE_AMT Else XfmSeparateRejects.PL_FEE_BASE_FEE_AMT_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_BASE_FEE_AMT, {{ ref('JoinSrcSortReject') }}.PL_FEE_BASE_FEE_AMT_R) AS PL_FEE_BASE_FEE_AMT,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_PAY_FEE_AT_FUNDING_FLAG Else XfmSeparateRejects.PL_FEE_PAY_FEE_AT_FUNDING_FLAG_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_PAY_FEE_AT_FUNDING_FLAG, {{ ref('JoinSrcSortReject') }}.PL_FEE_PAY_FEE_AT_FUNDING_FLAG_R) AS PL_FEE_PAY_FEE_AT_FUNDING_FLAG,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_START_DATE Else XfmSeparateRejects.PL_FEE_START_DATE_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_START_DATE, {{ ref('JoinSrcSortReject') }}.PL_FEE_START_DATE_R) AS PL_FEE_START_DATE,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_PL_CAPITALIS_FEE_CAT_ID Else XfmSeparateRejects.PL_FEE_PL_CAPITALIS_FEE_CAT_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_CAPITALIS_FEE_CAT_ID, {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_CAPITALIS_FEE_CAT_ID_R) AS PL_FEE_PL_CAPITALIS_FEE_CAT_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_FEE_SCREEN_DESC Else XfmSeparateRejects.PL_FEE_FEE_SCREEN_DESC_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_SCREEN_DESC, {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_SCREEN_DESC_R) AS PL_FEE_FEE_SCREEN_DESC,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_FEE_DESC Else XfmSeparateRejects.PL_FEE_FEE_DESC_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_DESC, {{ ref('JoinSrcSortReject') }}.PL_FEE_FEE_DESC_R) AS PL_FEE_FEE_DESC,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_CASS_FEE_CODE Else XfmSeparateRejects.PL_FEE_CASS_FEE_CODE_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_CASS_FEE_CODE, {{ ref('JoinSrcSortReject') }}.PL_FEE_CASS_FEE_CODE_R) AS PL_FEE_CASS_FEE_CODE,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_CASS_FEE_KEY Else XfmSeparateRejects.PL_FEE_CASS_FEE_KEY_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_CASS_FEE_KEY, {{ ref('JoinSrcSortReject') }}.PL_FEE_CASS_FEE_KEY_R) AS PL_FEE_CASS_FEE_KEY,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_TOTAL_FEE_AMT Else XfmSeparateRejects.PL_FEE_TOTAL_FEE_AMT_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_TOTAL_FEE_AMT, {{ ref('JoinSrcSortReject') }}.PL_FEE_TOTAL_FEE_AMT_R) AS PL_FEE_TOTAL_FEE_AMT,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_PL_APP_PROD_ID Else XfmSeparateRejects.PL_FEE_PL_APP_PROD_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_APP_PROD_ID, {{ ref('JoinSrcSortReject') }}.PL_FEE_PL_APP_PROD_ID_R) AS PL_FEE_PL_APP_PROD_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_PL_MARGIN_ID Else XfmSeparateRejects.PL_MARGIN_PL_MARGIN_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_MARGIN_ID, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_MARGIN_ID_R) AS PL_MARGIN_PL_MARGIN_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_MARGIN_AMT Else XfmSeparateRejects.PL_MARGIN_MARGIN_AMT_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_MARGIN_AMT, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_MARGIN_AMT_R) AS PL_MARGIN_MARGIN_AMT,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_PL_FEE_ID Else XfmSeparateRejects.PL_MARGIN_PL_FEE_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_FEE_ID, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_FEE_ID_R) AS PL_MARGIN_PL_FEE_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_PL_INT_RATE_ID Else XfmSeparateRejects.PL_MARGIN_PL_INT_RATE_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_INT_RATE_ID, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_INT_RATE_ID_R) AS PL_MARGIN_PL_INT_RATE_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_MARGIN_REASON_CAT_ID Else XfmSeparateRejects.PL_MARGIN_MARGIN_REASON_CAT_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_MARGIN_REASON_CAT_ID, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_MARGIN_REASON_CAT_ID_R) AS PL_MARGIN_MARGIN_REASON_CAT_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_PL_APP_PROD_ID Else XfmSeparateRejects.PL_MARGIN_PL_APP_PROD_ID_R,
+		IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_APP_PROD_ID, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_PL_APP_PROD_ID_R) AS PL_MARGIN_PL_APP_PROD_ID,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_FOUND_FLAG Else  If ( IF IsNotNull((XfmSeparateRejects.PL_FEE_FOUND_FLAG_R)) THEN (XfmSeparateRejects.PL_FEE_FOUND_FLAG_R) ELSE "") = 'Y' Then XfmSeparateRejects.PL_FEE_FOUND_FLAG_R Else 'N',
+		IFF(
+	    IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG, IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG_R IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG_R, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_FEE_FOUND_FLAG_R, 'N')
+	) AS PL_FEE_FOUND_FLAG,
+		-- *SRC*: \(20)If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_FOUND_FLAG Else  If ( IF IsNotNull((XfmSeparateRejects.PL_MARGIN_FOUND_FLAG_R)) THEN (XfmSeparateRejects.PL_MARGIN_FOUND_FLAG_R) ELSE "") = 'Y' Then XfmSeparateRejects.PL_MARGIN_FOUND_FLAG_R Else 'N',
+		IFF(
+	    IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG, 
+	    IFF(IFF({{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG_R IS NOT NULL, {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG_R, '') = 'Y', {{ ref('JoinSrcSortReject') }}.PL_MARGIN_FOUND_FLAG_R, 'N')
+	) AS PL_MARGIN_FOUND_FLAG,
+		-- *SRC*: \(20)If Len(Trim(( IF IsNotNull((XfmSeparateRejects.ORIG_ETL_D_R)) THEN (XfmSeparateRejects.ORIG_ETL_D_R) ELSE ""))) = 0 Then ETL_PROCESS_DT Else XfmSeparateRejects.ORIG_ETL_D_R,
+		IFF(LEN(TRIM(IFF({{ ref('JoinSrcSortReject') }}.ORIG_ETL_D_R IS NOT NULL, {{ ref('JoinSrcSortReject') }}.ORIG_ETL_D_R, ''))) = 0, ETL_PROCESS_DT, {{ ref('JoinSrcSortReject') }}.ORIG_ETL_D_R) AS ORIG_ETL_D
+	FROM {{ ref('JoinSrcSortReject') }}
+	WHERE 
+)
+
+SELECT * FROM XfmSeparateRejectWithoutSourceAndTheRest

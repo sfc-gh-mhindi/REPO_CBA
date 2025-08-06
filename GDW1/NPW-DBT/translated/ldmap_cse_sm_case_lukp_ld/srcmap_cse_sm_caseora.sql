@@ -1,0 +1,10 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_SM_CASE_Lukp_Ld']) }}
+
+WITH 
+,
+SrcMAP_CSE_SM_CASEOra AS (SELECT SM_CASE_ID, TARG_I, TARG_SUBJ FROM MAP_CSE_SM_CASE
+GROUP BY 
+SM_CASE_ID, TARG_I, TARG_SUBJ\(20))
+
+
+SELECT * FROM SrcMAP_CSE_SM_CASEOra

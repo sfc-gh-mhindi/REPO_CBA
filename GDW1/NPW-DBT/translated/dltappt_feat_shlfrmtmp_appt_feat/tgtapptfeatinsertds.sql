@@ -1,0 +1,25 @@
+{{ config(materialized='incremental', alias='_cba__app_csel4_csel4dev_dataset_appt__feat__i__cse__ccl__bus__app__fee__20060616', incremental_strategy='insert_overwrite', tags=['DltAPPT_FEAT_SHLFrmTMP_APPT_FEAT']) }}
+
+SELECT
+	APPT_I,
+	FEAT_I,
+	EFFT_D,
+	SRCE_SYST_C,
+	SRCE_SYST_APPT_FEAT_I,
+	SRCE_SYST_STND_VALU_Q,
+	SRCE_SYST_STND_VALU_R,
+	SRCE_SYST_STND_VALU_A,
+	ACTL_VALU_Q,
+	ACTL_VALU_R,
+	ACTL_VALU_A,
+	CNCY_C,
+	OVRD_FEAT_I,
+	OVRD_REAS_C,
+	FEAT_SEQN_N,
+	FEAT_STRT_D,
+	FEE_CHRG_D,
+	EXPY_D,
+	PROS_KEY_EFFT_I,
+	PROS_KEY_EXPY_I,
+	EROR_SEQN_I 
+FROM {{ ref('Funnel_71') }}

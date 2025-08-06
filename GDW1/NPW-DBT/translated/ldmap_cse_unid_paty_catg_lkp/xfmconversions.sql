@@ -1,0 +1,13 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_UNID_PATY_CATG_Lkp']) }}
+
+WITH XfmConversions AS (
+	SELECT
+		-- *SRC*: trim(InMAP_CSE_UNID_PATY_CATGTera.TP_BROK_GRUP_CAT_ID),
+		TRIM({{ ref('SrcMAP_CSE_UNID_PATY_CATG_Tera') }}.TP_BROK_GRUP_CAT_ID) AS TP_BROKER_GROUP_CAT_ID,
+		-- *SRC*: trim(InMAP_CSE_UNID_PATY_CATGTera.UNID_PATY_CATG_C),
+		TRIM({{ ref('SrcMAP_CSE_UNID_PATY_CATG_Tera') }}.UNID_PATY_CATG_C) AS UNID_PATY_CATG_C
+	FROM {{ ref('SrcMAP_CSE_UNID_PATY_CATG_Tera') }}
+	WHERE 
+)
+
+SELECT * FROM XfmConversions

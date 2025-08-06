@@ -1,0 +1,15 @@
+{{ config(materialized='view', tags=['LdDltClp_App_Pdct_Feat']) }}
+
+WITH 
+appt_pdct_feat AS (
+	SELECT
+	*
+	FROM {{ ref("appt_pdct_feat")  }}),
+tmp_lp_appt_pdct_feat AS (
+	SELECT
+	*
+	FROM {{ ref("tmp_lp_appt_pdct_feat")  }}),
+Src_Tera_APPT_PDCT_COND AS (SELECT a.APPT_PDCT_I AS NEW_APPT_PDCT_I, a.FEAT_I AS NEW_FEAT_I, A.SRCE_SYST_APPT_FEAT_I AS NEW_SRCE_SYST_APPT_FEAT_I, a.ACTL_VALU_R AS NEW_ACTL_VALU_R, b.APPT_PDCT_I AS OLD_APPT_PDCT_I, b.FEAT_I AS OLD_FEAT_I, B.SRCE_SYST_APPT_FEAT_I AS OLD_SRCE_SYST_APPT_FEAT_I, b.ACTL_VALU_R AS OLD_ACTL_VALU_R FROM TMP_LP_APPT_PDCT_FEAT LEFT OUTER JOIN APPT_PDCT_FEAT ON a.APPT_PDCT_I = b.APPT_PDCT_I AND a.FEAT_I = b.FEAT_I AND b.EXPY_D = '9999-12-31')
+
+
+SELECT * FROM Src_Tera_APPT_PDCT_COND

@@ -1,0 +1,25 @@
+{{ config(materialized='view', tags=['XfmBusnEvnt']) }}
+
+WITH XfmTrans AS (
+	SELECT
+		-- *SRC*: 'CSE' : 'A7' : FrmSrc.OL_CLIENT_RM_RATING_ID,
+		CONCAT(CONCAT('CSE', 'A7'), {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.OL_CLIENT_RM_RATING_ID) AS svEvntI,
+		-- *SRC*: StringToTime(FrmSrc.MOD_TIMESTAMP[9, 2] : ':' : FrmSrc.MOD_TIMESTAMP[11, 2] : ':' : FrmSrc.MOD_TIMESTAMP[13, 2], '%hh:%nn:%ss'),
+		STRINGTOTIME(CONCAT(CONCAT(CONCAT(CONCAT(SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 9, 2), ':'), SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 11, 2)), ':'), SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 13, 2)), '%hh:%nn:%ss') AS svEvntAcltT,
+		-- *SRC*: StringToDate(FrmSrc.MOD_TIMESTAMP[1, 4] : '-' : FrmSrc.MOD_TIMESTAMP[5, 2] : '-' : FrmSrc.MOD_TIMESTAMP[7, 2], "%yyyy-%mm-%dd"),
+		STRINGTODATE(CONCAT(CONCAT(CONCAT(CONCAT(SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 1, 4), '-'), SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 5, 2)), '-'), SUBSTRING({{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.MOD_TIMESTAMP, 7, 2)), '%yyyy-%mm-%dd') AS svEvntActlD,
+		svEvntI AS EVNT_I,
+		{{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.OL_CLIENT_RM_RATING_ID AS SRCE_SYST_EVNT_I,
+		svEvntActlD AS EVNT_ACTL_D,
+		'CSE' AS SRCE_SYST_C,
+		-- *SRC*: SetNull(),
+		SETNULL() AS EROR_SEQN_I,
+		-- *SRC*: SetNull(),
+		SETNULL() AS SRCE_SYST_EVNT_TYPE_I,
+		svEvntAcltT AS EVNT_ACTL_T,
+		0 AS ROW_SECU_ACCS_C
+	FROM {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}
+	WHERE 
+)
+
+SELECT * FROM XfmTrans

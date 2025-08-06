@@ -1,0 +1,29 @@
+{{ config(materialized='view', tags=['XfmAppt_Qstn']) }}
+
+WITH Fnnl AS (
+	SELECT
+		APP_ID as APP_ID,
+		QA_QUESTION_ID as QA_QUESTION_ID,
+		QA_ANSWER_ID as QA_ANSWER_ID,
+		TEXT_ANSWER as TEXT_ANSWER,
+		CIF_CODE as CIF_CODE,
+		SUBTYPE_CODE as SUBTYPE_CODE,
+		APPT_QLFY_C as APPT_QLFY_C,
+		QSTN_C as QSTN_C,
+		RESP_C as RESP_C
+	FROM {{ ref('Filter_AnswrId') }}
+	UNION ALL
+	SELECT
+		APP_ID,
+		QA_QUESTION_ID,
+		QA_ANSWER_ID,
+		TEXT_ANSWER,
+		CIF_CODE,
+		SUBTYPE_CODE,
+		APPT_QLFY_C,
+		QSTN_C,
+		RESP_C
+	FROM {{ ref('LKP') }}
+)
+
+SELECT * FROM Fnnl

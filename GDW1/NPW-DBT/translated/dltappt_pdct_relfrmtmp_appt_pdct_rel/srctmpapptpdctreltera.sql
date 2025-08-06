@@ -1,0 +1,15 @@
+{{ config(materialized='view', tags=['DltAPPT_PDCT_RELFrmTMP_APPT_PDCT_REL']) }}
+
+WITH 
+tmp_appt_pdct_rel AS (
+	SELECT
+	*
+	FROM {{ ref("tmp_appt_pdct_rel")  }}),
+appt_pdct_rel AS (
+	SELECT
+	*
+	FROM {{ ref("appt_pdct_rel")  }}),
+SrcTmpApptPdctRelTera AS (SELECT a.APPT_PDCT_I AS NEW_APPT_PDCT_I, a.RELD_APPT_PDCT_I AS NEW_RELD_APPT_PDCT_I, a.REL_TYPE_C AS NEW_REL_TYPE_C, b.APPT_PDCT_I AS OLD_APPT_PDCT_I, b.RELD_APPT_PDCT_I AS OLD_RELD_APPT_PDCT_I, b.EFFT_D AS OLD_EFFT_D, b.REL_TYPE_C AS OLD_REL_TYPE_C FROM TMP_APPT_PDCT_REL LEFT OUTER JOIN APPT_PDCT_REL ON TRIM(a.APPT_PDCT_I) = TRIM(b.APPT_PDCT_I) AND TRIM(a.RELD_APPT_PDCT_I) = TRIM(b.RELD_APPT_PDCT_I) AND b.EXPY_D = '9999-12-31' WHERE a.RUN_STRM = '{{ var("RUN_STREAM") }}')
+
+
+SELECT * FROM SrcTmpApptPdctRelTera

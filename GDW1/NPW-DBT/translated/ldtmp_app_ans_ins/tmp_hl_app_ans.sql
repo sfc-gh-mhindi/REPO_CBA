@@ -1,0 +1,27 @@
+{{ config(materialized='incremental', alias='tmp_xs_evnt_app_ans', incremental_strategy='append', tags=['LdTMP_APP_ANS_Ins']) }}
+
+SELECT
+	EVNT_I
+	QSTN_C
+	EFFT_D
+	RESP_C
+	RESP_CMMT_X
+	EXPY_D
+	PROS_KEY_EFFT_I
+	SRCE_SYST_EVNT_I
+	SRCE_SYST_C
+	EVNT_ACTV_TYPE_C_XS
+	EVNT_ACTV_TYPE_C
+	DEPT_ROLE_C
+	DEPT_I
+	EMPL_I
+	EVNT_PATY_ROLE_TYPE_C_EE
+	EVNT_PATY_ROLE_TYPE_C
+	SRCE_SYST_PATY_I
+	PATY_I
+	RELD_EVNT_I
+	EVNT_REL_TYPE_C
+	APPT_QLFY_C
+	MOD_TIMESTAMP
+	RUN_STRM 
+FROM {{ ref('Transformer_89') }}

@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['ExtWRK_APPT_COM_CCL_CHL_APPFrmStg']) }}
+
+WITH 
+wrk_appt_com_ccl_chl_app AS (
+	SELECT
+	*
+	FROM {{ ref("wrk_appt_com_ccl_chl_app")  }}),
+SrcWrkApptTera AS (SELECT APPT_I, APPT_C, APPT_FORM_C, APPT_QLFY_C, STUS_TRAK_I, APPT_ORIG_C, APPT_N, SRCE_SYST_C, SRCE_SYST_APPT_I, APPT_CRAT_D, RATE_SEEK_F, PROS_KEY_EFFT_I, EROR_SEQN_I, RUN_STRM, ORIG_APPT_SRCE_C, APPT_RECV_S, REL_MGR_STAT_C, APPT_RECV_D, APPT_RECV_T FROM WRK_APPT_COM_CCL_CHL_APP)
+
+
+SELECT * FROM SrcWrkApptTera

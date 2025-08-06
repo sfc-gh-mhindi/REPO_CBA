@@ -1,0 +1,23 @@
+{{ config(materialized='view', tags=['LdDelFlagREJT_CCC_BUS_APP_PROD_BAL_XFERDel']) }}
+
+WITH 
+_cba__app_csel4_csel4dev_dataset_appt__trnf__detl__20061016 AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_csel4_csel4dev_dataset_appt__trnf__detl__20061016")  }})
+CC_APP_PROD_BAL_XFER AS (
+	SELECT DELETED_TABLE_NAME,
+		DELETED_KEY_1,
+		DELETED_KEY_1_VALUE,
+		DELETED_KEY_2,
+		DELETED_KEY_2_VALUE,
+		DELETED_KEY_3,
+		DELETED_KEY_3_VALUE,
+		DELETED_KEY_4,
+		DELETED_KEY_4_VALUE,
+		DELETED_KEY_5,
+		DELETED_KEY_5_VALUE
+	FROM _cba__app_csel4_csel4dev_dataset_appt__trnf__detl__20061016
+)
+
+SELECT * FROM CC_APP_PROD_BAL_XFER

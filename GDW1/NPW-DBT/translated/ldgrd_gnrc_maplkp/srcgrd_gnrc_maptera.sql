@@ -1,0 +1,8 @@
+{{ config(materialized='view', tags=['LdGRD_GNRC_MAPLkp']) }}
+
+WITH 
+,
+SrcGRD_GNRC_MAPTera AS (SELECT MAP_TYPE_C,EFFT_D,TARG_NUMC_C,TARG_CHAR_C,SRCE_NUMC_1_C,SRCE_CHAR_1_C,SRCE_NUMC_2_C,SRCE_CHAR_2_C,SRCE_NUMC_3_C,SRCE_CHAR_3_C,SRCE_NUMC_4_C,SRCE_CHAR_4_C,SRCE_NUMC_5_C,SRCE_CHAR_5_C,SRCE_NUMC_6_C,SRCE_CHAR_6_C,SRCE_NUMC_7_C,SRCE_CHAR_7_C,EXPY_D FROM {{ var('GDW_ACCT_VW') }}.MAP_CSE_APPT_FEAT WHERE efft_d (date, format 'yyyymmdd') <= '{{ var('ETL_PROCESS_DT') }}' and expy_d (date, format 'yyyymmdd') >= '{{ var('ETL_PROCESS_DT') }}';)
+
+
+SELECT * FROM SrcGRD_GNRC_MAPTera

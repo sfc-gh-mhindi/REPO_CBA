@@ -1,0 +1,23 @@
+{{ config(materialized='view', tags=['XfmAppt_Pdct']) }}
+
+WITH FnlToXfm AS (
+	SELECT
+		APP_PROD_ID as APP_PROD_ID,
+		APP_ID as APP_ID,
+		PDCT_N as PDCT_N,
+		PO_OVERDRAFT_CAT_ID as PO_OVERDRAFT_CAT_ID,
+		APPT_PDCT_CATG_C as APPT_PDCT_CATG_C,
+		APPT_PDCT_DURT_C as APPT_PDCT_DURT_C
+	FROM {{ ref('FiltrNullAndNotNull') }}
+	UNION ALL
+	SELECT
+		APP_PROD_ID,
+		APP_ID,
+		PDCT_N,
+		PO_OVERDRAFT_CAT_ID,
+		APPT_PDCT_CATG_C,
+		APPT_PDCT_DURT_C
+	FROM {{ ref('Lkp') }}
+)
+
+SELECT * FROM FnlToXfm

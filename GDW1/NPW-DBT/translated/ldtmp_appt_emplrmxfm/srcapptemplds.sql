@@ -1,0 +1,21 @@
+{{ config(materialized='view', tags=['LdTMP_APPT_EMPLrmXfm']) }}
+
+WITH 
+_cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__empl AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__empl")  }})
+SrcApptEmplDS AS (
+	SELECT EMPL_I,
+		APPT_I,
+		EMPL_ROLE_C,
+		EFFT_D,
+		EXPY_D,
+		PROS_KEY_EFFT_I,
+		PROS_KEY_EXPY_I,
+		EROR_SEQN_I,
+		RUN_STRM
+	FROM _cba__app_csel4_csel4dev_dataset_tmp__cse__com__bus__ccl__chl__com__app__appt__empl
+)
+
+SELECT * FROM SrcApptEmplDS

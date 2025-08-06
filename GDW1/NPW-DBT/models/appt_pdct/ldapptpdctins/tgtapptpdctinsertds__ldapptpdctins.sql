@@ -1,0 +1,29 @@
+
+SELECT 
+  appt_pdct_i,
+  debt_abn_x,
+  debt_busn_m,
+  smpl_appt_f,
+  job_comm_catg_c,
+  appt_qlfy_c,
+  acqr_type_c,
+  acqr_adhc_x,
+  acqr_srce_c,
+  pdct_n,
+  appt_i,
+  srce_syst_c,
+  srce_syst_appt_pdct_i,
+  loan_fndd_meth_c,
+  new_acct_f,
+  brok_paty_i,
+  copy_from_othr_appt_f,
+  efft_d,
+  expy_d,
+  pros_key_efft_i,
+  pros_key_expy_i,
+  eror_seqn_i,
+  appt_pdct_catg_c,
+  appt_pdct_durt_c,
+  ases_d
+from 
+  {{ cvar('datasets_schema')}}.{{ cvar("base_dir") }}__dataset__{{ cvar("tgt_table_tbl") }}_I_{{ cvar("run_stream") }}_{{ cvar("etl_process_dt_tbl") }}__DS

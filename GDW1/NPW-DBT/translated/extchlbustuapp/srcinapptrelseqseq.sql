@@ -1,0 +1,43 @@
+{{ config(materialized='view', tags=['ExtChlBusTuApp']) }}
+
+WITH 
+_cba__app_hlt_dev_inprocess_cse__chl__bus__tu__app__cse__chl__bus__tu__app__20070926 AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_hlt_dev_inprocess_cse__chl__bus__tu__app__cse__chl__bus__tu__app__20070926")  }})
+SrcInApptRelSeqSeq AS (
+	SELECT RECORD_TYPE,
+		MOD_TIMESTAMP,
+		SUBTYPE_CODE,
+		HL_APP_PROD_ID,
+		TU_APP_ID,
+		TU_ACCOUNT_ID,
+		TU_DOCCOLLECT_METHOD_CAT_ID,
+		DOCCOLLECT_ADDRESS_TYPE_ID,
+		DOCCOLLECT_BSB,
+		MOD_USER_ID,
+		TU_DOCCOLLECT_ADDRESS_LINE_1,
+		TU_DOCCOLLECT_ADDRESS_LINE_2,
+		TU_DOCCOLLECT_SUBURB,
+		TU_DOCCOLLECT_STATE_ID,
+		TU_DOCCOLLECT_POSTCODE,
+		TU_DOCCOLLECT_COUNTRY_ID,
+		SCREENSETDISPLAY_VAL,
+		SCREENSETLOCKED_VAL,
+		FULFILMENTSCREENDISPLAY_FLAG,
+		APPSUMMARYDISPLAY_FLAG,
+		TRANSACT_SET_VAL,
+		DOCCOLLECT_CONTACT_NAME,
+		TU_DOCCOLLECT_OVERSEA_STATE,
+		TOPUP_AMOUNT,
+		PROGRESSIVE_PAYMENT_FLAG,
+		TOPUP_AGENT_ID,
+		TOPUP_AGENT_NAME,
+		ACCOUNT_NO,
+		CRIS_PRODUCT_ID,
+		CAMPAIGN_CODE,
+		DUMMY
+	FROM _cba__app_hlt_dev_inprocess_cse__chl__bus__tu__app__cse__chl__bus__tu__app__20070926
+)
+
+SELECT * FROM SrcInApptRelSeqSeq

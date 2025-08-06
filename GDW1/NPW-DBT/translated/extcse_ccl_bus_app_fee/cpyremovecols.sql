@@ -1,0 +1,12 @@
+{{ config(materialized='view', tags=['ExtCSE_CCL_BUS_APP_FEE']) }}
+
+WITH CpyRemoveCols AS (
+	SELECT
+		CCL_FEE_TYPE_CAT_ID,
+		CCL_FEE_TYPE_CAT_FEE_TYPE_DESC,
+		CCL_FEE_TYPE_CAT_DEFAULT_AMT,
+		CCL_FEE_TYPE_CAT_DEFAULT_FEE_PCT
+	FROM {{ ref('SrcCCL_FEE_TYPE_CATSeq') }}
+)
+
+SELECT * FROM CpyRemoveCols

@@ -1,0 +1,57 @@
+{{ config(materialized='view', tags=['DltAPPT_PDCT_FEAT_PEXAFrmTMP_APPT_FEAT_PEXA']) }}
+
+WITH XfmCheckDeltaAction__OutTgtApptPdctFeatInsertDS AS (
+	SELECT
+		-- *SRC*: DateFromDaysSince(-1, StringToDate(ETL_PROCESS_DT, '%yyyy%mm%dd')),
+		DATEFROMDAYSSINCE(-1, STRINGTODATE(ETL_PROCESS_DT, '%yyyy%mm%dd')) AS ExpiryDate,
+		-- *SRC*: ( IF IsNotNull((InTmpApptPdctFeatTera.NEW_APPT_PDCT_I)) THEN (InTmpApptPdctFeatTera.NEW_APPT_PDCT_I) ELSE ""),
+		IFF({{ ref('SrcTmpApptPDctFeatTera') }}.NEW_APPT_PDCT_I IS NOT NULL, {{ ref('SrcTmpApptPDctFeatTera') }}.NEW_APPT_PDCT_I, '') AS APPT_PDCT_I,
+		-- *SRC*: ( IF IsNotNull((InTmpApptPdctFeatTera.NEW_FEAT_I)) THEN (InTmpApptPdctFeatTera.NEW_FEAT_I) ELSE ""),
+		IFF({{ ref('SrcTmpApptPDctFeatTera') }}.NEW_FEAT_I IS NOT NULL, {{ ref('SrcTmpApptPDctFeatTera') }}.NEW_FEAT_I, '') AS FEAT_I,
+		'NOT APPLICABLE' AS SRCE_SYST_APPT_FEAT_I,
+		-- *SRC*: StringToDate(ETL_PROCESS_DT, '%yyyy%mm%dd'),
+		STRINGTODATE(ETL_PROCESS_DT, '%yyyy%mm%dd') AS EFFT_D,
+		{{ ref('SrcTmpApptPDctFeatTera') }}.NEW_SRCE_SYST_C AS SRCE_SYST_C,
+		-- *SRC*: setnull(),
+		SETNULL() AS SRCE_SYST_APPT_OVRD_I,
+		-- *SRC*: setnull(),
+		SETNULL() AS OVRD_FEAT_I,
+		-- *SRC*: setnull(),
+		SETNULL() AS SRCE_SYST_STND_VALU_Q,
+		-- *SRC*: setnull(),
+		SETNULL() AS SRCE_SYST_STND_VALU_R,
+		-- *SRC*: setnull(),
+		SETNULL() AS SRCE_SYST_STND_VALU_A,
+		-- *SRC*: setnull(),
+		SETNULL() AS CNCY_C,
+		-- *SRC*: setnull(),
+		SETNULL() AS ACTL_VALU_Q,
+		-- *SRC*: setnull(),
+		SETNULL() AS ACTL_VALU_R,
+		-- *SRC*: setnull(),
+		SETNULL() AS ACTL_VALU_A,
+		-- *SRC*: setnull(),
+		SETNULL() AS FEAT_SEQN_N,
+		-- *SRC*: setnull(),
+		SETNULL() AS FEAT_STRT_D,
+		-- *SRC*: setnull(),
+		SETNULL() AS FEE_CHRG_D,
+		-- *SRC*: setnull(),
+		SETNULL() AS OVRD_REAS_C,
+		-- *SRC*: setnull(),
+		SETNULL() AS FEE_ADD_TO_TOTL_F,
+		-- *SRC*: setnull(),
+		SETNULL() AS FEE_CAPL_F,
+		-- *SRC*: StringToDate('9999-12-31', '%yyyy-%mm-%dd'),
+		STRINGTODATE('9999-12-31', '%yyyy-%mm-%dd') AS EXPY_D,
+		REFR_PK AS PROS_KEY_EFFT_I,
+		-- *SRC*: SetNull(),
+		SETNULL() AS PROS_KEY_EXPY_I,
+		-- *SRC*: SetNull(),
+		SETNULL() AS EROR_SEQN_I,
+		{{ ref('SrcTmpApptPDctFeatTera') }}.NEW_FEAT_VALU_C AS FEAT_VALU_C
+	FROM {{ ref('SrcTmpApptPDctFeatTera') }}
+	WHERE {{ ref('SrcTmpApptPDctFeatTera') }}.REC_TYPE_I = 'I' OR {{ ref('SrcTmpApptPDctFeatTera') }}.REC_TYPE_I = 'U'
+)
+
+SELECT * FROM XfmCheckDeltaAction__OutTgtApptPdctFeatInsertDS

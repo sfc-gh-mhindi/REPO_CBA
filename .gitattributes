@@ -1,0 +1,1 @@
+GDW1/CBA_GDW_DDL_Extracts/*.sql filter=lfs diff=lfs merge=lfs -text

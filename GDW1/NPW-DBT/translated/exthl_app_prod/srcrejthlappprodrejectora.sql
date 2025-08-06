@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['ExtHL_APP_PROD']) }}
+
+WITH 
+rejt_chl_bus_app_prod AS (
+	SELECT
+	*
+	FROM {{ source("cse4_stg","rejt_chl_bus_app_prod")  }}),
+SrcRejtHlAppProdRejectOra AS (SELECT HL_APP_PROD_ID, PARENT_HL_APP_PROD_ID, HL_REPAYMENT_PERIOD_CAT_ID, AMOUNT, LOAN_TERM_MONTHS, ACCOUNT_NUMBER, TOTAL_LOAN_AMOUNT, HLS_FLAG, GDW_UPDATED_LDP_PAID_ON_AMOUNT, CAST(ORIG_ETL_D AS TEXT) AS ORIG_ETL_D FROM REJT_CHL_BUS_APP_PROD WHERE EROR_C LIKE 'RPR%')
+
+
+SELECT * FROM SrcRejtHlAppProdRejectOra
