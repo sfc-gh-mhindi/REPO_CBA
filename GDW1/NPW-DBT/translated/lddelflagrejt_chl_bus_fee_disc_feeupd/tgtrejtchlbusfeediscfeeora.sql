@@ -1,0 +1,12 @@
+{{ config(materialized='view', tags=['LdDelFlagREJT_CHL_BUS_FEE_DISC_FEEUpd']) }}
+
+SELECT
+	HL_FEE_ID
+	BFD_DISCOUNT_REASON
+	BFD_DISCOUNT_CODE
+	BFD_DISCOUNT_AMT
+	BFD_DISCOUNT_TERM
+	BFD_HL_FEE_DISCOUNT_CAT_ID
+	BFD_FOUND_FLAG
+	ETL_D 
+FROM {{ ref('ModConversions') }}

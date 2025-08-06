@@ -1,0 +1,41 @@
+{{ config(materialized='view', tags=['LdTMP_FA_ENV_EVNTFrmXfm']) }}
+
+WITH 
+_cba__app_csel4_csel4dev_dataset_tmp__fa__env__evnt AS (
+	SELECT
+	*
+	FROM {{ source("","_cba__app_csel4_csel4dev_dataset_tmp__fa__env__evnt")  }})
+SrcFAEnvEvntDS AS (
+	SELECT FA_ENV_EVNT_ID,
+		FA_UTAK_ID,
+		FA_ENV_EVNT_CAT_ID,
+		CRAT_DATE,
+		CRAT_BY_STAF_NUM,
+		COIN_REQ_ID,
+		ORIG_ETL_D,
+		EVNT_I,
+		INT_GRUP_I,
+		EVNT_ACTV_TYPE_C,
+		BUSN_EVNT_F,
+		CTCT_EVNT_F,
+		INVT_EVNT_F,
+		FNCL_ACCT_EVNT_F,
+		FNCL_NVAL_EVNT_F,
+		INCD_F,
+		INSR_EVNT_F,
+		INSR_NVAL_EVNT_F,
+		ROW_SECU_ACCS_C,
+		SRCE_SYST_EVNT_I,
+		SRCE_SYST_EVNT_TYPE_I,
+		EVNT_ACTL_D,
+		EVNT_ACTL_T,
+		SRCE_SYST_C,
+		EMPL_I,
+		EVNT_PATY_ROLE_TYPE_C,
+		EMPL_ROLE_C,
+		INT_GRUP_EMPL_F,
+		EVNT_EMPL_F
+	FROM _cba__app_csel4_csel4dev_dataset_tmp__fa__env__evnt
+)
+
+SELECT * FROM SrcFAEnvEvntDS

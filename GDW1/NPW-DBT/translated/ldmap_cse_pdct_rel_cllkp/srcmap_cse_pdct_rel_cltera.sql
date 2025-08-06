@@ -1,0 +1,15 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_PDCT_REL_CLLkp']) }}
+
+WITH 
+,
+SrcMAP_CSE_PDCT_REL_CLTera AS (SELECT 
+MAP_CSE_PDCT_REL_CL.PARN_PDCT_LVL_CAT_ID,
+MAP_CSE_PDCT_REL_CL.CHLD_PDCT_LVL_CAT_ID,
+MAP_CSE_PDCT_REL_CL.REL_TYPE_C,
+MAP_CSE_PDCT_REL_CL.EFFT_D,
+MAP_CSE_PDCT_REL_CL.EXPY_D 
+FROM {{ var('GDW_ACCT_VW') }}.MAP_CSE_PDCT_REL_CL as MAP_CSE_PDCT_REL_CL
+WHERE MAP_CSE_PDCT_REL_CL.efft_d (date, format 'yyyymmdd') <= '{{ var('ETL_PROCESS_DT') }}' and MAP_CSE_PDCT_REL_CL.expy_d (date, format 'yyyymmdd') >= '{{ var('ETL_PROCESS_DT') }}' )
+
+
+SELECT * FROM SrcMAP_CSE_PDCT_REL_CLTera

@@ -1,0 +1,15 @@
+{{ config(materialized='view', tags=['DltAPPT_STUS_REASFrmTMP_APPT_STUS_REAS']) }}
+
+WITH 
+appt_stus_reas AS (
+	SELECT
+	*
+	FROM {{ source("tdcsad","appt_stus_reas")  }}),
+tmp_appt_stus_reas AS (
+	SELECT
+	*
+	FROM {{ ref("tmp_appt_stus_reas")  }}),
+SrcTmpApptStusReasTera AS (SELECT a.APPT_I AS NEW_APPT_I, a.STUS_C AS NEW_STUS_C, a.STUS_REAS_TYPE_C AS NEW_STUS_REAS_TYPE_C, a.STRT_S AS NEW_STRT_S, a.END_S AS NEW_END_S, b.APPT_I AS OLD_APPT_I, b.STUS_C AS OLD_STUS_C, b.STUS_REAS_TYPE_C AS OLD_STUS_REAS_TYPE_C, b.STRT_S AS OLD_STRT_S, b.END_S AS OLD_END_S, b.EFFT_D AS OLD_EFFT_D FROM TMP_APPT_STUS_REAS LEFT OUTER JOIN APPT_STUS_REAS ON TRIM(a.APPT_I) = TRIM(b.APPT_I) AND TRIM(a.STUS_C) = TRIM(b.STUS_C) AND TRIM(a.STUS_REAS_TYPE_C) = TRIM(b.STUS_REAS_TYPE_C) AND a.STRT_S = b.STRT_S AND b.EXPY_D = '9999-12-31' WHERE a.RUN_STRM = '{{ var("RUN_STREAM") }}')
+
+
+SELECT * FROM SrcTmpApptStusReasTera

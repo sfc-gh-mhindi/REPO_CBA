@@ -1,0 +1,16 @@
+{{ config(materialized='view', tags=['MergePlIntRatePlMargin']) }}
+
+WITH FL_IgnoreNullPlIntRateIdRecs AS (
+	SELECT
+		PL_MARGIN_PL_MARGIN_ID,
+		PL_MARGIN_MARGIN_AMT,
+		PL_MARGIN_PL_FEE_ID,
+		PL_INT_RATE_ID,
+		PL_MARGIN_MARGIN_REASON_CAT_ID,
+		PL_MARGIN_PL_APP_PROD_ID,
+		PL_MARGIN_FOUND_FLAG
+	FROM {{ ref('CgAdd_Flag2') }}
+	WHERE PL_INT_RATE_ID IS NOT NULL
+)
+
+SELECT * FROM FL_IgnoreNullPlIntRateIdRecs

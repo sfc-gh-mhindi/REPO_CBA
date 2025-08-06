@@ -1,0 +1,25 @@
+{{ config(materialized='view', tags=['ExtFaEnvisionEvent']) }}
+
+WITH FunMergeSourceAndRejt AS (
+	SELECT
+		FA_ENVISION_EVENT_ID as FA_ENVISION_EVENT_ID,
+		FA_UNDERTAKING_ID as FA_UNDERTAKING_ID,
+		FA_ENVISION_EVENT_CAT_ID as FA_ENVISION_EVENT_CAT_ID,
+		CREATED_DATE as CREATED_DATE,
+		CREATED_BY_STAFF_NUMBER as CREATED_BY_STAFF_NUMBER,
+		COIN_REQUEST_ID as COIN_REQUEST_ID,
+		ORIG_ETL_D as ORIG_ETL_D
+	FROM {{ ref('XfmSeparateRejectWithoutSourceAndTheRest__InSourceRec') }}
+	UNION ALL
+	SELECT
+		FA_ENVISION_EVENT_ID,
+		FA_UNDERTAKING_ID,
+		FA_ENVISION_EVENT_CAT_ID,
+		CREATED_DATE,
+		CREATED_BY_STAFF_NUMBER,
+		COIN_REQUEST_ID,
+		ORIG_ETL_D
+	FROM {{ ref('XfmSeparateRejectWithoutSourceAndTheRest__InRejectWithoutSourceRec') }}
+)
+
+SELECT * FROM FunMergeSourceAndRejt

@@ -1,0 +1,27 @@
+{{ config(materialized='view', tags=['LdREJT_CHL_BUS_APP_PROD_PURP']) }}
+
+WITH FunChlBusAppProdPurpNulls AS (
+	SELECT
+		HL_APP_PROD_PURPOSE_ID as HL_APP_PROD_PURPOSE_ID,
+		HL_APP_PROD_ID as HL_APP_PROD_ID,
+		HL_LOAN_PURPOSE_CAT_ID as HL_LOAN_PURPOSE_CAT_ID,
+		AMOUNT as AMOUNT,
+		MAIN_PURPOSE as MAIN_PURPOSE,
+		ETL_D as ETL_D,
+		ORIG_ETL_D as ORIG_ETL_D,
+		EROR_C as EROR_C
+	FROM {{ ref('RejChlBusAppProdPurpDS') }}
+	UNION ALL
+	SELECT
+		HL_APP_PROD_PURPOSE_ID,
+		HL_APP_PROD_ID,
+		HL_LOAN_PURPOSE_CAT_ID,
+		AMOUNT,
+		MAIN_PURPOSE,
+		ETL_D,
+		ORIG_ETL_D,
+		EROR_C
+	FROM {{ ref('SrcChlBusAppProdPurpRejectsDS') }}
+)
+
+SELECT * FROM FunChlBusAppProdPurpNulls

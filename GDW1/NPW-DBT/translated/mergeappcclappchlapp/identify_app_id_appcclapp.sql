@@ -1,0 +1,35 @@
+{{ config(materialized='view', tags=['MergeAppCclAppChlApp']) }}
+
+WITH Identify_APP_ID_AppCclApp AS (
+	SELECT
+		-- *SRC*: \(20)If IsNull(OutDropColumns.APP_APP_ID) then OutDropColumns.CCL_APP_CCL_APP_ID else OutDropColumns.APP_APP_ID,
+		IFF({{ ref('JoinAppCclApp') }}.APP_APP_ID IS NULL, {{ ref('JoinAppCclApp') }}.CCL_APP_CCL_APP_ID, {{ ref('JoinAppCclApp') }}.APP_APP_ID) AS APP_ID,
+		APP_APP_ID,
+		APP_SUBTYPE_CODE,
+		APP_APP_NO,
+		APP_CREATED_DATE,
+		APP_CREATED_BY_STAFF_NUMBER,
+		APP_OWNED_BY_STAFF_NUMBER,
+		APP_CHANNEL_CAT_ID,
+		APP_LODGEMENT_BRANCH_ID,
+		APP_SM_CASE_ID,
+		CCL_APP_CCL_APP_ID,
+		CCL_APP_CCL_APP_CAT_ID,
+		CCL_APP_CCL_FORM_CAT_ID,
+		CCL_APP_TOT_PERSONAL_FAC_AMT,
+		CCL_APP_TOT_EQUIPFIN_FAC_AMT,
+		CCL_APP_TOT_COMMERCIAL_FAC_AMT,
+		CCL_APP_TOPUP_APP_ID,
+		CCL_APP_AF_PRIMARY_INDUSTRY_ID,
+		CCL_APP_AD_TUC_AMT,
+		CCL_APP_COMMISSION_AMT,
+		CCL_APP_BROKER_REFERAL_FLAG,
+		-- *SRC*: ( IF IsNotNull((OutDropColumns.APP_FOUND_FLAG)) THEN (OutDropColumns.APP_FOUND_FLAG) ELSE ('N')),
+		IFF({{ ref('JoinAppCclApp') }}.APP_FOUND_FLAG IS NOT NULL, {{ ref('JoinAppCclApp') }}.APP_FOUND_FLAG, 'N') AS APP_FOUND_FLAG,
+		-- *SRC*: ( IF IsNotNull((OutDropColumns.CCL_APP_FOUND_FLAG)) THEN (OutDropColumns.CCL_APP_FOUND_FLAG) ELSE ('N')),
+		IFF({{ ref('JoinAppCclApp') }}.CCL_APP_FOUND_FLAG IS NOT NULL, {{ ref('JoinAppCclApp') }}.CCL_APP_FOUND_FLAG, 'N') AS CCL_APP_FOUND_FLAG
+	FROM {{ ref('JoinAppCclApp') }}
+	WHERE 
+)
+
+SELECT * FROM Identify_APP_ID_AppCclApp

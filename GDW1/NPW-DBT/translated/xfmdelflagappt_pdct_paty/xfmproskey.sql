@@ -1,0 +1,16 @@
+{{ config(materialized='view', tags=['XfmDelFlagAPPT_PDCT_PATY']) }}
+
+WITH XfmProsKey AS (
+	SELECT
+		DELETED_TABLE_NAME,
+		{{ ref('SrcApptPdctPatyDS') }}.DELETED_KEY_1_VALUE AS APP_PROD_ID,
+		{{ ref('SrcApptPdctPatyDS') }}.DELETED_KEY_2_VALUE AS CIF_CODE,
+		{{ ref('SrcApptPdctPatyDS') }}.DELETED_KEY_3_VALUE AS ROLE_CAT_ID,
+		{{ ref('SrcApptPdctPatyDS') }}.DELETED_KEY_4_VALUE AS SBTY_CODE,
+		-- *SRC*: \(20)If OutApptPdctPatyDS.DELETED_TABLE_NAME = 'APP_PROD_CLIENT_ROLE' Then 'CSE_COM_BUS_APP_PROD_CLNT_RL_APPT_PDCT_PATY' Else ( If OutApptPdctPatyDS.DELETED_TABLE_NAME = 'CCL_APP_PROD' Then 'CSE_CCL_BUS_APP_PROD_APPT_PDCT_PATY' Else ''),
+		IFF({{ ref('SrcApptPdctPatyDS') }}.DELETED_TABLE_NAME = 'APP_PROD_CLIENT_ROLE', 'CSE_COM_BUS_APP_PROD_CLNT_RL_APPT_PDCT_PATY', IFF({{ ref('SrcApptPdctPatyDS') }}.DELETED_TABLE_NAME = 'CCL_APP_PROD', 'CSE_CCL_BUS_APP_PROD_APPT_PDCT_PATY', '')) AS CONV_M
+	FROM {{ ref('SrcApptPdctPatyDS') }}
+	WHERE 
+)
+
+SELECT * FROM XfmProsKey

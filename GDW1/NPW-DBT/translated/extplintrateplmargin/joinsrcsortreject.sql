@@ -1,0 +1,56 @@
+{{ config(materialized='view', tags=['ExtPlIntRatePlMargin']) }}
+
+WITH JoinSrcSortReject AS (
+	SELECT
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_PL_INT_RATE_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_DOC_SEQ_NO,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_CASS_MARGIN_AMT,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_INT_RATE_TERM,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_INT_RATE_FREQ_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_VARIANT_CAT_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_USAGE_CAT_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_PL_APP_PROD_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_PL_MARGIN_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_MARGIN_AMT,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_PL_FEE_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_PL_INT_RATE_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_MARGIN_RESN_CAT_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_PL_APP_PROD_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_INT_RTE_AMT_2,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_INT_RTCT_ID2,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_PL_INT_RATE_ID,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_INT_RATE_AMT_1,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_INT_RTCT_ID1,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_MARGIN_FOUND_FLAG,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_FOUND_FLAG,
+		{{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_AMT_FOUND_FLAG,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_ID AS PL_INT_RATE_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_PL_INT_RATE_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_DOC_SEQ_NO_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_CASS_MARGIN_AMT_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_INT_RATE_TERM_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_INT_RATE_FREQUENCY_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_VARIANT_CAT_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_USAGE_CAT_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_PL_APP_PROD_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_PL_MARGIN_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_MARGIN_AMT_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_PL_FEE_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_PL_INT_RATE_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_MARGIN_REASON_CAT_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_PL_APP_PROD_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_INT_RATE_AMT_2_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_PL_INT_RATE_CAT_ID_2_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_PL_INT_RATE_ID_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_INT_RATE_AMT_1_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_PL_INT_RATE_CAT_ID_1_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_MARGIN_FOUND_FLAG_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_FOUND_FLAG_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_AMT_FOUND_FLAG_R,
+		{{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.ORIG_ETL_D_R
+	FROM {{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}
+	OUTER JOIN {{ ref('CpyRejtPlIntRatePlMarginRejectOra') }} ON {{ ref('XfmCheckPlIntRateIdNulls__OutCheckPlIntRateIdNullsSorted') }}.PL_INT_RATE_ID = {{ ref('CpyRejtPlIntRatePlMarginRejectOra') }}.PL_INT_RATE_ID
+)
+
+SELECT * FROM JoinSrcSortReject

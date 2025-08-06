@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['LdDelFlagREJT_COM_BUS_AP_PRD_CLNT_RLDel']) }}
+
+WITH RenameCol AS (
+	SELECT
+		{{ ref('APP_PROD_CLIENT_ROLE') }}.DELETED_KEY_1_VALUE AS APP_PROD_ID,
+		{{ ref('APP_PROD_CLIENT_ROLE') }}.DELETED_KEY_2_VALUE AS CIF_CODE,
+		{{ ref('APP_PROD_CLIENT_ROLE') }}.DELETED_KEY_3_VALUE AS ROLE_CAT_ID
+	FROM {{ ref('APP_PROD_CLIENT_ROLE') }}
+)
+
+SELECT * FROM RenameCol

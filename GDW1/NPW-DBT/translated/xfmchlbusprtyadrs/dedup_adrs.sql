@@ -1,0 +1,13 @@
+{{ config(materialized='view', tags=['XfmChlBusPrtyAdrs']) }}
+
+WITH Dedup_adrs AS (
+	SELECT ADRS_I, ADRS_TYPE_C, SRCE_SYST_C, ADRS_QLFY_C, SRCE_SYST_ADRS_I, SRCE_SYST_ADRS_SEQN_N, RUN_STRM 
+	FROM (
+		SELECT ADRS_I, ADRS_TYPE_C, SRCE_SYST_C, ADRS_QLFY_C, SRCE_SYST_ADRS_I, SRCE_SYST_ADRS_SEQN_N, RUN_STRM,
+		 ROW_NUMBER() OVER (PARTITION BY ADRS_I ORDER BY 1 ASC) AS ROW_NUM 
+		FROM {{ ref('XfmBusinessRules__OutAdrsDS') }}
+	) AS Dedup_adrs_TEMP
+	WHERE ROW_NUM = 1
+)
+
+SELECT * FROM Dedup_adrs

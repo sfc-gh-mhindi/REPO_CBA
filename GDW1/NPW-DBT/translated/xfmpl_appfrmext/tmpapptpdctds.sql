@@ -1,0 +1,26 @@
+{{ config(materialized='incremental', alias='_cba__app_csel4_csel4dev_dataset_tmp__cse__cpl__bus__app__appt__pdct', incremental_strategy='insert_overwrite', tags=['XfmPL_APPFrmExt']) }}
+
+SELECT
+	APPT_PDCT_I,
+	APPT_QLFY_C,
+	ACQR_TYPE_C,
+	ACQR_ADHC_X,
+	ACQR_SRCE_C,
+	PDCT_N,
+	APPT_I,
+	SRCE_SYST_C,
+	SRCE_SYST_APPT_PDCT_I,
+	LOAN_FNDD_METH_C,
+	NEW_ACCT_F,
+	BROK_PATY_I,
+	COPY_FROM_OTHR_APPT_F,
+	EFFT_D,
+	EXPY_D,
+	PROS_KEY_EFFT_I,
+	PROS_KEY_EXPY_I,
+	EROR_SEQN_I,
+	RUN_STRM,
+	APPT_PDCT_CATG_C,
+	ASES_D,
+	APPT_PDCT_DURT_C 
+FROM {{ ref('XfmBusinessRules__OutTmpApptPdctDS') }}

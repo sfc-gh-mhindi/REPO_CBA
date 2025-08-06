@@ -1,0 +1,13 @@
+{{ config(materialized='view', tags=['LdREJT_CSE_CHL_BUS_APP']) }}
+
+WITH ModConversions AS (
+	SELECT 
+	--Manual
+	--ETL_D= date_from_string[%yyyy%mm%dd] (ETL_D)
+	--ORIG_ETL_D= date_from_string[%yyyy%mm%dd] (ORIG_ETL_D)
+	--HSCA_CONVERTED_TO_FULL_AT= date_from_string[%yyyy%mm%dd] (HSCA_CONVERTED_TO_FULL_AT)
+	HL_APP_ID, HL_PACKAGE_CAT_ID, LPC_OFFICE, STATUS_TRACKER_ID, ETL_D, ORIG_ETL_D, EROR_C, HL_APP_PROD_ID, CHL_APP_PCD_EXT_SYS_CAT_ID, CHL_APP_SIMPLE_APP_FLAG, CHL_APP_ORIGINATING_AGENT_ID, CHL_APP_AGENT_NAME, CASS_WITHHOLD_RISKBANK_FLAG, FHB_FLAG, SETTLEMENT_DATE, PEXA_FLAG, HSCA_FLAG, HSCA_CONVERTED_TO_FULL_AT 
+	FROM {{ ref('FunCseChlBusNulls') }}
+)
+
+SELECT * FROM ModConversions

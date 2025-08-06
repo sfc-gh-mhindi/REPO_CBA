@@ -1,0 +1,13 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_APPT_PDCT_PATY_ROLELkp']) }}
+
+WITH XfmConversions AS (
+	SELECT
+		-- *SRC*: Trim(InMAP_CSE_APPT_PDCT_PATY_ROLETera.ROLE_CAT_ID),
+		TRIM({{ ref('SrcMAP_CSE_APPT_PDCT_PATY_ROLETera') }}.ROLE_CAT_ID) AS ROLE_CAT_ID,
+		-- *SRC*: Trim(InMAP_CSE_APPT_PDCT_PATY_ROLETera.PATY_ROLE_C),
+		TRIM({{ ref('SrcMAP_CSE_APPT_PDCT_PATY_ROLETera') }}.PATY_ROLE_C) AS PATY_ROLE_C
+	FROM {{ ref('SrcMAP_CSE_APPT_PDCT_PATY_ROLETera') }}
+	WHERE 
+)
+
+SELECT * FROM XfmConversions

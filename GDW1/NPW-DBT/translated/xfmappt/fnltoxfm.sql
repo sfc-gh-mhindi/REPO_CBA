@@ -1,0 +1,23 @@
+{{ config(materialized='view', tags=['XfmAppt']) }}
+
+WITH FnlToXfm AS (
+	SELECT
+		APP_ID as APP_ID,
+		CHANNEL_CAT_ID as CHANNEL_CAT_ID,
+		APP_NO as APP_NO,
+		CREATED_DATE as CREATED_DATE,
+		APP_ENTRY_POINT as APP_ENTRY_POINT,
+		APPT_ORIG_C as APPT_ORIG_C
+	FROM {{ ref('Filter') }}
+	UNION ALL
+	SELECT
+		APP_ID,
+		CHANNEL_CAT_ID,
+		APP_NO,
+		CREATED_DATE,
+		APP_ENTRY_POINT,
+		APPT_ORIG_C
+	FROM {{ ref('Lkp') }}
+)
+
+SELECT * FROM FnlToXfm

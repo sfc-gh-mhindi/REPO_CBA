@@ -1,0 +1,33 @@
+{{ config(materialized='view', tags=['XfmAppt_Pdct_AcctFrmTmp']) }}
+
+WITH Funnel_Src_And_Idnn AS (
+	SELECT
+		APPT_PDCT_I as APPT_PDCT_I,
+		ACCT_I as ACCT_I,
+		REL_TYPE_C as REL_TYPE_C,
+		EFFT_D as EFFT_D,
+		PROS_KEY_EFFT_I as PROS_KEY_EFFT_I,
+		ERR_FLG as ERR_FLG,
+		EXPY_D as EXPY_D,
+		PROS_KEY_EXPY_I as PROS_KEY_EXPY_I,
+		EROR_SEQN_I as EROR_SEQN_I,
+		ACCOUNT_NUMBER as ACCOUNT_NUMBER,
+		REPAYMENT_ACCOUNT_NUMBER as REPAYMENT_ACCOUNT_NUMBER
+	FROM {{ ref('split') }}
+	UNION ALL
+	SELECT
+		APPT_PDCT_I,
+		REPAYMENT_ACCOUNT_NUMBER,
+		ACCOUNT_NUMBER,
+		ACCT_I,
+		REL_TYPE_C,
+		EFFT_D,
+		PROS_KEY_EFFT_I,
+		ERR_FLG,
+		PROS_KEY_EXPY_I,
+		EXPY_D,
+		EROR_SEQN_I
+	FROM {{ ref('Acct_I_Null_Check__Acct_I_NotNull') }}
+)
+
+SELECT * FROM Funnel_Src_And_Idnn

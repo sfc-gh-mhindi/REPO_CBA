@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['DltAPPT_GNRC_DATE_Frm_TMP_APPT_GNRC_DATE']) }}
+
+WITH 
+tmp_chlba_appt_gnrc_date AS (
+	SELECT
+	*
+	FROM {{ source("tdcselstg","tmp_chlba_appt_gnrc_date")  }}),
+TMP_APPT_GNRC_DATE AS (SELECT APPT_I, DATE_ROLE_C, EFFT_D, GNRC_ROLE_S, GNRC_ROLE_D, GNRC_ROLE_T, EXPY_D, PROS_KEY_EFFT_I, PROS_KEY_EXPY_I, EROR_SEQN_I, MODF_S, MODF_D, MODF_T, USER_I, CHNG_REAS_TYPE_C FROM TMP_CHLBA_APPT_GNRC_DATE)
+
+
+SELECT * FROM TMP_APPT_GNRC_DATE

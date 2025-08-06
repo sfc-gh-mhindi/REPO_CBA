@@ -1,0 +1,27 @@
+{{ config(materialized='view', tags=['XfmEvnt']) }}
+
+WITH XFM1 AS (
+	SELECT
+		-- *SRC*: 'CSE' : 'A7' : FrmSrc.OL_CLIENT_RM_RATING_ID,
+		CONCAT(CONCAT('CSE', 'A7'), {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}.OL_CLIENT_RM_RATING_ID) AS svEvntI,
+		svEvntI AS EVNT_I,
+		'3638' AS EVNT_ACTV_TYPE_C,
+		'N' AS INVT_EVNT_F,
+		'N' AS FNCL_ACCT_EVNT_F,
+		'N' AS CTCT_EVNT_F,
+		'Y' AS BUSN_EVNT_F,
+		-- *SRC*: SetNull(),
+		SETNULL() AS EROR_SEQN_I,
+		'N' AS FNCL_NVAL_EVNT_F,
+		'N' AS INCD_F,
+		'N' AS INSR_EVNT_F,
+		'N' AS INSR_NVAL_EVNT_F,
+		0 AS ROW_SECU_ACCS_C,
+		'N' AS FNCL_GL_EVNT_F,
+		'N' AS AUTT_AUTN_EVNT_F,
+		'N' AS COLL_EVNT_F
+	FROM {{ ref('CSE_ONLN_BUS_OL_CLNT_RM_RATE') }}
+	WHERE 
+)
+
+SELECT * FROM XFM1

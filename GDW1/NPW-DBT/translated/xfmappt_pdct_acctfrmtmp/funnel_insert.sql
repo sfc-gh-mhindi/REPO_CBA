@@ -1,0 +1,33 @@
+{{ config(materialized='view', tags=['XfmAppt_Pdct_AcctFrmTmp']) }}
+
+WITH Funnel_insert AS (
+	SELECT
+		EROR_ACCT_NUMB as EROR_ACCT_NUMB,
+		CONV_M as CONV_M,
+		EROR_TABL_NAME as EROR_TABL_NAME,
+		EROR_COLM_NAME as EROR_COLM_NAME,
+		RJCT_REAS as RJCT_REAS,
+		LOAD_S as LOAD_S,
+		PROS_KEY_EFFT_I as PROS_KEY_EFFT_I,
+		EXPY_DATE as EXPY_DATE,
+		PROS_KEY_EXPY_I as PROS_KEY_EXPY_I,
+		ROW_SECU_ACCS_C as ROW_SECU_ACCS_C,
+		RJCT_RECD as RJCT_RECD
+	FROM {{ ref('Const_Acct_I__IdnnError_AccNum_I') }}
+	UNION ALL
+	SELECT
+		EROR_ACCT_NUMB,
+		CONV_M,
+		EROR_TABL_NAME,
+		EROR_COLM_NAME,
+		RJCT_REAS,
+		LOAD_S,
+		PROS_KEY_EFFT_I,
+		EXPY_DATE,
+		PROS_KEY_EXPY_I,
+		ROW_SECU_ACCS_C,
+		RJCT_RECD
+	FROM {{ ref('Const_Acct_I__IdnnEror_RepAccNum_I') }}
+)
+
+SELECT * FROM Funnel_insert

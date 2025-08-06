@@ -1,0 +1,13 @@
+{{ config(materialized='view', tags=['XfmChlBusPrtyAdrs']) }}
+
+WITH dedup_phys_adrs AS (
+	SELECT ADRS_I, PHYS_ADRS_TYPE_C, ADRS_LINE_1_X, ADRS_LINE_2_X, SURB_X, CITY_X, PCOD_C, STAT_C, ISO_CNTY_C, EFFT_D, EXPY_D, RUN_STRM, CHL_PRCP_SCUY_FLAG 
+	FROM (
+		SELECT ADRS_I, PHYS_ADRS_TYPE_C, ADRS_LINE_1_X, ADRS_LINE_2_X, SURB_X, CITY_X, PCOD_C, STAT_C, ISO_CNTY_C, EFFT_D, EXPY_D, RUN_STRM, CHL_PRCP_SCUY_FLAG,
+		 ROW_NUMBER() OVER (PARTITION BY ADRS_I ORDER BY 1 ASC) AS ROW_NUM 
+		FROM {{ ref('XfmBusinessRules__OutPhysAdrsDS') }}
+	) AS dedup_phys_adrs_TEMP
+	WHERE ROW_NUM = 1
+)
+
+SELECT * FROM dedup_phys_adrs

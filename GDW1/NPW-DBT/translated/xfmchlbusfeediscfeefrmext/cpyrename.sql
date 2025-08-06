@@ -1,0 +1,26 @@
+{{ config(materialized='view', tags=['XfmChlBusFeeDiscFeeFrmExt']) }}
+
+WITH CpyRename AS (
+	SELECT
+		HL_FEE_ID,
+		BF_HL_FEE_ID,
+		BF_HL_APP_PROD_ID,
+		{{ ref('SrcPremapDS') }}.BF_XML_CODE AS SRCE_CHAR_1_C,
+		BF_DISPLAY_NAME,
+		BF_CATEGORY,
+		BF_UNIT_AMOUNT,
+		BF_TOTAL_AMOUNT,
+		BF_FOUND_FLAG,
+		BFD_HL_FEE_DISCOUNT_ID,
+		BFD_HL_FEE_ID,
+		BFD_DISCOUNT_REASON,
+		BFD_DISCOUNT_CODE,
+		BFD_DISCOUNT_AMT,
+		BFD_DISCOUNT_TERM,
+		{{ ref('SrcPremapDS') }}.BFD_HL_FEE_DISCOUNT_CAT_ID AS HL_FEE_DISCOUNT_CAT_ID,
+		BFD_FOUND_FLAG,
+		ORIG_ETL_D
+	FROM {{ ref('SrcPremapDS') }}
+)
+
+SELECT * FROM CpyRename

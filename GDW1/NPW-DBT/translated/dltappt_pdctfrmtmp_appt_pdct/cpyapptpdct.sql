@@ -1,0 +1,50 @@
+{{ config(materialized='view', tags=['DltAPPT_PDCTFrmTMP_APPT_PDCT']) }}
+
+WITH CpyApptPdct AS (
+	SELECT
+		NEW_APPT_PDCT_I,
+		NEW_DEBT_ABN_X,
+		NEW_DEBT_BUSN_M,
+		NEW_SMPL_APPT_F,
+		NEW_JOB_COMM_CATG_C,
+		NEW_APPT_QLFY_C,
+		NEW_ACQR_TYPE_C,
+		NEW_ACQR_ADHC_X,
+		NEW_ACQR_SRCE_C,
+		NEW_PDCT_N,
+		NEW_APPT_I,
+		NEW_SRCE_SYST_C,
+		NEW_SRCE_SYST_APPT_PDCT_I,
+		NEW_LOAN_FNDD_METH_C,
+		NEW_NEW_ACCT_F,
+		NEW_BROK_PATY_I,
+		NEW_COPY_FROM_OTHR_APPT_F,
+		NEW_APPT_PDCT_CATG_C,
+		NEW_APPT_PDCT_DURT_C,
+		NEW_ASES_D,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_APPT_PDCT_I AS NEW_APPT_PDCT_I,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_DEBT_ABN_X AS NEW_DEBT_ABN_X,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_DEBT_BUSN_M AS NEW_DEBT_BUSN_M,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_JOB_COMM_CATG_C AS NEW_JOB_COMM_CATG_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_APPT_QLFY_C AS NEW_APPT_QLFY_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_ACQR_TYPE_C AS NEW_ACQR_TYPE_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_ACQR_ADHC_X AS NEW_ACQR_ADHC_X,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_ACQR_SRCE_C AS NEW_ACQR_SRCE_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_PDCT_N AS NEW_PDCT_N,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_APPT_I AS NEW_APPT_I,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_SRCE_SYST_C AS NEW_SRCE_SYST_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_SRCE_SYST_APPT_PDCT_I AS NEW_SRCE_SYST_APPT_PDCT_I,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_LOAN_FNDD_METH_C AS NEW_LOAN_FNDD_METH_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_NEW_ACCT_F AS NEW_NEW_ACCT_F,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_BROK_PATY_I AS NEW_BROK_PATY_I,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_COPY_FROM_OTHR_APPT_F AS NEW_COPY_FROM_OTHR_APPT_F,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_SMPL_APPT_F AS NEW_SMPL_APPT_F,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_APPT_PDCT_CATG_C AS NEW_APPT_PDCT_CATG_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_APPT_PDCT_DURT_C AS NEW_APPT_PDCT_DURT_C,
+		{{ ref('SrcTmpApptPdctTera') }}.OLD_ASES_D AS NEW_ASES_D,
+		OLD_APPT_I,
+		OLD_EFFT_D
+	FROM {{ ref('SrcTmpApptPdctTera') }}
+)
+
+SELECT * FROM CpyApptPdct

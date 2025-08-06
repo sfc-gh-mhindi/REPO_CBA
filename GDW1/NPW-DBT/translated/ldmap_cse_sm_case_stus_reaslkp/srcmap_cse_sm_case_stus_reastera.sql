@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['LdMAP_CSE_SM_CASE_STUS_REASLkp']) }}
+
+WITH 
+,
+SrcMAP_CSE_SM_CASE_STUS_REASTera AS (SELECT 
+MAP_CSE_SM_CASE_STUS_REAS.SM_REAS_CAT_ID,
+MAP_CSE_SM_CASE_STUS_REAS.STUS_REAS_TYPE_C 
+FROM {{ var('GDW_ACCT_VW') }}.MAP_CSE_SM_CASE_STUS_REAS as MAP_CSE_SM_CASE_STUS_REAS  WHERE MAP_CSE_SM_CASE_STUS_REAS.efft_d (date, format 'yyyymmdd') <= '{{ var('ETL_PROCESS_DT') }}' and MAP_CSE_SM_CASE_STUS_REAS.expy_d (date, format 'yyyymmdd') >= '{{ var('ETL_PROCESS_DT') }}' )
+
+
+SELECT * FROM SrcMAP_CSE_SM_CASE_STUS_REASTera

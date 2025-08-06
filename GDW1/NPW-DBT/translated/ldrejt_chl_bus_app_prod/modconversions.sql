@@ -1,0 +1,12 @@
+{{ config(materialized='view', tags=['LdREJT_CHL_BUS_APP_PROD']) }}
+
+WITH ModConversions AS (
+	SELECT 
+	--Manual
+	--ETL_D= date_from_string[%yyyy%mm%dd] (ETL_D)
+	--ORIG_ETL_D= date_from_string[%yyyy%mm%dd] (ORIG_ETL_D)
+	HL_APP_PROD_ID, PARENT_HL_APP_PROD_ID, HL_REPAYMENT_PERIOD_CAT_ID, AMOUNT, LOAN_TERM_MONTHS, ACCOUNT_NUMBER, TOTAL_LOAN_AMOUNT, HLS_FLAG, GDW_UPDATED_LDP_PAID_ON_AMOUNT, ETL_D, ORIG_ETL_D, EROR_C 
+	FROM {{ ref('FunChlBusAppProdPurpNulls') }}
+)
+
+SELECT * FROM ModConversions

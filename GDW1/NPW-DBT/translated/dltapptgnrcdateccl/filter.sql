@@ -1,0 +1,36 @@
+{{ config(materialized='view', tags=['DltApptGnrcDateCCL']) }}
+
+WITH Filter AS (
+	SELECT
+		APPT_I,
+		DATE_ROLE_C,
+		EFFT_D,
+		GNRC_ROLE_S,
+		GNRC_ROLE_D,
+		GNRC_ROLE_T,
+		PROS_KEY_EFFT_I,
+		EROR_SEQN_I,
+		MODF_S,
+		MODF_S_TEMP,
+		MODF_D,
+		MODF_T,
+		USER_I,
+		CHNG_REAS_TYPE_C,
+		APPT_I,
+		DATE_ROLE_C,
+		EFFT_D,
+		GNRC_ROLE_S,
+		GNRC_ROLE_D,
+		GNRC_ROLE_T,
+		PROS_KEY_EFFT_I,
+		EROR_SEQN_I,
+		MODF_S,
+		MODF_S_TEMP,
+		MODF_D,
+		MODF_T,
+		USER_I,
+		CHNG_REAS_TYPE_C
+	FROM {{ ref('rs_APPT_GNRC_DATE') }}
+)
+
+SELECT * FROM Filter

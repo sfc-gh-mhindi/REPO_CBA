@@ -1,0 +1,57 @@
+{{ config(materialized='view', tags=['XfmChlBusTuAPPFrmExt']) }}
+
+WITH XfmBusinessRules__OutRej2 AS (
+	SELECT
+		-- *SRC*: \(20)If InXfmBusinessRules.TU_DOCCOLLECT_METHOD_CAT_ID = 'NA' Then @FALSE else @TRUE,
+		IFF({{ ref('ModNullHandling') }}.TU_DOCCOLLECT_METHOD_CAT_ID = 'NA', @FALSE, @TRUE) AS svLoadDelyInss,
+		-- *SRC*: \(20)If trim(InXfmBusinessRules.CRIS_PRODUCT_ID) = 'NA' or trim(InXfmBusinessRules.ACCOUNT_NO) = 'NA' or InXfmBusinessRules.SRCE_SYST_C = 'NA' Then @FALSE Else @TRUE,
+		IFF(TRIM({{ ref('ModNullHandling') }}.CRIS_PRODUCT_ID) = 'NA' OR TRIM({{ ref('ModNullHandling') }}.ACCOUNT_NO) = 'NA' OR {{ ref('ModNullHandling') }}.SRCE_SYST_C = 'NA', @FALSE, @TRUE) AS svLoadApptPdctAcct,
+		-- *SRC*: \(20)If InXfmBusinessRules.TOPUP_AGENT_ID <> 'NA' Then @TRUE Else @FALSE,
+		IFF({{ ref('ModNullHandling') }}.TOPUP_AGENT_ID <> 'NA', @TRUE, @FALSE) AS svLoadUnidPaty,
+		-- *SRC*: \(20)if InXfmBusinessRules.DOCU_DELY_METH_C = '99999' and InXfmBusinessRules.TU_DOCCOLLECT_METHOD_CAT_ID = 'NA' then 'REJ7101' else '',
+		IFF({{ ref('ModNullHandling') }}.DOCU_DELY_METH_C = '99999' AND {{ ref('ModNullHandling') }}.TU_DOCCOLLECT_METHOD_CAT_ID = 'NA', 'REJ7101', '') AS svErrorCodeDelyMeth,
+		-- *SRC*: \(20)if isnotnull(InXfmBusinessRules.ADRS_TYPE_ID) and InXfmBusinessRules.PYAD_TYPE_C = '99999' then 'REJ7102' else '',
+		IFF({{ ref('ModNullHandling') }}.ADRS_TYPE_ID IS NOT NULL AND {{ ref('ModNullHandling') }}.PYAD_TYPE_C = '99999', 'REJ7102', '') AS svErrorCodeAddrType,
+		-- *SRC*: \(20)if InXfmBusinessRules.TU_DOCCOLLECT_OVERSEA_STATE = '-1' and trim(InXfmBusinessRules.STAT_X) = 'UNKNOWN' then 'REJ7103' else '',
+		IFF({{ ref('ModNullHandling') }}.TU_DOCCOLLECT_OVERSEA_STATE = '-1' AND TRIM({{ ref('ModNullHandling') }}.STAT_X) = 'UNKNOWN', 'REJ7103', '') AS svErrorCodeState,
+		-- *SRC*: \(20)if isnotnull(InXfmBusinessRules.CNTY_ID) and InXfmBusinessRules.ISO_CNTY_C = '99' then 'REJ7104' else '',
+		IFF({{ ref('ModNullHandling') }}.CNTY_ID IS NOT NULL AND {{ ref('ModNullHandling') }}.ISO_CNTY_C = '99', 'REJ7104', '') AS svErrorCodeCnty,
+		-- *SRC*: \(20)If (Len(Trim(( IF IsNotNull((InXfmBusinessRules.CAMPAIGN_CODE)) THEN (InXfmBusinessRules.CAMPAIGN_CODE) ELSE ""))) = 0) Then 0 ELSE 1,
+		IFF(LEN(TRIM(IFF({{ ref('ModNullHandling') }}.CAMPAIGN_CODE IS NOT NULL, {{ ref('ModNullHandling') }}.CAMPAIGN_CODE, ''))) = 0, 0, 1) AS svCampaignCode,
+		-- *SRC*: \(20)If Trim(Trim(InXfmBusinessRules.TU_APP_ID, '0')) = '' Then 'N' Else 'Y',
+		IFF(TRIM(TRIM({{ ref('ModNullHandling') }}.TU_APP_ID, '0')) = '', 'N', 'Y') AS svTuAppI,
+		{{ ref('ModNullHandling') }}.SBTY_CODE AS SUBTYPE_CODE,
+		HL_APP_PROD_ID,
+		TU_APP_ID,
+		TU_ACCOUNT_ID,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.TU_DOCCOLLECT_METHOD_CAT_ID) = 'NA' then '' else InXfmBusinessRules.TU_DOCCOLLECT_METHOD_CAT_ID,
+		IFF(TRIM({{ ref('ModNullHandling') }}.TU_DOCCOLLECT_METHOD_CAT_ID) = 'NA', '', {{ ref('ModNullHandling') }}.TU_DOCCOLLECT_METHOD_CAT_ID) AS TU_DOCCOLLECT_METHOD_CAT_ID,
+		{{ ref('ModNullHandling') }}.ADRS_TYPE_ID AS DOCCOLLECT_ADDRESS_TYPE_ID,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.DOCCOLLECT_BSB) = 'NA' then '' else InXfmBusinessRules.DOCCOLLECT_BSB,
+		IFF(TRIM({{ ref('ModNullHandling') }}.DOCCOLLECT_BSB) = 'NA', '', {{ ref('ModNullHandling') }}.DOCCOLLECT_BSB) AS DOCCOLLECT_BSB,
+		TU_DOCCOLLECT_ADDRESS_LINE_1,
+		TU_DOCCOLLECT_ADDRESS_LINE_2,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.TU_DOCCOLLECT_SUBURB) = '-1' then '' else InXfmBusinessRules.TU_DOCCOLLECT_SUBURB,
+		IFF(TRIM({{ ref('ModNullHandling') }}.TU_DOCCOLLECT_SUBURB) = '-1', '', {{ ref('ModNullHandling') }}.TU_DOCCOLLECT_SUBURB) AS TU_DOCCOLLECT_SUBURB,
+		{{ ref('ModNullHandling') }}.STAT_C AS TU_DOCCOLLECT_STATE_ID,
+		TU_DOCCOLLECT_POSTCODE,
+		{{ ref('ModNullHandling') }}.CNTY_ID AS TU_DOCCOLLECT_COUNTRY_ID,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.TU_DOCCOLLECT_OVERSEA_STATE) = '-1' then '' else InXfmBusinessRules.TU_DOCCOLLECT_OVERSEA_STATE,
+		IFF(TRIM({{ ref('ModNullHandling') }}.TU_DOCCOLLECT_OVERSEA_STATE) = '-1', '', {{ ref('ModNullHandling') }}.TU_DOCCOLLECT_OVERSEA_STATE) AS TU_DOCCOLLECT_OVERSEA_STATE,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.APPT_PDCT_A) = 'NA' then '' else InXfmBusinessRules.APPT_PDCT_A,
+		IFF(TRIM({{ ref('ModNullHandling') }}.APPT_PDCT_A) = 'NA', '', {{ ref('ModNullHandling') }}.APPT_PDCT_A) AS TOPUP_AMOUNT,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.TOPUP_AGENT_ID) = 'NA' then '' else InXfmBusinessRules.TOPUP_AGENT_ID,
+		IFF(TRIM({{ ref('ModNullHandling') }}.TOPUP_AGENT_ID) = 'NA', '', {{ ref('ModNullHandling') }}.TOPUP_AGENT_ID) AS TOPUP_AGENT_ID,
+		TOPUP_AGENT_NAME,
+		-- *SRC*: \(20)if trim(InXfmBusinessRules.ACCOUNT_NO) = 'NA' then '' else InXfmBusinessRules.ACCOUNT_NO,
+		IFF(TRIM({{ ref('ModNullHandling') }}.ACCOUNT_NO) = 'NA', '', {{ ref('ModNullHandling') }}.ACCOUNT_NO) AS ACCOUNT_NO,
+		-- *SRC*: \(20)if InXfmBusinessRules.CRIS_PRODUCT_ID = 'NA' then setnull() else InXfmBusinessRules.CRIS_PRODUCT_ID,
+		IFF({{ ref('ModNullHandling') }}.CRIS_PRODUCT_ID = 'NA', SETNULL(), {{ ref('ModNullHandling') }}.CRIS_PRODUCT_ID) AS CRIS_PRODUCT_ID,
+		ORIG_ETL_D,
+		ETL_PROCESS_DT AS ETL_D,
+		'RPR7002' AS EROR_C
+	FROM {{ ref('ModNullHandling') }}
+	WHERE TRIM({{ ref('ModNullHandling') }}.SRCE_SYST_C) = 'NA'
+)
+
+SELECT * FROM XfmBusinessRules__OutRej2

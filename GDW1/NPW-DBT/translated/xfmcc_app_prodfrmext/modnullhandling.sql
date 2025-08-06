@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['XfmCC_APP_PRODFrmExt']) }}
+
+WITH ModNullHandling AS (
+	SELECT 
+	--Manual
+	--TARG_CHAR_C: string[max=255]= handle_null (TARG_CHAR_C, '999009')
+	CC_APP_PROD_ID, REQUESTED_LIMIT_AMT, CC_INTEREST_OPT_CAT_ID AS SRCE_NUMC_1_C, CBA_HOMELOAN_NO, PRE_APPRV_AMOUNT, ORIG_ETL_D, FEAT_I AS TARG_CHAR_C, READ_COSTS_AND_RISKS_FLAG, ACCEPTS_COSTS_AND_RISKS_DATE 
+	FROM {{ ref('LkpReferences') }}
+)
+
+SELECT * FROM ModNullHandling

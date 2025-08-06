@@ -1,0 +1,28 @@
+{{ config(materialized='view', tags=['DltApptPdctFeatFrmTMP']) }}
+
+WITH src_cpy AS (
+	SELECT
+		APPT_PDCT_I,
+		FEAT_I,
+		SRCE_SYST_C,
+		ACTL_VALU_Q,
+		SRCE_SYST_APPT_FEAT_I,
+		SRCE_SYST_APPT_OVRD_I,
+		OVRD_FEAT_I,
+		SRCE_SYST_STND_VALU_Q,
+		SRCE_SYST_STND_VALU_R,
+		SRCE_SYST_STND_VALU_A,
+		CNCY_C,
+		ACTL_VALU_R,
+		ACTL_VALU_A,
+		FEAT_SEQN_N,
+		FEAT_STRT_D,
+		FEE_CHRG_D,
+		OVRD_REAS_C,
+		FEE_ADD_TO_TOTL_F,
+		FEE_CAPL_F,
+		EROR_SEQN_I
+	FROM {{ ref('Appt_Pdct_Feat_Trans') }}
+)
+
+SELECT * FROM src_cpy

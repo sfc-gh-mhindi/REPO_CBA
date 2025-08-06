@@ -1,0 +1,11 @@
+{{ config(materialized='view', tags=['ExtHL_FEATURE_ATTR']) }}
+
+WITH 
+rejt_chl_bus_feat_attr AS (
+	SELECT
+	*
+	FROM {{ source("cse4_stg","rejt_chl_bus_feat_attr")  }}),
+SrcRejtHlFeatureAttrRejectOra AS (SELECT HL_FEATURE_ATTR_ID, FEATURE_TERM, FEATURE_AMOUNT, FEATURE_BALANCE, FEATURE_FEE, FEATURE_SPEC_REPAY, FEATURE_EST_INT_AMT, FEATURE_DATE, FEATURE_COMMENT, HL_FEATURE_CAT_ID, HL_APP_PROD_ID, CAST(ORIG_ETL_D AS TEXT) AS ORIG_ETL_D FROM REJT_CHL_BUS_FEAT_ATTR WHERE EROR_C LIKE 'RPR%')
+
+
+SELECT * FROM SrcRejtHlFeatureAttrRejectOra
