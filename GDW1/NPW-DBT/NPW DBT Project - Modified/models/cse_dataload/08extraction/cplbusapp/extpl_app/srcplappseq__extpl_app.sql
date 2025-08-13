@@ -13,21 +13,17 @@ before_cte as(
 {% set inprocess_src = var('inprocess_source_override', default_inprocess) %}
 
 srcplappseq AS (
-	SELECT RECORD_TYPE,
-		MOD_TIMESTAMP,
+	SELECT MOD_TIMESTAMP,
 		PL_APP_ID,
 		NOMINATED_BRANCH_ID,
-		PL_PACKAGE_CAT_ID,
-		DUMMY
+		PL_PACKAGE_CAT_ID
 	
 	FROM {{ inprocess_src }}
 )
 
 SELECT 
-	RECORD_TYPE,
 	MOD_TIMESTAMP,
 	PL_APP_ID,
 	NOMINATED_BRANCH_ID,
-	PL_PACKAGE_CAT_ID,
-	DUMMY
+	PL_PACKAGE_CAT_ID
 FROM srcplappseq
