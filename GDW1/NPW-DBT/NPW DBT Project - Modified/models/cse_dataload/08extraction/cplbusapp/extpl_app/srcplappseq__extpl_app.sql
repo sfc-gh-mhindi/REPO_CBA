@@ -5,6 +5,13 @@ before_cte as(
 	from {{ ref('before__extpl_app') }}
 	where 1=2
 ),
+
+{% set default_inprocess =
+    cvar('intermediate_db') ~ '.' ~ cvar('files_schema') ~ '.' ~ cvar('base_dir') ~
+    '__INPROCESS__CSE_CPL_BUS_APP_' ~ cvar('run_stream') ~ '_' ~ cvar('etl_process_dt') ~ '__DLY'
+%}
+{% set inprocess_src = var('inprocess_source_override', default_inprocess) %}
+
 srcplappseq AS (
 	SELECT RECORD_TYPE,
 		MOD_TIMESTAMP,
@@ -13,7 +20,7 @@ srcplappseq AS (
 		PL_PACKAGE_CAT_ID,
 		DUMMY
 	
-	FROM {{ cvar("intermediate_db") }}.{{ cvar("files_schema") }}.{{ cvar("base_dir") }}__inprocess__CSE_CPL_BUS_APP_{{ cvar("run_stream") }}_{{ cvar("etl_process_dt") }}__DLY
+	FROM {{ inprocess_src }}
 )
 
 SELECT 
