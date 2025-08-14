@@ -306,7 +306,6 @@ COMMENT = '{ "origin": "sf_sc", "name": "snowconvert", "version": {  "major": 1,
 -------gdw1.sql .end
 
 create or replace TABLE NPD_D12_DMN_GDWMIG_IBRG_V.P_V_OUT_001_STD_0.CBA_APP__CSEL4__CSELDEV__INPROCESS__CSE_CPL_BUS_APP_CSE_CPL_BUS_APP_20250807__DLY (
-
     RECORD_TYPE VARCHAR(1),
     MOD_TIMESTAMP VARCHAR(25),
     PL_APP_ID VARCHAR(12),

@@ -59,7 +59,7 @@ vars:
   etl_process_dt_tbl: 20250807 #YYYYMMDD
   
   base_dir: cba_app__csel4__csel4dev #20250812 - added by mhindi and skumar
-  inprocess_source_override: NPD_D12_DMN_GDWMIG_IBRG.PDSSTG.CSE_CPL_BUS_APP
+  inprocess_source_override: NPD_D12_DMN_GDWMIG_IBRG.PDSSTG.CSE_CPL_BUS_APP #20250813 - added by mhindi to use ingested table instead of the one in the source
   envs:
     env_apt_startup_status: 'True'
     env_apt_show_component_calls: 'True'
