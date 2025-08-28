@@ -1,0 +1,78 @@
+{
+  "sql_blocks": [],
+  "controls": [
+    {
+      "type": "RUN",
+      "raw": ".RUN FILE=%%BTEQ_LOGON_SCRIPT%%",
+      "args": null,
+      "line_no": 1
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 2
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 23
+    },
+    {
+      "type": "OS_CMD",
+      "raw": ".OS rm /cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_%%TBSHORT%%PROS_KEY.txt",
+      "args": null,
+      "line_no": 26
+    },
+    {
+      "type": "IMPORT",
+      "raw": ".IMPORT VARTEXT FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt",
+      "args": null,
+      "line_no": 28
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT DATA FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_%%TBSHORT%%PROS_KEY.txt",
+      "args": null,
+      "line_no": 30
+    },
+    {
+      "type": "CALL_SP",
+      "raw": "CALL %%STARMACRDB%%.SP_GET_PROS_KEY(        \n  '%%GDW_USER%%',           -- From the config.pass parameters\n  '%%SRCE_SYST_M%%',          \n  '%%SRCE_M%%',           \n  '%%PSST_TABLE_M%%',           \n  CAST(trim(:BTCHKEY) as DECIMAL(10,0)),\n  CAST(%%INDATE%% as DATE FORMAT'YYYYMMDD'),            \n  '%%RSTR_F%%',                -- Restart Flag\n  'MVS',                     \n  IPROCESSKEY (CHAR(100))",
+      "args": null,
+      "line_no": 36
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 48
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 50
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 53
+    },
+    {
+      "type": "LABEL",
+      "raw": ".LABEL EXITERR",
+      "args": null,
+      "line_no": 55
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 57
+    }
+  ],
+  "errors": []
+}

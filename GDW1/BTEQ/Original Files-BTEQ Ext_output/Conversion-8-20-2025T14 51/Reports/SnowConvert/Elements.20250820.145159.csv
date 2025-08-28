@@ -1,0 +1,84 @@
+SessionID,Category,Grammar Element,File Type,Total Count,Not Converted Count (Self)
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,AND,BTEQ,65,29
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Set Operator,UNION ALL,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,IS NULL / IS NOT NULL,BTEQ,10,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,GOTO,BTEQ,397,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,<TdsBteqUnit-UNKNOWN>,BTEQ,BTEQ,48,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,ORDER BY,BTEQ,6,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,NOT LIKE,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,ECHOREQ,BTEQ,46,46
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,DISTINCT,BTEQ,5,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL,CREATE TABLE,BTEQ,13,3
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,LIKE ANY,BTEQ,2,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Data Type,DECIMAL,BTEQ,2,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL Content,[CREATE TABLE] VOLATILE,BTEQ,10,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,GROUP BY,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,LIKE,BTEQ,5,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,WHERE,BTEQ,52,11
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,-,BTEQ,12,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,SELECT,BTEQ,56,3
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,=,BTEQ,96,29
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,QUIT,BTEQ,134,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,+,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL,CREATE MULTISET TABLE,BTEQ,10,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,CAST,BTEQ,30,2
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,<>,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,LOGOFF,BTEQ,70,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL Content,[Create Table] PRIMARY INDEX,BTEQ,9,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,CONCAT,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,SET,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,ADD_MONTHS,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Data Type,NUMBER,BTEQ,20,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL Content,COLUMN NAME LIST,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,HAVING,BTEQ,5,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,RECORDMODE,BTEQ,2,2
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,LOGON,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,EXIT,BTEQ,43,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,NOT IN,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,CURRENT_DATE,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Data Type,INTEGER,BTEQ,2,2
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,ASC,BTEQ,1,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Data Type,CHAR,BTEQ,20,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,ON,BTEQ,7,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,BETWEEN,BTEQ,5,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,RANK,BTEQ,4,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,IN,BTEQ,6,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Set Operator,EXCEPT,BTEQ,23,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,PARTITION BY,BTEQ,4,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Data Type,VARCHAR,BTEQ,31,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,LABEL,BTEQ,91,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,IF,BTEQ,397,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,DESC,BTEQ,7,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,COALESCE,BTEQ,7,4
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL Content,TABLE AS query_expr,BTEQ,10,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,QUALIFY,BTEQ,6,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,FOLDLINE,BTEQ,1,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,JOIN,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DML,UPDATE,BTEQ,19,18
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,>=,BTEQ,5,2
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DML,INSERT,BTEQ,84,84
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,>,BTEQ,1,1
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,SUBSTR,BTEQ,14,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,ALL,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,COUNT,BTEQ,6,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,||,BTEQ,2,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,FORMAT,BTEQ,49,49
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DML,CALL,BTEQ,4,4
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Statement - Control of Flow,SEARCHED CASE EXPRESSION,BTEQ,7,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,LEFT JOIN,BTEQ,6,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,WIDTH,BTEQ,46,46
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,FIELD ACCESS,BTEQ,187,90
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,MAX,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,THEN,BTEQ,9,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Operator,<=,BTEQ,4,2
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DML,DELETE,BTEQ,63,59
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,TRIM,BTEQ,4,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,EXPORT,BTEQ,22,22
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,OS,BTEQ,8,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,DDL,DROP TABLE,BTEQ,55,42
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,TO_CHAR,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,EXTRACT,BTEQ,3,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,NULL,BTEQ,1,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,BTEQ,RUN,BTEQ,46,0
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Query,FROM,BTEQ,113,86
+9d1f72ba-c57b-41ec-9b39-3d75e2c7b5eb,Functions & Expressions,ROW_NUMBER,BTEQ,2,1

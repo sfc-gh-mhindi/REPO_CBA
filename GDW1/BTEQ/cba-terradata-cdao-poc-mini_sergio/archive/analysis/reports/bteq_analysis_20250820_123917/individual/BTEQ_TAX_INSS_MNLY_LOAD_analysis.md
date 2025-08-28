@@ -1,0 +1,614 @@
+# BTEQ_TAX_INSS_MNLY_LOAD.sql - BTEQ Analysis
+
+## File Overview
+- **File Name**: BTEQ_TAX_INSS_MNLY_LOAD.sql
+- **Analysis Status**: ✅ Success
+- **Control Statements**: 19
+- **SQL Blocks**: 7
+
+## Control Flow Analysis
+
+| Line | Type | Statement |
+|------|------|-----------|
+| 1 | RUN | `.RUN FILE=%%BTEQ_LOGON_SCRIPT%%` |
+| 2 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 42 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 166 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 176 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 203 | IF_ERRORCODE | ` .IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 207 | IF_ERRORCODE | ` .IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 211 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 241 | IF_ERRORCODE | ` .IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 243 | COLLECT_STATS | `COLLECT STATS ON %%STARDATADB%%.ACCT_PATY_TAX_INSS;` |
+| 245 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 299 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 301 | COLLECT_STATS | `COLLECT STATS ON %%STARDATADB%%.UTIL_PROS_ISAC;` |
+| 302 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 305 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 308 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 311 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 314 | IF_ERRORCODE | `.IF ERRORCODE <> 0 THEN .GOTO EXITERR` |
+| 319 | LABEL | `.LABEL EXITERR` |
+
+## SQL Blocks Analysis
+
+### SQL Block 1 (Lines 39-41)
+- **Complexity Score**: 0
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ❌ Invalid
+- **Teradata Features**: 0
+
+#### 📝 Original Teradata SQL:
+```sql
+WITH DATA PRIMARY INDEX(ACCT)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+WITH DATA PRIMARY INDEX(ACCT)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ❌
+
+### SQL Block 2 (Lines 74-165)
+- **Complexity Score**: 0
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ❌ Invalid
+- **Teradata Features**: 3
+
+#### 📝 Original Teradata SQL:
+```sql
+SELECT
+ACCT_I
+,PATY_I
+,RSDT_STUS
+,USER_IN_CYT_CALC
+,CYT_DOCU_QOTE
+,CASE WHEN RESI_STUS IS NULL THEN '9999' ELSE RESI_STUS_C END AS RESI_STUS_C
+,CASE WHEN SAP_IDNN_TYPE_C IS NULL THEN '9999' ELSE IDNN_TYPE_C END AS IDNN_TYPE_C
+,CASE WHEN SAP_IDNN_STUS_C IS NULL THEN '9999' ELSE IDNN_STUS_C END AS IDNN_STUS_C
+,AMCD.VALD_TO AS VALD_TO_CYT
+,BP.VALD_TO
+,LAST_UPDT_ON
+,ACCT_STUS
+,AMD.VALD_FROM
+,UTIL.RUN_STRM_PROS_D
+--,CASE WHEN AMCD.LOAD_S>=UTIL.EXT_FROM_S THEN 'Y' ELSE 'N' END AS LIND
+FROM
+(SEL * FROM ACCT_MSTR1) AMCD 
+INNER JOIN
+%%VCBODS%%.ACCT_MSTR_DATA_GENL AMD
+ON AMD.ACCT = AMCD.ACCT
+AND AMD.SRCE_SYST_ISAC_CODE = AMCD.SRCE_SYST_ISAC_CODE
+INNER JOIN
+(
+SELECT
+PATY_I
+,BP.BUSN_PTNR_NUMB
+,BP.SRCE_SYST_ISAC_CODE
+,BP.LOAD_S
+,PI.LOAD_S AS LOAD_S_PI
+,COALESCE (PI.VALD_TO,DATE '9999-12-31') AS VALD_TO
+FROM
+(SEL * FROM %%VCBODS%%.BUSN_PTNR
+WHERE IS_CURR_IND = 1) BP
+LEFT OUTER JOIN
+%%VCBODS%%.PTNR_IDNN_NUMB PI
+ON BP.BUSN_PTNR_NUMB = PI.BUSN_PTNR_NUMB
+AND BP.SRCE_SYST_ISAC_CODE = PI.SRCE_SYST_ISAC_CODE
+AND PTNR_ID_TYPE = 'ZCIF00'
+
+QUALIFY ROW_NUMBER() OVER(PARTITION BY BP.BUSN_PTNR_NUMB,BP.SRCE_SYST_ISAC_CODE ORDER BY PI.LOAD_S DESC,PI.VALD_TO DESC)=1
+
+)BP
+ON BP.BUSN_PTNR_NUMB = AMCD.BUSN_PTNR_NUMB
+AND BP.SRCE_SYST_ISAC_CODE = AMCD.SRCE_SYST_ISAC_CODE
+
+INNER JOIN
+(
+SELECT RUN_STRM_PROS_D, SRCE_SYST_ISAC, EXT_FROM_S, EXT_TO_S FROM %%UTILSTG%%.CBM_UTIL_RUN_STRM_OCCR_CNTL_H WHERE RUN_STRM_C='SAP00' AND SRCE_SYST_ISAC='E001'
+--AND RUN_STRM_PROS_D ='2016-05-17'
+) UTIL
+ON UTIL.SRCE_SYST_ISAC = AMCD.SRCE_SYST_ISAC_CODE
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_RESI_STUS AS MSRS
+ON MSRS.RESI_STUS=AMCD.RSDT_STUS AND RUN_STRM_PROS_D BETWEEN MSRS.EFFT_D AND MSRS.EXPY_D
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_IDNN_TYPE AS MSIT
+ON MSIT.SAP_IDNN_TYPE_C=AMCD.USER_IN_CYT_CALC AND RUN_STRM_PROS_D BETWEEN MSIT.EFFT_D AND MSIT.EXPY_D
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_IDNN_STUS AS MSIS
+ON MSIS.SAP_IDNN_STUS_C=AMCD.CYT_DOCU_QOTE AND RUN_STRM_PROS_D BETWEEN MSIS.EFFT_D AND MSIS.EXPY_D
+
+WHERE
+AMD.LOAD_S <= UTIL.EXT_TO_S AND COALESCE(AMD.UPD_LOAD_S,TIMESTAMP '9999-12-31 00:00:00.000000') > UTIL.EXT_TO_S
+AND
+AMCD.LOAD_S <= UTIL.EXT_TO_S
+AND
+COALESCE(AMD.PDCT,'') NOT IN
+( SELECT PDCT FROM %%VTECH%%.MAP_SAP_INVL_PDCT
+WHERE PDCT_C = 'INVL' AND UTIL.RUN_STRM_PROS_D BETWEEN EFFT_D AND EXPY_D )
+AND
+(
+( AMCD.LOAD_S >= UTIL.EXT_FROM_S )
+OR
+( AMD.LOAD_S >= UTIL.EXT_FROM_S )
+OR
+(BP.VALD_TO <> '9999-12-31' AND BP.LOAD_S_PI >= UTIL.EXT_FROM_S)
+)
+
+QUALIFY ROW_NUMBER() OVER(PARTITION BY AMCD.ACCT, AMCD.BUSN_PTNR_NUMB, AMCD.SRCE_SYST_ISAC_CODE ORDER BY AMCD.VALD_FROM DESC, AMCD.LOAD_S DESC)=1
+) AS SRC
+
+LEFT OUTER JOIN
+( SEL * FROM %%VTECH%%.ACCT_PATY_TAX_INSS
+WHERE SRCE_SYST_C='SAP' AND ACCT_I LIKE 'SAP%'
+QUALIFY ROW_NUMBER() OVER(PARTITION BY ACCT_I,PATY_I,SRCE_SYST_C ORDER BY EFFT_D DESC,EXPY_D DESC )=1
+) TGT
+ON SRC.ACCT_I=TGT.ACCT_I AND SRC.PATY_I=TGT.PATY_I AND TGT.SRCE_SYST_C='SAP'
+WHERE IND='I' )
+WITH DATA PRIMARY INDEX(ACCT_I,PATY_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+SELECT
+ACCT_I
+,PATY_I
+,RSDT_STUS
+,USER_IN_CYT_CALC
+,CYT_DOCU_QOTE
+,CASE WHEN RESI_STUS IS NULL THEN '9999' ELSE RESI_STUS_C END AS RESI_STUS_C
+,CASE WHEN SAP_IDNN_TYPE_C IS NULL THEN '9999' ELSE IDNN_TYPE_C END AS IDNN_TYPE_C
+,CASE WHEN SAP_IDNN_STUS_C IS NULL THEN '9999' ELSE IDNN_STUS_C END AS IDNN_STUS_C
+,AMCD.VALD_TO AS VALD_TO_CYT
+,BP.VALD_TO
+,LAST_UPDT_ON
+,ACCT_STUS
+,AMD.VALD_FROM
+,UTIL.RUN_STRM_PROS_D
+--,CASE WHEN AMCD.LOAD_S>=UTIL.EXT_FROM_S THEN 'Y' ELSE 'N' END AS LIND
+FROM
+(SEL * FROM ACCT_MSTR1) AMCD 
+INNER JOIN
+%%VCBODS%%.ACCT_MSTR_DATA_GENL AMD
+ON AMD.ACCT = AMCD.ACCT
+AND AMD.SRCE_SYST_ISAC_CODE = AMCD.SRCE_SYST_ISAC_CODE
+INNER JOIN
+(
+SELECT
+PATY_I
+,BP.BUSN_PTNR_NUMB
+,BP.SRCE_SYST_ISAC_CODE
+,BP.LOAD_S
+,PI.LOAD_S AS LOAD_S_PI
+,COALESCE (PI.VALD_TO,DATE '9999-12-31') AS VALD_TO
+FROM
+(SEL * FROM %%VCBODS%%.BUSN_PTNR
+WHERE IS_CURR_IND = 1) BP
+LEFT OUTER JOIN
+%%VCBODS%%.PTNR_IDNN_NUMB PI
+ON BP.BUSN_PTNR_NUMB = PI.BUSN_PTNR_NUMB
+AND BP.SRCE_SYST_ISAC_CODE = PI.SRCE_SYST_ISAC_CODE
+AND PTNR_ID_TYPE = 'ZCIF00'
+
+QUALIFY ROW_NUMBER() OVER(PARTITION BY BP.BUSN_PTNR_NUMB,BP.SRCE_SYST_ISAC_CODE ORDER BY PI.LOAD_S DESC,PI.VALD_TO DESC)=1
+
+)BP
+ON BP.BUSN_PTNR_NUMB = AMCD.BUSN_PTNR_NUMB
+AND BP.SRCE_SYST_ISAC_CODE = AMCD.SRCE_SYST_ISAC_CODE
+
+INNER JOIN
+(
+SELECT RUN_STRM_PROS_D, SRCE_SYST_ISAC, EXT_FROM_S, EXT_TO_S FROM %%UTILSTG%%.CBM_UTIL_RUN_STRM_OCCR_CNTL_H WHERE RUN_STRM_C='SAP00' AND SRCE_SYST_ISAC='E001'
+--AND RUN_STRM_PROS_D ='2016-05-17'
+) UTIL
+ON UTIL.SRCE_SYST_ISAC = AMCD.SRCE_SYST_ISAC_CODE
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_RESI_STUS AS MSRS
+ON MSRS.RESI_STUS=AMCD.RSDT_STUS AND RUN_STRM_PROS_D BETWEEN MSRS.EFFT_D AND MSRS.EXPY_D
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_IDNN_TYPE AS MSIT
+ON MSIT.SAP_IDNN_TYPE_C=AMCD.USER_IN_CYT_CALC AND RUN_STRM_PROS_D BETWEEN MSIT.EFFT_D AND MSIT.EXPY_D
+LEFT OUTER JOIN
+%%VTECH%%.MAP_SAP_IDNN_STUS AS MSIS
+ON MSIS.SAP_IDNN_STUS_C=AMCD.CYT_DOCU_QOTE AND RUN_STRM_PROS_D BETWEEN MSIS.EFFT_D AND MSIS.EXPY_D
+
+WHERE
+AMD.LOAD_S <= UTIL.EXT_TO_S AND COALESCE(AMD.UPD_LOAD_S,TIMESTAMP '9999-12-31 00:00:00.000000') > UTIL.EXT_TO_S
+AND
+AMCD.LOAD_S <= UTIL.EXT_TO_S
+AND
+COALESCE(AMD.PDCT,'') NOT IN
+( SELECT PDCT FROM %%VTECH%%.MAP_SAP_INVL_PDCT
+WHERE PDCT_C = 'INVL' AND UTIL.RUN_STRM_PROS_D BETWEEN EFFT_D AND EXPY_D )
+AND
+(
+( AMCD.LOAD_S >= UTIL.EXT_FROM_S )
+OR
+( AMD.LOAD_S >= UTIL.EXT_FROM_S )
+OR
+(BP.VALD_TO <> '9999-12-31' AND BP.LOAD_S_PI >= UTIL.EXT_FROM_S)
+)
+
+QUALIFY ROW_NUMBER() OVER(PARTITION BY AMCD.ACCT, AMCD.BUSN_PTNR_NUMB, AMCD.SRCE_SYST_ISAC_CODE ORDER BY AMCD.VALD_FROM DESC, AMCD.LOAD_S DESC)=1
+) AS SRC
+
+LEFT OUTER JOIN
+( SEL * FROM %%VTECH%%.ACCT_PATY_TAX_INSS
+WHERE SRCE_SYST_C='SAP' AND ACCT_I LIKE 'SAP%'
+QUALIFY ROW_NUMBER() OVER(PARTITION BY ACCT_I,PATY_I,SRCE_SYST_C ORDER BY EFFT_D DESC,EXPY_D DESC )=1
+) TGT
+ON SRC.ACCT_I=TGT.ACCT_I AND SRC.PATY_I=TGT.PATY_I AND TGT.SRCE_SYST_C='SAP'
+WHERE IND='I' )
+WITH DATA PRIMARY INDEX(ACCT_I,PATY_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ❌
+
+#### 🎯 Teradata Features Detected:
+- QUALIFY clause
+- ROW_NUMBER() OVER
+- Variable substitution
+
+### SQL Block 3 (Lines 173-175)
+- **Complexity Score**: 0
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ❌ Invalid
+- **Teradata Features**: 0
+
+#### 📝 Original Teradata SQL:
+```sql
+WITH DATA PRIMARY INDEX(PROS_KEY_EFFT_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+WITH DATA PRIMARY INDEX(PROS_KEY_EFFT_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ❌
+
+### SQL Block 4 (Lines 181-202)
+- **Complexity Score**: 0
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ❌ Invalid
+- **Teradata Features**: 0
+
+#### 📝 Original Teradata SQL:
+```sql
+SELECT 
+ACCT_I
+,PATY_I
+,SRCE_SYST_C
+,RESI_STUS_C
+,IDNN_TYPE_C
+,IDNN_STUS_C
+,RSDT_STUS
+,USER_IN_CYT_CALC
+,CYT_DOCU_QOTE
+,VALD_TO_CYT
+,VALD_TO
+,LAST_UPDT_ON
+,ACCT_STUS
+,VALD_FROM
+,SRC_EFFT_D AS EFFT_D
+,TGT_EFFT_D AS EXPY_D
+,IND
+ FROM LOAD_MISSING_ACCTS1 )
+WITH DATA PRIMARY INDEX(ACCT_I,PATY_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+SELECT 
+ACCT_I
+,PATY_I
+,SRCE_SYST_C
+,RESI_STUS_C
+,IDNN_TYPE_C
+,IDNN_STUS_C
+,RSDT_STUS
+,USER_IN_CYT_CALC
+,CYT_DOCU_QOTE
+,VALD_TO_CYT
+,VALD_TO
+,LAST_UPDT_ON
+,ACCT_STUS
+,VALD_FROM
+,SRC_EFFT_D AS EFFT_D
+,TGT_EFFT_D AS EXPY_D
+,IND
+ FROM LOAD_MISSING_ACCTS1 )
+WITH DATA PRIMARY INDEX(ACCT_I,PATY_I)
+ON COMMIT PRESERVE ROWS;
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ❌
+
+### SQL Block 5 (Lines 209-210)
+- **Complexity Score**: 12
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ✅ Valid
+- **Teradata Features**: 0
+
+#### 📝 Original Teradata SQL:
+```sql
+UPDATE ACCT_PATY_INSS_FIX  SET EXPY_D='9999-12-31' WHERE EXPY_D IS NULL;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+UPDATE ACCT_PATY_INSS_FIX SET EXPY_D = '9999-12-31' WHERE EXPY_D IS NULL
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ✅
+
+#### ⚡ Optimized SQL:
+```sql
+UPDATE "acct_paty_inss_fix" SET "expy_d" = '9999-12-31'
+WHERE
+  "expy_d" IS NULL
+```
+
+#### 📊 SQL Metadata:
+- **Tables**: ACCT_PATY_INSS_FIX
+- **Columns**: EXPY_D
+
+### SQL Block 6 (Lines 213-240)
+- **Complexity Score**: 63
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ✅ Valid
+- **Teradata Features**: 1
+
+#### 📝 Original Teradata SQL:
+```sql
+INSERT INTO %%STARDATADB%%.ACCT_PATY_TAX_INSS
+( 
+ ACCT_I
+,PATY_I
+,SRCE_SYST_C
+,RESI_STUS_C
+,IDNN_TYPE_C
+,IDNN_STUS_C
+,EFFT_D
+,EXPY_D
+,PROS_KEY_EFFT_I
+,PROS_KEY_EXPY_I
+,ROW_SECU_ACCS_C
+)
+SELECT 
+ ACCT_I
+,PATY_I
+,COALESCE(SRCE_SYST_C,SUBSTR(PATY_I,1,3))
+,RESI_STUS_C
+,IDNN_TYPE_C
+,IDNN_STUS_C
+,EFFT_D
+,EXPY_D
+,(SEL PROS_KEY_EFFT_I FROM UTIL_PROS_SAP_RUN) as PROS_KEY_EFFT_I
+,(SEL PROS_KEY_EFFT_I FROM UTIL_PROS_SAP_RUN) as PROS_KEY_EXPY_I
+,'0' AS ROW_SECU_ACCS_C
+ FROM  ACCT_PATY_INSS_FIX;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+INSERT INTO %%STARDATADB%%.ACCT_PATY_TAX_INSS (ACCT_I, PATY_I, SRCE_SYST_C, RESI_STUS_C, IDNN_TYPE_C, IDNN_STUS_C, EFFT_D, EXPY_D, PROS_KEY_EFFT_I, PROS_KEY_EXPY_I, ROW_SECU_ACCS_C) SELECT ACCT_I, PATY_I, COALESCE(SRCE_SYST_C, SUBSTRING(PATY_I, 1, 3)), RESI_STUS_C, IDNN_TYPE_C, IDNN_STUS_C, EFFT_D, EXPY_D, (SELECT PROS_KEY_EFFT_I FROM UTIL_PROS_SAP_RUN) AS PROS_KEY_EFFT_I, (SELECT PROS_KEY_EFFT_I FROM UTIL_PROS_SAP_RUN) AS PROS_KEY_EXPY_I, '0' AS ROW_SECU_ACCS_C FROM ACCT_PATY_INSS_FIX
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ✅
+
+#### 🎯 Teradata Features Detected:
+- Variable substitution
+
+#### ⚡ Optimized SQL:
+```sql
+INSERT INTO "%%stardatadb%%"."acct_paty_tax_inss" (
+  "acct_i",
+  "paty_i",
+  "srce_syst_c",
+  "resi_stus_c",
+  "idnn_type_c",
+  "idnn_stus_c",
+  "efft_d",
+  "expy_d",
+  "pros_key_efft_i",
+  "pros_key_expy_i",
+  "row_secu_accs_c"
+)
+SELECT
+  "acct_paty_inss_fix"."acct_i" AS "acct_i",
+  "acct_paty_inss_fix"."paty_i" AS "paty_i",
+  COALESCE("acct_paty_inss_fix"."srce_syst_c", SUBSTRING("acct_paty_inss_fix"."paty_i", 1, 3)) AS "_col_2",
+  "acct_paty_inss_fix"."resi_stus_c" AS "resi_stus_c",
+  "acct_paty_inss_fix"."idnn_type_c" AS "idnn_type_c",
+  "acct_paty_inss_fix"."idnn_stus_c" AS "idnn_stus_c",
+  "acct_paty_inss_fix"."efft_d" AS "efft_d",
+  "acct_paty_inss_fix"."expy_d" AS "expy_d",
+  (
+    SELECT
+      "util_pros_sap_run"."pros_key_efft_i" AS "pros_key_efft_i"
+    FROM "util_pros_sap_run" AS "util_pros_sap_run"
+  ) AS "pros_key_efft_i",
+  (
+    SELECT
+      "util_pros_sap_run"."pros_key_efft_i" AS "pros_key_efft_i"
+    FROM "util_pros_sap_run" AS "util_pros_sap_run"
+  ) AS "pros_key_expy_i",
+  '0' AS "row_secu_accs_c"
+FROM "acct_paty_inss_fix" AS "acct_paty_inss_fix"
+```
+
+#### 📊 SQL Metadata:
+- **Tables**: ACCT_PATY_INSS_FIX, ACCT_PATY_TAX_INSS, UTIL_PROS_SAP_RUN
+- **Columns**: ACCT_I, EFFT_D, EXPY_D, IDNN_STUS_C, IDNN_TYPE_C, PATY_I, PROS_KEY_EFFT_I, RESI_STUS_C, SRCE_SYST_C
+- **Functions**: PATY_I, SRCE_SYST_C
+
+### SQL Block 7 (Lines 248-298)
+- **Complexity Score**: 157
+- **Has Valid SQL**: ✅
+- **Conversion Successful**: ✅
+- **Syntax Validation**: ✅ Valid
+- **Teradata Features**: 1
+
+#### 📝 Original Teradata SQL:
+```sql
+INSERT INTO %%STARDATADB%%.UTIL_PROS_ISAC
+SEL
+PROS_KEY_EFFT_I AS PROS_KEY_I
+,'C5647678' AS CONV_M
+,'MNL' AS CONV_TYPE_M
+,CURRENT_TIMESTAMP(0) AS PROS_RQST_S
+,CURRENT_TIMESTAMP(0) AS PROS_LAST_RQST_S
+,NULL AS PROS_RQST_Q
+,CURRENT_DATE AS BTCH_RUN_D
+,PROS_KEY_EFFT_I AS BTCH_KEY_I
+,'SAP' AS SRCE_SYST_M
+,'Data Remediation - Manual' AS SRCE_M
+,'ACCT_PATY_TAX_INSS' AS TRGT_M
+,'Y' AS SUCC_F
+,'Y' AS COMT_F
+,CURRENT_TIMESTAMP(0) AS COMT_S
+,NULL AS MLTI_LOAD_EFFT_D
+,NULL AS SYST_S
+,NULL AS MLTI_LOAD_COMT_S
+,NULL AS SYST_ET_Q
+,NULL AS SYST_UV_Q
+,(SEL COUNT(*) FROM LOAD_MISSING_ACCTS1 ) AS SYST_INS_Q
+,NULL AS SYST_UPD_Q
+,NULL AS SYST_DEL_Q
+,NULL AS SYST_ET_TABL_M
+,NULL AS SYST_UV_TABL_M
+,NULL AS SYST_HEAD_ET_TABL_M
+,NULL AS SYST_HEAD_UV_TABL_M
+,NULL AS SYST_TRLR_ET_TABL_M
+,NULL AS SYST_TRLR_UV_TABL_M
+,NULL AS PREV_PROS_KEY_I
+,NULL AS HEAD_RECD_TYPE_C
+,NULL AS HEAD_FILE_M
+,NULL AS HEAD_BTCH_RUN_D
+,NULL AS HEAD_FILE_CRAT_S
+,NULL AS HEAD_GENR_PRGM_M
+,NULL AS HEAD_BTCH_KEY_I
+,NULL AS HEAD_PROS_KEY_I
+,NULL AS HEAD_PROS_PREV_KEY_I
+,NULL AS TRLR_RECD_TYPE_C
+,NULL AS TRLR_RECD_Q
+,NULL AS TRLR_HASH_TOTL_A
+,NULL AS TRLR_COLM_HASH_TOTL_M
+,NULL AS TRLR_EROR_RECD_Q
+,NULL AS TRLR_FILE_COMT_S
+,NULL AS TRLR_RECD_ISRT_Q
+,NULL AS TRLR_RECD_UPDT_Q
+,NULL AS TRLR_RECD_DELT_Q
+FROM
+ UTIL_PROS_SAP_RUN;
+```
+
+#### ❄️ Converted Snowflake SQL:
+```sql
+INSERT INTO %%STARDATADB%%.UTIL_PROS_ISAC SELECT PROS_KEY_EFFT_I AS PROS_KEY_I, 'C5647678' AS CONV_M, 'MNL' AS CONV_TYPE_M, CURRENT_TIMESTAMP(0) AS PROS_RQST_S, CURRENT_TIMESTAMP(0) AS PROS_LAST_RQST_S, NULL AS PROS_RQST_Q, CURRENT_DATE AS BTCH_RUN_D, PROS_KEY_EFFT_I AS BTCH_KEY_I, 'SAP' AS SRCE_SYST_M, 'Data Remediation - Manual' AS SRCE_M, 'ACCT_PATY_TAX_INSS' AS TRGT_M, 'Y' AS SUCC_F, 'Y' AS COMT_F, CURRENT_TIMESTAMP(0) AS COMT_S, NULL AS MLTI_LOAD_EFFT_D, NULL AS SYST_S, NULL AS MLTI_LOAD_COMT_S, NULL AS SYST_ET_Q, NULL AS SYST_UV_Q, (SELECT COUNT(*) FROM LOAD_MISSING_ACCTS1) AS SYST_INS_Q, NULL AS SYST_UPD_Q, NULL AS SYST_DEL_Q, NULL AS SYST_ET_TABL_M, NULL AS SYST_UV_TABL_M, NULL AS SYST_HEAD_ET_TABL_M, NULL AS SYST_HEAD_UV_TABL_M, NULL AS SYST_TRLR_ET_TABL_M, NULL AS SYST_TRLR_UV_TABL_M, NULL AS PREV_PROS_KEY_I, NULL AS HEAD_RECD_TYPE_C, NULL AS HEAD_FILE_M, NULL AS HEAD_BTCH_RUN_D, NULL AS HEAD_FILE_CRAT_S, NULL AS HEAD_GENR_PRGM_M, NULL AS HEAD_BTCH_KEY_I, NULL AS HEAD_PROS_KEY_I, NULL AS HEAD_PROS_PREV_KEY_I, NULL AS TRLR_RECD_TYPE_C, NULL AS TRLR_RECD_Q, NULL AS TRLR_HASH_TOTL_A, NULL AS TRLR_COLM_HASH_TOTL_M, NULL AS TRLR_EROR_RECD_Q, NULL AS TRLR_FILE_COMT_S, NULL AS TRLR_RECD_ISRT_Q, NULL AS TRLR_RECD_UPDT_Q, NULL AS TRLR_RECD_DELT_Q FROM UTIL_PROS_SAP_RUN
+```
+
+#### 🔍 Syntax Validation Details:
+- **Valid**: ✅
+
+#### 🎯 Teradata Features Detected:
+- Variable substitution
+
+#### ⚡ Optimized SQL:
+```sql
+INSERT INTO "%%stardatadb%%"."util_pros_isac"
+SELECT
+  "util_pros_sap_run"."pros_key_efft_i" AS "pros_key_i",
+  'C5647678' AS "conv_m",
+  'MNL' AS "conv_type_m",
+  CURRENT_TIMESTAMP(0) AS "pros_rqst_s",
+  CURRENT_TIMESTAMP(0) AS "pros_last_rqst_s",
+  NULL AS "pros_rqst_q",
+  CURRENT_DATE AS "btch_run_d",
+  "util_pros_sap_run"."pros_key_efft_i" AS "btch_key_i",
+  'SAP' AS "srce_syst_m",
+  'Data Remediation - Manual' AS "srce_m",
+  'ACCT_PATY_TAX_INSS' AS "trgt_m",
+  'Y' AS "succ_f",
+  'Y' AS "comt_f",
+  CURRENT_TIMESTAMP(0) AS "comt_s",
+  NULL AS "mlti_load_efft_d",
+  NULL AS "syst_s",
+  NULL AS "mlti_load_comt_s",
+  NULL AS "syst_et_q",
+  NULL AS "syst_uv_q",
+  (
+    SELECT
+      COUNT(*) AS "_col_0"
+    FROM "load_missing_accts1" AS "load_missing_accts1"
+  ) AS "syst_ins_q",
+  NULL AS "syst_upd_q",
+  NULL AS "syst_del_q",
+  NULL AS "syst_et_tabl_m",
+  NULL AS "syst_uv_tabl_m",
+  NULL AS "syst_head_et_tabl_m",
+  NULL AS "syst_head_uv_tabl_m",
+  NULL AS "syst_trlr_et_tabl_m",
+  NULL AS "syst_trlr_uv_tabl_m",
+  NULL AS "prev_pros_key_i",
+  NULL AS "head_recd_type_c",
+  NULL AS "head_file_m",
+  NULL AS "head_btch_run_d",
+  NULL AS "head_file_crat_s",
+  NULL AS "head_genr_prgm_m",
+  NULL AS "head_btch_key_i",
+  NULL AS "head_pros_key_i",
+  NULL AS "head_pros_prev_key_i",
+  NULL AS "trlr_recd_type_c",
+  NULL AS "trlr_recd_q",
+  NULL AS "trlr_hash_totl_a",
+  NULL AS "trlr_colm_hash_totl_m",
+  NULL AS "trlr_eror_recd_q",
+  NULL AS "trlr_file_comt_s",
+  NULL AS "trlr_recd_isrt_q",
+  NULL AS "trlr_recd_updt_q",
+  NULL AS "trlr_recd_delt_q"
+FROM "util_pros_sap_run" AS "util_pros_sap_run"
+```
+
+#### 📊 SQL Metadata:
+- **Tables**: LOAD_MISSING_ACCTS1, UTIL_PROS_ISAC, UTIL_PROS_SAP_RUN
+- **Columns**: PROS_KEY_EFFT_I
+- **Functions**: *, 0, None
+
+## Migration Recommendations
+
+### Suggested Migration Strategy
+**High complexity** - Break into multiple models, use DCF full framework
+
+### DCF Mapping
+- **Error Handling**: Convert `.IF ERRORCODE` patterns to DCF error handling macros
+- **File Operations**: Replace IMPORT/EXPORT with dbt seeds or external tables
+- **Statistics**: Replace COLLECT STATS with Snowflake post-hooks
+- **Stored Procedures**: Map CALL statements to DCF stored procedure macros
+
+---
+
+*Generated by BTEQ Parser Service - 2025-08-20 12:39:25*

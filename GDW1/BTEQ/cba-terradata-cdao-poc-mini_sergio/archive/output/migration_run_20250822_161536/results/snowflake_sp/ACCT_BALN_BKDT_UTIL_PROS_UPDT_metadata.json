@@ -1,0 +1,21 @@
+{
+  "procedure_name": "ACCT_BALN_BKDT_UTIL_PROS_UPDT",
+  "parameters": [
+    "ERROR_TABLE STRING DEFAULT 'PROCESS_ERROR_LOG'",
+    "PROCESS_KEY STRING DEFAULT 'UNKNOWN_PROCESS'"
+  ],
+  "warnings": [],
+  "llm_enhancements": [],
+  "quality_score": 0.0,
+  "migration_notes": [],
+  "generation_timestamp": "2025-08-22T16:15:53.136266",
+  "versions_generated": [
+    "prescriptive"
+  ],
+  "preferred_version": "prescriptive",
+  "preferred_file": "ACCT_BALN_BKDT_UTIL_PROS_UPDT_prescriptive.sql",
+  "available_files": {
+    "prescriptive": "ACCT_BALN_BKDT_UTIL_PROS_UPDT_prescriptive.sql",
+    "preferred": "ACCT_BALN_BKDT_UTIL_PROS_UPDT.sql"
+  }
+}

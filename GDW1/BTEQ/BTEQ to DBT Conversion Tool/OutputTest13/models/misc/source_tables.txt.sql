@@ -1,0 +1,92 @@
+-- =====================================================================
+-- DBT Model: source_tables.txt
+-- Converted from BTEQ: source_tables.txt
+-- Category: misc
+-- Original Size: 1.1KB, 64 lines
+-- Complexity Score: 1
+-- Generated: 2025-08-21 16:26:38
+-- =====================================================================
+
+{{
+    config(
+        materialized='table',
+        docs={'show': true}
+    )
+}}
+
+-- This model performs data modification operations
+-- Execute via post-hook or separate run
+
+{{ config(
+    materialized='table',
+    post_hook=[
+        "  FROM {{ bteq_var(\"DDSTG\") }}. ACCT_PATY_REL_WSS APA
+ACCT_BALN_BKDT_ADJ_RULE
+ACCT_BALN_BKDT_STG1
+ACCT_BALN_BKDT_STG2
+ACCT_BASE
+ACCT_MSTR_CYT_DATA
+ACCT_OFFR
+ACCT_PATY
+ACCT_PATY_DEDUP
+ACCT_PATY_REL_THA
+ACCT_PATY_REL_WSS
+ACCT_PATY_TAX_INSS
+ACCT_PATY_THA_NEW_RNGE
+ACCT_PDCT
+ACCT_REL
+ACCT_REL_HLS_REME
+ACCT_REL_WSS_DITPS
+ACCT_UNID_PATY
+ACCT_XREF_BPS_CBS
+ACCT_XREF_MAS_DAR
+BUSN_PTNR
+CBA_FNCL_SERV_GL_DATA_CURR
+CBM_UTIL_RUN_STRM_OCCR_CNTL_H
+CLS_FCLY
+CLS_UNID_PATY
+DAR_ACCT
+DEPT_DIMN_NODE_ANCS_CURR
+DERV_ACCT_PATY
+DERV_ACCT_PATY_ADD
+DERV_ACCT_PATY_CHG
+DERV_ACCT_PATY_CURR
+DERV_ACCT_PATY_DEL
+DERV_ACCT_PATY_FLAG
+DERV_ACCT_PATY_NON_RM
+DERV_ACCT_PATY_RM
+DERV_ACCT_PATY_ROW_SECU_FIX
+DERV_PRTF_ACCT
+DERV_PRTF_ACCT_PATY_PSST
+DERV_PRTF_ACCT_PATY_STAG
+DERV_PRTF_ACCT_REL
+DERV_PRTF_ACCT_STAG
+DERV_PRTF_OWN_PSST
+DERV_PRTF_PATY
+DERV_PRTF_PATY_REL
+DERV_PRTF_PATY_STAG
+GRD_DEPT_FLAT_CURR
+GRD_GNRC_MAP_CURR
+GRD_GNRC_MAP_DERV_PATY_HOLD
+GRD_GNRC_MAP_DERV_PATY_REL
+GRD_GNRC_MAP_DERV_UNID_PATY
+GRD_RPRT_CALR_FNYR
+MAP_SAP_INVL_PDCT
+MOS_FCLY
+MOS_LOAN
+MSTR_CNCT_BALN_TRNF_PRTP
+MSTR_CNCT_MSTR_DATA_GENL
+MSTR_CNCT_PRXY_ACCT
+ODS_RULE
+THA_ACCT
+UTIL_BTCH_ISAC
+UTIL_PARM
+UTIL_PROS_ISAC
+UTIL_PROS_SAP_RUN
+WUL_NON_SAP_ACCT
+"
+    ]
+) }}
+
+-- Placeholder query for DBT execution
+SELECT 1 as operation_complete

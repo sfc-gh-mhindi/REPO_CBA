@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-08-21T15:52:25.313913",
+  "total_dbt_models": 11,
+  "dbt_models": [
+    {
+      "filename": "acct_baln_bkdt_adj_rule_isrt.sql",
+      "model_name": "acct_baln_bkdt_adj_rule_isrt",
+      "file_size_bytes": 6440,
+      "last_modified": "2025-08-21T15:41:39.130058"
+    },
+    {
+      "filename": "acct_baln_bkdt_audt_get_pros_key.sql",
+      "model_name": "acct_baln_bkdt_audt_get_pros_key",
+      "file_size_bytes": 3816,
+      "last_modified": "2025-08-21T15:42:43.163021"
+    },
+    {
+      "filename": "acct_baln_bkdt_audt_isrt.sql",
+      "model_name": "acct_baln_bkdt_audt_isrt",
+      "file_size_bytes": 3241,
+      "last_modified": "2025-08-21T15:43:43.516253"
+    },
+    {
+      "filename": "acct_baln_bkdt_avg_call_proc.sql",
+      "model_name": "acct_baln_bkdt_avg_call_proc",
+      "file_size_bytes": 1365,
+      "last_modified": "2025-08-21T15:44:38.698146"
+    },
+    {
+      "filename": "acct_baln_bkdt_delt.sql",
+      "model_name": "acct_baln_bkdt_delt",
+      "file_size_bytes": 2645,
+      "last_modified": "2025-08-21T15:45:09.862693"
+    },
+    {
+      "filename": "acct_baln_bkdt_get_pros_key.sql",
+      "model_name": "acct_baln_bkdt_get_pros_key",
+      "file_size_bytes": 3601,
+      "last_modified": "2025-08-21T15:45:54.862347"
+    },
+    {
+      "filename": "acct_baln_bkdt_isrt.sql",
+      "model_name": "acct_baln_bkdt_isrt",
+      "file_size_bytes": 2082,
+      "last_modified": "2025-08-21T15:46:54.180974"
+    },
+    {
+      "filename": "acct_baln_bkdt_recn_get_pros_key.sql",
+      "model_name": "acct_baln_bkdt_recn_get_pros_key",
+      "file_size_bytes": 3904,
+      "last_modified": "2025-08-21T15:48:00.391261"
+    },
+    {
+      "filename": "acct_baln_bkdt_recn_isrt.sql",
+      "model_name": "acct_baln_bkdt_recn_isrt",
+      "file_size_bytes": 3877,
+      "last_modified": "2025-08-21T15:48:56.555807"
+    },
+    {
+      "filename": "acct_baln_bkdt_stg_isrt.sql",
+      "model_name": "acct_baln_bkdt_stg_isrt",
+      "file_size_bytes": 5304,
+      "last_modified": "2025-08-21T15:50:18.716558"
+    },
+    {
+      "filename": "acct_baln_bkdt_util_pros_updt.sql",
+      "model_name": "acct_baln_bkdt_util_pros_updt",
+      "file_size_bytes": 2127,
+      "last_modified": "2025-08-21T15:51:24.678687"
+    }
+  ]
+}

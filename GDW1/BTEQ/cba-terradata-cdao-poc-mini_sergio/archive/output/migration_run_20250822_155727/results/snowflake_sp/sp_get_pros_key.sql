@@ -1,0 +1,134 @@
+CREATE OR REPLACE PROCEDURE SP_GET_PROS_KEY
+(
+    OUTPUT_PATH STRING DEFAULT '/tmp/output',
+    INPUT_PATH STRING DEFAULT '/tmp/input',
+    OUTPUT_PATH STRING DEFAULT '/tmp/output',
+    OUTPUT_PATH STRING DEFAULT '/tmp/output',
+    ERROR_TABLE STRING DEFAULT 'PROCESS_ERROR_LOG',
+    PROCESS_KEY STRING DEFAULT 'UNKNOWN_PROCESS'
+  )
+  RETURNS STRING
+  LANGUAGE SQL
+  EXECUTE AS CALLER
+AS
+$$
+DECLARE
+-- =============================================================================
+-- Procedure: SP_GET_PROS_KEY
+-- Generated: 2025-08-22 15:57:36
+-- Source: Converted from Teradata BTEQ script
+-- Generator: SnowflakeSPGenerator v1.0
+-- =============================================================================
+-- Original BTEQ Preview:
+-- .RUN FILE=%%BTEQ_LOGON_SCRIPT%%
+-- .IF ERRORCODE <> 0    THEN .GOTO EXITERR
+-- 
+-- .SET QUIET OFF
+-- .SET ECHOREQ ON
+-- .SET FORMAT OFF
+-- .SET WIDTH 120
+-- 
+-- ------------------------------------------------------------------------------
+-- --
+-- =============================================================================
+
+  -- Variable declarations
+  LET error_code INTEGER DEFAULT 0;
+  LET sql_state STRING DEFAULT '00000';
+  LET error_message STRING DEFAULT '';
+  LET row_count INTEGER DEFAULT 0;
+  LET current_step STRING DEFAULT 'INIT';
+
+  -- Label tracking variables
+  LET goto_exiterr BOOLEAN DEFAULT FALSE;
+
+  -- Exception handling setup
+  DECLARE
+    general_exception EXCEPTION (-20001, 'General procedure error');
+  BEGIN
+    -- Main procedure logic starts here
+
+    -- Line 1: .RUN FILE=%%BTEQ_LOGON_SCRIPT%%
+    -- RUN statement: Execute accumulated SQL
+    -- (SQL execution handled inline in Snowflake)
+
+    -- Line 2: .IF ERRORCODE <> 0    THEN .GOTO EXITERR
+    IF (error_code <> 0) THEN
+      GOTO error_exit;
+    END IF;
+
+    -- Line 23: .EXPORT RESET
+    -- File I/O: Consider using Snowflake stages and COPY commands
+
+    -- Line 26: .OS rm /cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_%%TBSHORT%%PROS_KEY.txt
+    -- OS Command: Not supported in Snowflake stored procedures
+    -- Consider using external functions or stages for file operations
+
+    -- Line 28: .IMPORT VARTEXT FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt
+    -- File I/O: Consider using Snowflake stages and COPY commands
+
+    -- Line 30: .EXPORT DATA FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_%%TBSHORT%%PROS_KEY.txt
+    -- File I/O: Consider using Snowflake stages and COPY commands
+
+    -- Line 36: CALL %%STARMACRDB%%.SP_GET_PROS_KEY(        
+  '%%GDW_USER%%',           -- From the config.pass parameters
+  '%%SRCE_SYST_M%%',          
+  '%%SRCE_M%%',           
+  '%%PSST_TABLE_M%%',           
+  CAST(trim(:BTCHKEY) as DECIMAL(10,0)),
+  CAST(%%INDATE%% as DATE FORMAT'YYYYMMDD'),            
+  '%%RSTR_F%%',                -- Restart Flag
+  'MVS',                     
+  IPROCESSKEY (CHAR(100))
+    CALL %%STARMACRDB%%.SP_GET_PROS_KEY(        
+  '%%GDW_USER%%',           -- From the config.pass parameters
+  '%%SRCE_SYST_M%%',          
+  '%%SRCE_M%%',           
+  '%%PSST_TABLE_M%%',           
+  CAST(trim(:BTCHKEY) as DECIMAL(10,0)),
+  CAST(%%INDATE%% as DATE FORMAT'YYYYMMDD'),            
+  '%%RSTR_F%%',                -- Restart Flag
+  'MVS',                     
+  IPROCESSKEY (CHAR(100));
+    -- Check for errors after stored procedure call
+    IF (SQLCODE <> 0) THEN
+      error_code := SQLCODE;
+      error_message := SQLERRM;
+      GOTO error_exit;
+    END IF;
+
+    -- Line 48: .EXPORT RESET
+    -- File I/O: Consider using Snowflake stages and COPY commands
+
+    -- Line 50: .IF ERRORCODE <> 0    THEN .GOTO EXITERR
+    IF (error_code <> 0) THEN
+      GOTO error_exit;
+    END IF;
+
+    -- Line 53: .LOGOFF
+    -- LOGOFF: Connection cleanup handled by Snowflake
+    current_step := 'LOGOFF_COMPLETED';
+
+    -- Line 55: .LABEL EXITERR
+    exiterr:
+
+    -- Line 57: .LOGOFF
+    -- LOGOFF: Connection cleanup handled by Snowflake
+    current_step := 'LOGOFF_COMPLETED';
+
+    -- Success path
+    RETURN 'SUCCESS: ' || current_step || ' completed. Rows processed: ' || row_count;
+
+    -- Error handling
+    error_exit:
+      -- Log error to error table if available
+      INSERT INTO IDENTIFIER(:ERROR_TABLE) (PROCESS_KEY, ERROR_CODE, ERROR_MESSAGE, ERROR_TIMESTAMP)
+      VALUES (:PROCESS_KEY, error_code, error_message, CURRENT_TIMESTAMP());
+      
+      RETURN 'ERROR: ' || error_message || ' (Code: ' || error_code || ')';
+
+  EXCEPTION
+    WHEN OTHER THEN
+      RETURN 'FATAL ERROR: ' || SQLERRM || ' (Code: ' || SQLCODE || ')';
+END;
+$$;

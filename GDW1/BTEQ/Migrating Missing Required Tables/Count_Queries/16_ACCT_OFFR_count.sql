@@ -1,0 +1,6 @@
+-- Count query for STARCADPRODDATA.ACCT_OFFR
+-- Snowflake table: PS_CLD_RW.STARCADPRODDATA.ACCT_OFFR
+-- Teradata counterpart: STARCADPRODDATA.ACCT_OFFR
+
+SELECT count(1) AS record_count
+FROM STARCADPRODDATA.ACCT_OFFR; 

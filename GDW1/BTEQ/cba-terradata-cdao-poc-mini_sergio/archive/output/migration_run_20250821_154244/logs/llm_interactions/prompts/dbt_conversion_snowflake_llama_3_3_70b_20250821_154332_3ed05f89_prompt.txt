@@ -1,0 +1,274 @@
+# LLM Request
+Interaction ID: 20250821_154332_3ed05f89
+Timestamp: 2025-08-21T15:43:32.449620
+Provider: snowflake_cortex
+Model: snowflake-llama-3.3-70b
+Request Type: dbt_conversion
+Temperature: None
+Max Tokens: None
+
+# Context Data
+{
+  "procedure_name": "ACCT_BALN_BKDT_AUDT_ISRT",
+  "conversion_type": "bteq_to_dbt"
+}
+
+# Prompt
+# BTEQ SQL to DBT Model Conversion
+
+You are a senior data engineer expert in converting legacy BTEQ SQL scripts to modern DBT models with Jinja templating.
+
+## CRITICAL INSTRUCTIONS - NO HALLUCINATION POLICY
+- ONLY transform the logic provided in the source BTEQ SQL
+- DO NOT add new business logic, columns, or transformations
+- DO NOT create new table references not in the original
+- PRESERVE all existing business logic exactly
+- If unclear about any logic, maintain the original approach
+
+## Source Context
+
+### 1. Original BTEQ SQL Script
+```sql
+.RUN FILE=%%BTEQ_LOGON_SCRIPT%%
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+.SET QUIET OFF
+.SET ECHOREQ ON
+.SET FORMAT OFF
+.SET WIDTH 120
+----------------------------------------------------------------------
+-- $LastChangedBy: vajapes $
+-- $LastChangedDate: 2012-02-28 09:08:37 +1100 (Tue, 28 Feb 2012) $
+-- $LastChangedRevision: 9218 $
+----------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  Description :Populate the AUDT table for future reference as the records 
+--are going to be deleted from ACCT BALN BKDT and this acts as a driver for the 
+--ADJ RULE view 
+--
+--   Ver  Date       Modified By            Description
+--  ---- ---------- ---------------------- -----------------------------------
+--  1.0  2011-10-05 Suresh Vajapeyajula               Initial Version
+------------------------------------------------------------------------------
+
+/*Loading the records from ACCT_BALN_BKDT_STG1 to ACCT_BALN_BKDT_AUDT.
+This table holds data that is going to be deleted from ACCT_BALN_BKDT. 
+The pros keys in this table can be used to establish logical relationship between tables in the event 
+of any failures and rollback. However, the Pros Keys from ACCT_BALN_ADJ  loaded as 
+ADJ_PROS_KEY_EFFT_I could not be used to backtrack Adjustments for bulk loads or for 
+multiple adjustments for same ACCT_I and overlapping preiods. A known limitation
+*/
+INSERT INTO  %%CAD_PROD_DATA%%.ACCT_BALN_BKDT_AUDT
+(
+ACCT_I,                        
+BALN_TYPE_C,                   
+CALC_FUNC_C,                   
+TIME_PERD_C,                   
+BALN_A,                        
+CALC_F,                        
+SRCE_SYST_C,                   
+ORIG_SRCE_SYST_C,              
+LOAD_D,                        
+BKDT_EFFT_D,                   
+BKDT_EXPY_D,                   
+PROS_KEY_EFFT_I,               
+ABAL_PROS_KEY_EFFT_I,          
+ABAL_PROS_KEY_EXPY_I,          
+ABAL_BKDT_PROS_KEY_I,     
+ADJ_PROS_KEY_EFFT_I
+)
+SELECT 
+STG1.ACCT_I,                        
+STG1.BALN_TYPE_C,
+STG1.CALC_FUNC_C,                  
+STG1.TIME_PERD_C,                  
+STG1.BALN_A,
+STG1.CALC_F,
+STG1.SRCE_SYST_C,
+STG1.ORIG_SRCE_SYST_C,
+STG1.LOAD_D,
+STG1.BKDT_EFFT_D,
+STG1.BKDT_EXPY_D,
+PKEY.PROS_KEY_EFFT_I,
+STG1.PROS_KEY_EFFT_I AS ABAL_PROS_KEY_EFFT_I,
+STG1.PROS_KEY_EXPY_I AS ABAL_PROS_KEY_EXPY_I,
+STG2.BKDT_PROS_KEY_I AS ABAL_BKDT_PROS_KEY_I,
+ADJ.PROS_KEY_EFFT_I AS ADJ_PROS_KEY_EFFT_I
+FROM 
+%%DDSTG%%.ACCT_BALN_BKDT_STG1 STG1
+INNER JOIN
+/*Capturing the maximum pros_key_efft_i in the event of multiple pros keys for one account 
+and populating for Auditing purposes*/
+(SELECT ACCT_I, MAX(PROS_KEY_EFFT_I) AS PROS_KEY_EFFT_I FROM
+%%DDSTG%%.ACCT_BALN_BKDT_ADJ_RULE
+GROUP BY 1
+)ADJ
+ON
+STG1.ACCT_I = ADJ.ACCT_I
+CROSS JOIN
+/*Capture tha latest pros key [from the parent process] and update the audt table*/
+(SELECT MAX(BKDT_PROS_KEY_I) AS BKDT_PROS_KEY_I
+FROM %%DDSTG%%.ACCT_BALN_BKDT_STG2)STG2
+CROSS JOIN
+/*Capture tha latest pros key [from the Auditing process] and update the audt table*/
+(SELECT MAX(PROS_KEY_I)  AS PROS_KEY_EFFT_I
+FROM %%VTECH%%.UTIL_PROS_ISAC WHERE 
+CONV_M='CAD_X01_ACCT_BALN_BKDT_AUDT')PKEY
+ ;
+
+
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+/*Update UTIL_PROS_ISAC with the  flags , completed timestamp and record counts inserted*/
+UPDATE %%CAD_PROD_DATA%%.UTIL_PROS_ISAC
+FROM
+(SELECT COUNT(*) FROM 
+%%DDSTG%%.ACCT_BALN_BKDT_STG1)A(INS_CNT)
+SET  
+        COMT_F = 'Y',
+	SUCC_F='Y',
+	COMT_S =  CURRENT_TIMESTAMP(0),
+	SYST_INS_Q = A.INS_CNT
+ WHERE PROS_KEY_I = (SELECT MAX(PROS_KEY_I) FROM %%VTECH%%.UTIL_PROS_ISAC 
+ WHERE CONV_M='CAD_X01_ACCT_BALN_BKDT_AUDT');
+
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+.QUIT 0
+.LOGOFF
+.EXIT
+
+.LABEL EXITERR
+.QUIT 1
+.LOGOFF
+.EXIT
+```
+
+### 2. Reference Stored Procedure Translation (for context)
+```sql
+
+CREATE OR REPLACE PROCEDURE ACCT_BALN_BKDT_AUDT_ISRT()
+RETURNS STRING
+LANGUAGE SQL
+AS
+$$
+BEGIN
+    -- Converted from BTEQ: ACCT_BALN_BKDT_AUDT_ISRT
+    RETURN 'SUCCESS';
+END;
+$$;
+
+```
+
+### 3. Additional Analysis
+BTEQ to DBT conversion for ACCT_BALN_BKDT_AUDT_ISRT
+
+
+## DBT Conversion Requirements
+
+### 1. DBT Model Structure
+- Start with proper Jinja config block using config() macro
+- Use appropriate materialization strategy (table, view, incremental)
+- Add meaningful tags for categorization
+- Include pre_hook and post_hook for logging if needed
+- Set proper database/schema references using vars
+
+### 2. SQL Best Practices
+- Use modern SQL patterns (CTEs over subqueries where beneficial)
+- Implement proper column naming and aliasing
+- Add clear comments explaining business logic
+- Use explicit column lists (avoid SELECT *)
+- Optimize JOIN patterns and WHERE clause ordering
+
+### 3. DBT-Specific Features
+- Use ref() macro for model dependencies
+- Use var() macro for configuration values
+- Use source() macro if referencing source tables
+- Add data quality tests where appropriate
+- Use DBT's built-in functions for date/time operations
+
+### 4. Materialization Strategy
+- Choose appropriate materialization based on table usage:
+  * `table` for frequently queried data
+  * `view` for lightweight transformations
+  * `incremental` for large datasets with delta processing
+- Include incremental_strategy if using incremental
+
+### 5. Configuration Best Practices
+- Use meaningful database/schema configuration
+- Add appropriate tags for data lineage
+- Include pre/post hooks for process logging
+- Set up proper error handling in hooks
+
+### 6. Code Organization
+- Use clear CTE naming that describes the transformation
+- Group related logic into logical CTEs
+- Add section comments for major transformations
+- Maintain proper indentation and formatting
+
+## Expected DBT Model Output Format
+
+The output should be a complete DBT model file with:
+
+```sql
+{%- set process_name = 'YOUR_PROCESS_NAME' -%}
+{%- set stream_name = 'YOUR_STREAM_NAME' -%}
+
+{{
+  config(
+    materialized='your_strategy',
+    database=var('target_database'),
+    schema='target_schema',
+    tags=['relevant', 'tags'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('Process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('Process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model Documentation
+    Purpose: Brief description
+    Business Logic: Key transformations
+    Dependencies: Source tables/models
+*/
+
+WITH cte_name AS (
+    -- Clear CTE logic
+    SELECT ...
+),
+
+final AS (
+    SELECT ...
+)
+
+SELECT * FROM final
+```
+
+## Specific Transformation Guidance
+
+### BTEQ Control Flow → DBT Patterns
+- Convert DELETE + INSERT patterns to proper materialization
+- Replace BTEQ variables with DBT vars and Jinja variables
+- Transform error handling to DBT test patterns where possible
+- Convert procedural logic to declarative SQL transformations
+
+### Date/Time Functions
+- Use DBT date functions or modern SQL equivalents
+- Replace Teradata date arithmetic with standard functions
+- Maintain timezone handling if present
+
+### Process Control Tables
+- Reference process control via source() or ref() macros
+- Use var() for process configuration values
+- Implement delta processing via incremental materialization
+
+## Output Instructions
+
+Provide ONLY the complete DBT model SQL code. Do not include explanations, markdown formatting, or additional commentary.
+
+## DBT Model:

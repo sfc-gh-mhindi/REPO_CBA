@@ -1,0 +1,40 @@
+{
+  "success": false,
+  "quality_score": 1.0,
+  "model_sql": "{%- set process_name = 'ACCT_BALN_BKDT_ADJ_RULE' -%}\n{%- set stream_name = 'ACCT_BALN_BKDT' -%}\n\n{{\n  config(\n    materialized='table',\n    database=var('target_database'),\n    schema='ddstg',\n    tags=['account_balance', 'backdated_adjustment', 'sap'],\n    pre_hook=[\n        \"DELETE FROM {{ this }}\",\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_ADJ_RULE process started') }}\"\n    ],\n    post_hook=[\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_ADJ_RULE process ended') }}\"\n    ]\n  )\n}}\n\n/*\n    Model: ACCT_BALN_BKDT_ADJ_RULE\n    Purpose: Calculate the Backdated adjustment from ACCT BALN ADJ and apply it on ACCT BALN\n    Business Logic: \n    - Processes SAP account balance adjustments with backdating logic\n    - Calculates business day 4 logic for adjustment timing\n    - Aggregates similar adjustments for the same period\n    Dependencies: \n    - {{ ref('acct_baln_adj') }}\n    - {{ ref('grd_rprt_calr_clyr') }}\n    - {{ ref('util_pros_isac') }}\n*/\n\nWITH acct_baln_adj_filtered AS (\n    SELECT\t\n        ADJ.ACCT_I AS ACCT_I,\n        ADJ.SRCE_SYST_C AS SRCE_SYST_C, \n        ADJ.BALN_TYPE_C AS BALN_TYPE_C,\n        ADJ.CALC_FUNC_C AS CALC_FUNC_C,\n        ADJ.TIME_PERD_C AS TIME_PERD_C,\n        ADJ.ADJ_FROM_D AS ADJ_FROM_D,\n        ADJ.ADJ_TO_D,\n        -- Adjustments impacting the current record need to be loaded on the next day to avoid changing the open balances\n        CASE \n            WHEN ADJ.EFFT_D = ADJ.ADJ_TO_D THEN DATEADD(DAY, 1, ADJ.EFFT_D)\n            ELSE ADJ.EFFT_D \n        END AS EFFT_D,\n        ADJ.GL_RECN_F,\n        ADJ.ADJ_A,\n        ADJ.PROS_KEY_EFFT_I\n    FROM {{ ref('acct_baln_adj') }} ADJ\n    WHERE\t\n        ADJ.SRCE_SYST_C = 'SAP'\n        AND ADJ.BALN_TYPE_C = 'BALN'\n        AND ADJ.CALC_FUNC_C = 'SPOT' \n        AND ADJ.TIME_PERD_C = 'E' \n        -- Excluding the adjustments with $0 in value as this brings no change to the \n        -- $value in tha ACCT BALN and had a negative impact on the last records in \n        -- ACCT BALN, so considerably important to eliminate\n        AND ADJ.ADJ_A <> 0 \n        -- Capturing delta adjustments\n        AND ADJ.EFFT_D >= (\n            SELECT MAX(BTCH_RUN_D) \n            FROM {{ ref('util_pros_isac') }}\n            WHERE TRGT_M = 'ACCT_BALN_BKDT' \n                AND SRCE_SYST_M = 'GDW'\n                AND COMT_F = 'Y'  \t\n                AND SUCC_F = 'Y'\n        )\n),\n\nbusiness_day_4 AS (\n    -- Calculation of Business day 4 Logic\n    SELECT\t\n        CALR_YEAR_N,\n        CALR_MNTH_N,\n        CALR_CALR_D\n    FROM {{ ref('grd_rprt_calr_clyr') }}\n    WHERE\t\n        CALR_WEEK_DAY_N NOT IN (1, 7) \n        AND CALR_NON_WORK_DAY_F = 'N'\n        AND CALR_CALR_D BETWEEN DATEADD(MONTH, -13, CURRENT_DATE()) AND DATEADD(MONTH, 1, CURRENT_DATE())\n    QUALIFY\tROW_NUMBER() OVER (\n        PARTITION BY CALR_YEAR_N, CALR_MNTH_N \n        ORDER BY CALR_CALR_D\n    ) = 4\n),\n\ndt1_with_business_day AS (\n    SELECT \n        DT1.ACCT_I,\n        DT1.SRCE_SYST_C, \n        DT1.BALN_TYPE_C,\n        DT1.CALC_FUNC_C,\n        DT1.TIME_PERD_C,\n        DT1.ADJ_FROM_D,\n        DT1.ADJ_TO_D,\n        DT1.EFFT_D,\n        DT1.GL_RECN_F,\n        DT1.ADJ_A,\n        DT1.PROS_KEY_EFFT_I,\n        BSDY_4.CALR_CALR_D AS BUSINESS_DAY_4,\n        DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) AS MONTH_DIFF\n    FROM acct_baln_adj_filtered DT1\n    INNER JOIN business_day_4 BSDY_4\n        ON EXTRACT(YEAR FROM DT1.EFFT_D) = EXTRACT(YEAR FROM BSDY_4.CALR_CALR_D)\n        AND EXTRACT(MONTH FROM DT1.EFFT_D) = EXTRACT(MONTH FROM BSDY_4.CALR_CALR_D)\n),\n\nfinal AS (\n    SELECT \n        DT1.ACCT_I,\n        DT1.SRCE_SYST_C, \n        DT1.BALN_TYPE_C,\n        DT1.CALC_FUNC_C,\n        DT1.TIME_PERD_C,\n        DT1.ADJ_FROM_D,\n        CASE \n            WHEN DT1.MONTH_DIFF = 0 \n                THEN DT1.ADJ_FROM_D \n            -- Backdated logic calculation when difference of months is 1 \n            -- and DT1.EFFT_D is between Business day 1 and Biz day 4\n            WHEN DT1.MONTH_DIFF = 1 \n                AND DT1.EFFT_D <= DT1.BUSINESS_DAY_4 \n                THEN DT1.ADJ_FROM_D\n            -- Backdated logic calculation when difference of months is 1 \n            -- and DT1.EFFT_D is NOT between Business day 1 and Biz day 4\n            WHEN DT1.MONTH_DIFF = 1 \n                AND DT1.EFFT_D > DT1.BUSINESS_DAY_4  \n                THEN DATE_TRUNC('MONTH', DT1.EFFT_D)\n            -- Backdated logic calculation when difference of months is greater than 1 \n            -- and DT1.EFFT_D is between Business day 1 and Biz day 4\n            WHEN DT1.MONTH_DIFF > 1 \n                AND DT1.EFFT_D <= DT1.BUSINESS_DAY_4 \n                THEN DATEADD(MONTH, -1, DATE_TRUNC('MONTH', DT1.EFFT_D))\n            -- Backdated logic calculation when difference of months is greater than 1 \n            -- and DT1.EFFT_D is NOT between Business day 1 and Biz day 4\n            WHEN DT1.MONTH_DIFF > 1 \n                AND DT1.EFFT_D > DT1.BUSINESS_DAY_4  \n                THEN DATE_TRUNC('MONTH', DT1.EFFT_D)\n        END AS BKDT_ADJ_FROM_D,\n        DT1.ADJ_TO_D,\n        -- Similar adjustments for the same period are added\n        SUM(DT1.ADJ_A) AS ADJ_A,\n        DT1.EFFT_D,\n        DT1.GL_RECN_F,\n        DT1.PROS_KEY_EFFT_I\n    FROM dt1_with_business_day DT1\n    WHERE\n        -- Including the adjustments that are excluded in the previous run for open record\n        DT1.EFFT_D <= (\n            SELECT MAX(BTCH_RUN_D) AS BTCH_RUN_D\n            FROM {{ ref('util_pros_isac') }}\n            WHERE TRGT_M = 'ACCT_BALN_ADJ' \n                AND SRCE_SYST_M = 'SAP'\n                AND COMT_F = 'Y'  \n                AND SUCC_F = 'Y'\n        )\n        -- To avoid any records that are processed in the previous runs\n        AND DT1.EFFT_D > (\n            SELECT MAX(BTCH_RUN_D) AS BTCH_RUN_D\n            FROM {{ ref('util_pros_isac') }}\n            WHERE TRGT_M = 'ACCT_BALN_BKDT' \n                AND SRCE_SYST_M = 'GDW'\n                AND COMT_F = 'Y'  \n                AND SUCC_F = 'Y'\n        )\n    GROUP BY \n        DT1.ACCT_I,\n        DT1.SRCE_SYST_C, \n        DT1.BALN_TYPE_C,\n        DT1.CALC_FUNC_C,\n        DT1.TIME_PERD_C,\n        DT1.ADJ_FROM_D,\n        BKDT_ADJ_FROM_D,\n        DT1.ADJ_TO_D,\n        DT1.EFFT_D,\n        DT1.GL_RECN_F, \n        DT1.PROS_KEY_EFFT_I\n    HAVING \n        -- To exclude any adjustments that fall in the period where the GL is closed\n        BKDT_ADJ_FROM_D <= DT1.ADJ_TO_D\n)\n\nSELECT * FROM final",
+  "metadata": {
+    "models_used": [
+      "claude-4-sonnet",
+      "snowflake-llama-3.3-70b"
+    ],
+    "preferred_model": "claude-4-sonnet",
+    "quality_score": 1.0,
+    "dbt_features": [
+      "config",
+      "variables",
+      "references",
+      "macros",
+      "jinja_variables",
+      "pre_hooks",
+      "post_hooks",
+      "tags"
+    ],
+    "total_time_ms": 82721,
+    "comparison_notes": [
+      "Selected claude-4-sonnet as preferred model",
+      "claude-4-sonnet: Quality=1.000, Features=8, Time=59153ms",
+      "snowflake-llama-3.3-70b: Quality=0.910, Features=8, Time=23555ms"
+    ],
+    "migration_notes": [
+      "Converted Teradata date functions to Snowflake equivalents",
+      "Organized logic using CTEs for better readability",
+      "Added DBT configuration for materialization and metadata",
+      "Used DBT variables for environment-specific configuration",
+      "Converted from procedural BTEQ to declarative DBT model"
+    ]
+  },
+  "warnings": [
+    "Uses SELECT * - consider explicit column selection"
+  ],
+  "execution_time_ms": 82721
+}

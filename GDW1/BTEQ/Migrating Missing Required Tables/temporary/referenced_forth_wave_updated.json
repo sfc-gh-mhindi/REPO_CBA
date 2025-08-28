@@ -1,0 +1,62 @@
+{
+  "description": "Tables referenced in BTEQ files but not found in any SQL files (neither as tables nor views)",
+  "total_tables_in_json": 109,
+  "found_as_tables": 31,
+  "found_as_views": 33,
+  "missing_count": 41,
+  "missing_tables": [
+    "DGRDDB.GRD_PRTF_TYPE_ENHC_HIST_PSST",
+    "DGRDDB.GRD_PRTF_TYPE_ENHC_PSST",
+    "PDDSTG.ACCT_BALN_BKDT_STG1",
+    "PDDSTG.ACCT_BALN_BKDT_STG2",
+    "PDDSTG.ACCT_REL_HLS_REME",
+    "PDDSTG.ACCT_REL_HLS_REME_HIST",
+    "PDDSTG.UTIL_PROS_SAP_RUN",
+    "PVTECH.ACCT_BALN_BKDT",
+    "PVTECH.ACCT_BALN_BKDT_RECN",
+    "PVTECH.ACCT_INT_GRUP",
+    "PVTECH.DERV_PRTF_ACCT_HIST_PSST",
+    "PVTECH.DERV_PRTF_ACCT_INT_GRUP_PSST",
+    "PVTECH.DERV_PRTF_ACCT_PSST",
+    "PVTECH.DERV_PRTF_INT_GRUP_ENHC_PSST",
+    "PVTECH.DERV_PRTF_INT_GRUP_OWN_PSST",
+    "PVTECH.DERV_PRTF_INT_HIST_PSST",
+    "PVTECH.DERV_PRTF_INT_PSST",
+    "PVTECH.DERV_PRTF_OWN_HIST_PSST",
+    "PVTECH.DERV_PRTF_OWN_PSST",
+    "PVTECH.DERV_PRTF_PATY_HIST_PSST",
+    "PVTECH.DERV_PRTF_PATY_INT_GRUP_PSST",
+    "PVTECH.GRD_PRTF_TYPE_ENHC",
+    "PVTECH.GRD_PRTF_TYPE_ENHC_HIST_PSST",
+    "PVTECH.GRD_PRTF_TYPE_ENHC_PSST",
+    "STAR_CAD_PROD_DATA.ACCT_BALN_BKDT",
+    "STAR_CAD_PROD_DATA.ACCT_BALN_BKDT_AUDT",
+    "STAR_CAD_PROD_DATA.ACCT_BALN_BKDT_RECN",
+    "STAR_CAD_PROD_DATA.ACCT_PATY_TAX_INSS",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_INT_GRUP_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_OWN_REL",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_GRUP_ENHC_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_GRUP_OWN_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_OWN_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_OWN_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_INT_GRUP_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_OWN_REL"
+  ],
+  "summary": {
+    "table_sql_files_checked": [
+      "../../../Migrating 140 Tables/After CDL Issue was Reverted/CBA01-Creating Iceberg Tables.sql",
+      "../CBA01.1 - Missing Tables.sql"
+    ],
+    "view_sql_files_checked": [
+      "../../../Migrating 140 Tables/After CDL Issue was Reverted/CBA02-Creating Views.sql",
+      "../CBA02.1 - Missing Views.sql"
+    ],
+    "total_tables_found_in_sql": 159,
+    "total_views_found_in_sql": 147
+  }
+}

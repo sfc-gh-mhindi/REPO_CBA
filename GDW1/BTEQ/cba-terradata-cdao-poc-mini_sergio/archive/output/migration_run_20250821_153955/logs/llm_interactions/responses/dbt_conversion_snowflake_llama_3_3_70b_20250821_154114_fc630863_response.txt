@@ -1,0 +1,159 @@
+# LLM Response
+Interaction ID: 20250821_154114_fc630863
+Success: True
+Processing Time: 24556ms
+Quality Score: None
+
+# Response
+```sql
+{%- set process_name = 'ACCT_BALN_BKDT_ADJ_RULE_ISRT' -%}
+{%- set stream_name = 'ACCT_BALN_BKDT_ADJ_RULE' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('target_database'),
+    schema='target_schema',
+    tags=['account_balance', 'backdated_adjustment'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('Process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('Process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model Documentation
+    Purpose: Calculate the Backdated adjustment from ACCT BALN ADJ and apply it on ACCT BALN
+    Business Logic: 
+        1. Filter adjustments based on source system, balance type, calculation function, and time period.
+        2. Calculate backdated adjustment dates based on the difference between effective date and adjustment from date.
+        3. Join with business day 4 logic to determine the correct backdated adjustment date.
+        4. Group and sum adjustments for the same period.
+    Dependencies: 
+        - PVTECH.ACCT_BALN_ADJ
+        - PVTECH.GRD_RPRT_CALYR
+        - PVTECH.UTIL_PROS_ISAC
+*/
+
+WITH adjusted_data AS (
+    SELECT
+        ADJ.ACCT_I,
+        ADJ.SRCE_SYST_C,
+        ADJ.BALN_TYPE_C,
+        ADJ.CALC_FUNC_C,
+        ADJ.TIME_PERD_C,
+        ADJ.ADJ_FROM_D,
+        ADJ.ADJ_TO_D,
+        CASE 
+            WHEN ADJ.EFFT_D = ADJ.ADJ_TO_D THEN ADJ.EFFT_D + 1
+            ELSE ADJ.EFFT_D
+        END AS EFFT_D,
+        ADJ.Gl_RECN_F,
+        ADJ.ADJ_A,
+        ADJ.PROS_KEY_EFFT_I
+    FROM 
+        {{ source('PVTECH', 'ACCT_BALN_ADJ') }} ADJ
+    WHERE 
+        SRCE_SYST_C = 'SAP'
+        AND BALN_TYPE_C = 'BALN'
+        AND CALC_FUNC_C = 'SPOT'
+        AND TIME_PERD_C = 'E'
+        AND ADJ.ADJ_A <> 0
+        AND ADJ.EFFT_D >= (
+            SELECT 
+                MAX(BTCH_RUN_D) 
+            FROM 
+                {{ source('PVTECH', 'UTIL_PROS_ISAC') }} 
+            WHERE 
+                TRGT_M = 'ACCT_BALN_BKDT' 
+                AND SRCE_SYST_M = 'GDW'
+                AND COMT_F = 'Y' 
+                AND SUCC_F = 'Y'
+        )
+),
+
+business_day_4 AS (
+    SELECT 
+        CALR_YEAR_N,
+        CALR_MNTH_N,
+        CALR_CALR_D
+    FROM 
+        {{ source('PVTECH', 'GRD_RPRT_CALYR') }}
+    WHERE 
+        CALR_WEEK_DAY_N NOT IN (1, 7) 
+        AND CALR_NON_WORK_DAY_F = 'N'
+        AND CALR_CALR_D BETWEEN ADD_MONTHS(CURRENT_DATE, -13) AND ADD_MONTHS(CURRENT_DATE, 1)
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY CALR_YEAR_N, CALR_MNTH_N ORDER BY CALR_CALR_D) = 4
+),
+
+final AS (
+    SELECT 
+        ADJ.ACCT_I,
+        ADJ.SRCE_SYST_C,
+        ADJ.BALN_TYPE_C,
+        ADJ.CALC_FUNC_C,
+        ADJ.TIME_PERD_C,
+        ADJ.ADJ_FROM_D,
+        CASE 
+            WHEN (ADJ.EFFT_D - ADJ.ADJ_FROM_D) = INTERVAL '0 month' THEN ADJ.ADJ_FROM_D
+            WHEN (ADJ.EFFT_D - ADJ.ADJ_FROM_D) = INTERVAL '1 month' AND ADJ.EFFT_D <= BSDY_4.CALR_CALR_D THEN ADJ.ADJ_FROM_D
+            WHEN (ADJ.EFFT_D - ADJ.ADJ_FROM_D) = INTERVAL '1 month' AND ADJ.EFFT_D > BSDY_4.CALR_CALR_D THEN ADJ.EFFT_D - (EXTRACT(DAY FROM ADJ.EFFT_D) - 1)
+            WHEN (ADJ.EFFT_D - ADJ.ADJ_FROM_D) > INTERVAL '1 month' AND ADJ.EFFT_D <= BSDY_4.CALR_CALR_D THEN ADJ.EFFT_D - (EXTRACT(DAY FROM ADJ.EFFT_D) - 1) - INTERVAL '1 month'
+            WHEN (ADJ.EFFT_D - ADJ.ADJ_FROM_D) > INTERVAL '1 month' AND ADJ.EFFT_D > BSDY_4.CALR_CALR_D THEN ADJ.EFFT_D - (EXTRACT(DAY FROM ADJ.EFFT_D) - 1)
+        END AS BKDT_ADJ_FROM_D,
+        ADJ.ADJ_TO_D,
+        SUM(ADJ.ADJ_A) AS ADJ_A,
+        ADJ.EFFT_D,
+        ADJ.Gl_RECN_F,
+        ADJ.PROS_KEY_EFFT_I
+    FROM 
+        adjusted_data ADJ
+    INNER JOIN 
+        business_day_4 BSDY_4 
+    ON 
+        EXTRACT(YEAR FROM ADJ.EFFT_D) = EXTRACT(YEAR FROM BSDY_4.CALR_CALR_D)
+        AND EXTRACT(MONTH FROM ADJ.EFFT_D) = EXTRACT(MONTH FROM BSDY_4.CALR_CALR_D)
+    WHERE 
+        ADJ.EFFT_D <= (
+            SELECT 
+                MAX(BTCH_RUN_D) 
+            FROM 
+                {{ source('PVTECH', 'UTIL_PROS_ISAC') }} 
+            WHERE 
+                TRGT_M = 'ACCT_BALN_ADJ' 
+                AND SRCE_SYST_M = 'SAP'
+                AND COMT_F = 'Y' 
+                AND SUCC_F = 'Y'
+        )
+        AND ADJ.EFFT_D > (
+            SELECT 
+                MAX(BTCH_RUN_D) 
+            FROM 
+                {{ source('PVTECH', 'UTIL_PROS_ISAC') }} 
+            WHERE 
+                TRGT_M = 'ACCT_BALN_BKDT' 
+                AND SRCE_SYST_M = 'GDW'
+                AND COMT_F = 'Y' 
+                AND SUCC_F = 'Y'
+        )
+        AND BKDT_ADJ_FROM_D <= ADJ.ADJ_TO_D
+    GROUP BY 
+        ADJ.ACCT_I,
+        ADJ.SRCE_SYST_C,
+        ADJ.BALN_TYPE_C,
+        ADJ.CALC_FUNC_C,
+        ADJ.TIME_PERD_C,
+        ADJ.ADJ_FROM_D,
+        BKDT_ADJ_FROM_D,
+        ADJ.ADJ_TO_D,
+        ADJ.EFFT_D,
+        ADJ.Gl_RECN_F,
+        ADJ.PROS_KEY_EFFT_I
+)
+
+SELECT * FROM final
+```

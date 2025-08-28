@@ -1,0 +1,77 @@
+{
+  "batch_run_timestamp": "2025-08-21T15:51:25.846821",
+  "total_files_processed": 11,
+  "successful_conversions": 11,
+  "failed_conversions": 0,
+  "total_processing_time_seconds": 690.2656950950623,
+  "average_time_per_file": 62.75142682682384,
+  "consolidation_directory": "/Users/psundaram/Documents/prjs/cba/agentic/bteq_agentic/output/consol_dbt",
+  "detailed_results": {
+    "acct_baln_bkdt_adj_rule_isrt": {
+      "status": "success",
+      "processing_time": 104.73380088806152,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_audt_get_pros_key": {
+      "status": "success",
+      "processing_time": 63.76548385620117,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_audt_isrt": {
+      "status": "success",
+      "processing_time": 60.42032194137573,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_avg_call_proc": {
+      "status": "success",
+      "processing_time": 55.099624156951904,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_delt": {
+      "status": "success",
+      "processing_time": 31.2347309589386,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_get_pros_key": {
+      "status": "success",
+      "processing_time": 45.03074884414673,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_isrt": {
+      "status": "success",
+      "processing_time": 59.649126291275024,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_recn_get_pros_key": {
+      "status": "success",
+      "processing_time": 65.86190724372864,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_recn_isrt": {
+      "status": "success",
+      "processing_time": 56.52102994918823,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_stg_isrt": {
+      "status": "success",
+      "processing_time": 81.72053694725037,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    },
+    "acct_baln_bkdt_util_pros_updt": {
+      "status": "success",
+      "processing_time": 66.17080974578857,
+      "dbt_files_generated": 2,
+      "total_files_copied": 4
+    }
+  }
+}

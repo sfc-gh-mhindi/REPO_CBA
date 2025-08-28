@@ -1,0 +1,147 @@
+{
+    "name": "TMP2",
+    "guid": "d48f5732-0c71-4ffb-af81-c5c3f880876a",
+    "inputPath": "/Users/mhindi/Library/CloudStorage/GoogleDrive-mazen.hindi@snowflake.com/My Drive/Work/Code Repos/CBA/REPO_CBA/GDW1/BTEQ/Migrating Missing Required Tables/temporary/TOCONVERT",
+    "outputPath": "/Users/mhindi/Library/CloudStorage/GoogleDrive-mazen.hindi@snowflake.com/My Drive/Work/Code Repos/CBA/REPO_CBA/GDW1/BTEQ/Migrating Missing Required Tables/temporary/TOCONVERT_output",
+    "projectInputPath": "",
+    "repointingPath": "",
+    "replatformingPath": "",
+    "connectionMappingsPath": "/var/folders/bj/vljj79ls735fp2mnpf5hh92c0000gn/T/snowconvert-connection-mappings/d48f5732-0c71-4ffb-af81-c5c3f880876a/connection-mappings.csv",
+    "migrationContextPath": "",
+    "platform": "SnowConvert",
+    "accesscode": "1087ee68-f9c5-4ac2-b9e9-83a89ba6cbcd",
+    "assessmentAccesscode": "",
+    "isDemo": false,
+    "steps": [
+        {
+            "name": "Project Creation",
+            "status": 1,
+            "active": false,
+            "disabled": false,
+            "steps": []
+        },
+        {
+            "name": "Extraction",
+            "status": 1,
+            "active": false,
+            "disabled": false,
+            "steps": []
+        },
+        {
+            "name": "Conversion",
+            "status": 0,
+            "active": true,
+            "disabled": false,
+            "steps": [
+                {
+                    "name": "Execution",
+                    "status": 0,
+                    "disabled": false,
+                    "active": true,
+                    "expandOptions": {
+                        "isExpandable": true,
+                        "expand": true
+                    }
+                },
+                {
+                    "name": "Results",
+                    "status": 0,
+                    "disabled": true,
+                    "active": false
+                }
+            ]
+        },
+        {
+            "name": "Deployment",
+            "status": 0,
+            "active": false,
+            "disabled": true,
+            "steps": []
+        },
+        {
+            "name": "Data Migration",
+            "status": 0,
+            "active": false,
+            "disabled": true,
+            "steps": [
+                {
+                    "name": "Execution",
+                    "status": 0,
+                    "disabled": true,
+                    "active": false
+                },
+                {
+                    "name": "Results",
+                    "status": 0,
+                    "disabled": true,
+                    "active": true
+                }
+            ]
+        },
+        {
+            "name": "Data Validation",
+            "status": 0,
+            "active": false,
+            "disabled": true,
+            "preview": true,
+            "steps": [
+                {
+                    "name": "Execution",
+                    "status": 0,
+                    "disabled": true,
+                    "active": false
+                },
+                {
+                    "name": "Results",
+                    "status": 0,
+                    "disabled": true,
+                    "active": true
+                }
+            ]
+        }
+    ],
+    "conversionSettings": {
+        "sourcePlatform": "teradata",
+        "conversionOptions": {
+            "commentIfMissingDependencies": false,
+            "generateStoredProcedureTags": false,
+            "splitPeriodDataType": false,
+            "disableTopologicalLevelReorder": false,
+            "useCollateForCaseSpecification": false,
+            "encoding": "65001",
+            "sessionMode": "Tera",
+            "customObjectName": "default",
+            "useExistingNameQualification": false,
+            "arrangeOption": {
+                "arrange": false
+            },
+            "characterToApproximateNumber": 10,
+            "defaultTimestampFormat": "YYYY/MM/DD HH:MI:SS",
+            "defaultDateFormat": "YYYY/MM/DD",
+            "defaultTimezoneFormat": "GMT-5",
+            "defaultTimeFormat": "HH:MI:SS",
+            "bteqTargetLanguage": "Python",
+            "pLTargetLanguage": "SnowScript",
+            "targetLag": "TargetLag",
+            "targetLagNumber": "1",
+            "targetLagTime": "days",
+            "warehouse": "UPDATE_DUMMY_WAREHOUSE",
+            "conversionRateMode": "LoC"
+        }
+    },
+    "internalProcessInputPath": "",
+    "internalAssessmentOutputPath": "",
+    "internalConversionOutputPath": "/Users/mhindi/Library/CloudStorage/GoogleDrive-mazen.hindi@snowflake.com/My Drive/Work/Code Repos/CBA/REPO_CBA/GDW1/BTEQ/Migrating Missing Required Tables/temporary/TOCONVERT_output/Conversion-8-22-2025T11 9",
+    "customerData": {
+        "company": "Snowflake",
+        "email": "mazen.hindi@snowflake.com"
+    },
+    "conversionProgress": {
+        "isSuccessful": true
+    },
+    "customInputPaths": {
+        "assessment": "",
+        "conversion": ""
+    },
+    "projectRootPath": ""
+}

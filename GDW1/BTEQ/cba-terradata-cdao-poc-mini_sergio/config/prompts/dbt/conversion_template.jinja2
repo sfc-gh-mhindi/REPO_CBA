@@ -1,0 +1,97 @@
+# BTEQ SQL to DBT Model Conversion
+
+{{ system_prompt }}
+
+## CRITICAL INSTRUCTIONS - NO HALLUCINATION POLICY
+{% for instruction in critical_instructions %}
+- {{ instruction }}
+{% endfor %}
+
+## Source Context
+
+### 1. Original BTEQ SQL Script
+```sql
+{{ original_bteq_sql }}
+```
+
+### 2. Reference Input and Output (for context)
+```sql
+{{ chosen_stored_procedure }}
+```
+
+### 3. Additional Analysis
+{{ additional_analysis }}
+
+## **CRITICAL: Snowflake SQL Syntax Requirements**
+**Target Platform: {{ snowflake_syntax_requirements.target_platform }}** - {{ snowflake_syntax_requirements.critical_note }}
+
+**Date Arithmetic (MANDATORY):**
+{% for example in snowflake_syntax_requirements.date_arithmetic.correct_examples %}
+- ✅ {{ example }}
+{% endfor %}
+{% for example in snowflake_syntax_requirements.date_arithmetic.never_use %}
+- ❌ NEVER: {{ example }}
+{% endfor %}
+
+**Date Functions:**
+{% for func in snowflake_syntax_requirements.date_functions.correct %}
+- ✅ {{ func }}
+{% endfor %}
+{% for func in snowflake_syntax_requirements.date_functions.never_use %}
+- ❌ NEVER: {{ func }}
+{% endfor %}
+
+## **CRITICAL: UPDATE Statement Handling**
+**Multi-Statement BTEQ Pattern Recognition:**
+
+When BTEQ scripts contain **multiple statements** (INSERT followed by UPDATE):
+- **Primary INSERT/SELECT**: Convert to main DBT model SELECT statement with CTEs
+- **Post-processing UPDATE statements**: Convert to **post_hook** configurations
+
+**UPDATE Statement to Post-Hook Conversion Rules:**
+
+✅ **IDENTIFY UPDATE PATTERNS:**
+- UPDATE statements that follow INSERT statements
+- Updates to tracking/audit tables (e.g., UTIL_PROS_ISAC)
+- Updates that set completion flags (COMT_F='Y', SUCC_F='Y')
+- Updates that set timestamps (COMT_S=CURRENT_TIMESTAMP)
+- Updates that set record counts (SYST_INS_Q=COUNT)
+
+✅ **CONVERT TO POST_HOOK:**
+```sql
+post_hook=[
+    "UPDATE target_database.UTIL_PROS_ISAC 
+     SET COMT_F = 'Y', 
+         SUCC_F = 'Y',
+         COMT_S = CURRENT_TIMESTAMP(0),
+         SYST_INS_Q = (SELECT COUNT(*) FROM target_table)
+     WHERE PROS_KEY_I = (SELECT MAX(PROS_KEY_I) FROM vtech_database.UTIL_PROS_ISAC 
+                         WHERE CONV_M='CONVERSION_MODULE_NAME')"
+]
+```
+
+**Example for UTIL_PROS_ISAC updates:**
+- Replace `target_database` with appropriate variable reference
+- Replace `target_table` with DBT `this` reference  
+- Replace `CONVERSION_MODULE_NAME` with actual module name from BTEQ
+
+**🚨 MANDATORY:** Always check for UPDATE statements after INSERT statements and convert them to post_hook configurations!
+
+## DBT Model Requirements
+
+### Configuration Standards (REQUIRED)
+- ALWAYS use materialized='{{ dbt_requirements.materialization }}'
+- ALWAYS include incremental_strategy='{{ dbt_requirements.incremental_strategy }}'
+{% for config in dbt_requirements.required_config %}
+- ALWAYS include {{ config }}
+{% endfor %}
+
+### Table Reference Standards
+- Transform table references using: {{ dbt_requirements.table_references.pattern }}
+- {{ dbt_requirements.table_references.note }}
+
+## Response Format
+Provide structured JSON response with:
+{% for field in output_schema.required_fields %}
+- {{ field }}
+{% endfor %}

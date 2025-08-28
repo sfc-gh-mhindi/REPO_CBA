@@ -1,0 +1,40 @@
+{
+  "success": false,
+  "quality_score": 1.0,
+  "model_sql": "{%- set process_name = 'ACCT_BALN_BKDT_GET_PROS_KEY' -%}\n{%- set stream_name = 'ACCT_BALN_BKDT' -%}\n\n{{\n  config(\n    materialized='table',\n    database=var('cad_prod_data_db'),\n    schema='util',\n    tags=['pros_key', 'util', 'account_balance'],\n    pre_hook=[\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_GET_PROS_KEY Process started') }}\"\n    ],\n    post_hook=[\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_GET_PROS_KEY Process ended') }}\",\n        \"UPDATE {{ var('cad_prod_data_db') }}.util.util_parm SET parm_ltrl_n = parm_ltrl_n + 1 WHERE parm_m = 'PROS_KEY'\"\n    ]\n  )\n}}\n\n/*\n    Model: ACCT_BALN_BKDT_GET_PROS_KEY\n    Purpose: Capture the PROS Key and update in UTIL PROS ISAC\n    Business Logic: \n        - Captures the Latest Pros Key from UTIL PARM table and updates UTIL PROS ISAC\n        - Inserts records for batch runs between ACCT_BALN_BKDT and ACCT_BALN_ADJ processing dates\n        - Increments PROS_KEY in UTIL_PARM table via post-hook\n    Dependencies: \n        - util_parm (PROS_KEY parameter)\n        - util_pros_isac (process tracking)\n        - grd_rprt_calr_clyr (calendar)\n*/\n\nWITH util_parm_cte AS (\n    SELECT parm_ltrl_n\n    FROM {{ source('vtech', 'util_parm') }}\n    WHERE parm_m = 'PROS_KEY'\n),\n\nbaln_max_batch AS (\n    SELECT MAX(btch_run_d) AS btch_run_d \n    FROM {{ source('vtech', 'util_pros_isac') }}\n    WHERE trgt_m = 'ACCT_BALN_ADJ' \n        AND srce_syst_m = 'SAP'\n        AND comt_f = 'Y'  \n        AND succ_f = 'Y'\n),\n\nbkdt_max_batch AS (\n    SELECT MAX(btch_run_d) AS btch_run_d \n    FROM {{ source('vtech', 'util_pros_isac') }}\n    WHERE trgt_m = 'ACCT_BALN_BKDT' \n        AND srce_syst_m = 'GDW'\n        AND comt_f = 'Y'  \n        AND succ_f = 'Y'\n),\n\ncalendar_dates AS (\n    SELECT cal.calr_calr_d\n    FROM {{ source('vtech', 'grd_rprt_calr_clyr') }} cal\n    CROSS JOIN baln_max_batch baln\n    CROSS JOIN bkdt_max_batch bkdt\n    WHERE cal.calr_calr_d > bkdt.btch_run_d \n        AND cal.calr_calr_d <= baln.btch_run_d\n),\n\nfinal AS (\n    SELECT \n        parm.parm_ltrl_n + 1 AS pros_key_i,\n        'CAD_X01_ACCT_BALN_BKDT' AS conv_m,\n        'TD' AS conv_type_m,\n        CURRENT_TIMESTAMP() AS pros_rqst_s,\n        CURRENT_TIMESTAMP() AS pros_last_rqst_s,\n        1 AS pros_rqst_q,\n        dt.calr_calr_d AS btch_run_d,\n        NULL AS btch_key_i,\n        'GDW' AS srce_syst_m,\n        'ACCT_BALN_BKDT_ADJ' AS srce_m,\n        'ACCT_BALN_BKDT' AS trgt_m,\n        'N' AS succ_f,\n        'N' AS comt_f,\n        NULL AS comt_s,\n        NULL AS mlti_load_efft_d,\n        NULL AS syst_s,\n        NULL AS mlti_load_comt_s,\n        NULL AS syst_et_q,\n        NULL AS syst_uv_q,\n        NULL AS syst_ins_q,\n        NULL AS syst_upd_q,\n        NULL AS syst_del_q,\n        NULL AS syst_et_tabl_m,\n        NULL AS syst_uv_tabl_m,\n        NULL AS syst_head_et_tabl_m,\n        NULL AS syst_head_uv_tabl_m,\n        NULL AS syst_trlr_et_tabl_m,\n        NULL AS syst_trlr_uv_tabl_m,\n        NULL AS prev_pros_key_i,\n        NULL AS head_recd_type_c,\n        NULL AS head_file_m,\n        NULL AS head_btch_run_d,\n        NULL AS head_file_crat_s,\n        NULL AS head_genr_prgm_m,\n        NULL AS head_btch_key_i,\n        NULL AS head_pros_key_i,\n        NULL AS head_pros_prev_key_i,\n        NULL AS trlr_recd_type_c,\n        NULL AS trlr_recd_q,\n        NULL AS trlr_hash_totl_a,\n        NULL AS trlr_colm_hash_totl_m,\n        NULL AS trlr_eror_recd_q,\n        NULL AS trlr_file_comt_s,\n        NULL AS trlr_recd_isrt_q,\n        NULL AS trlr_recd_updt_q,\n        NULL AS trlr_recd_delt_q\n    FROM util_parm_cte parm\n    CROSS JOIN calendar_dates dt\n)\n\nSELECT * FROM final",
+  "metadata": {
+    "models_used": [
+      "claude-4-sonnet",
+      "snowflake-llama-3.3-70b"
+    ],
+    "preferred_model": "claude-4-sonnet",
+    "quality_score": 1.0,
+    "dbt_features": [
+      "config",
+      "variables",
+      "sources",
+      "macros",
+      "jinja_variables",
+      "pre_hooks",
+      "post_hooks",
+      "tags",
+      "tests"
+    ],
+    "total_time_ms": 34800,
+    "comparison_notes": [
+      "Selected claude-4-sonnet as preferred model",
+      "claude-4-sonnet: Quality=1.000, Features=9, Time=16164ms",
+      "snowflake-llama-3.3-70b: Quality=0.910, Features=9, Time=18619ms"
+    ],
+    "migration_notes": [
+      "Organized logic using CTEs for better readability",
+      "Added DBT configuration for materialization and metadata",
+      "Used DBT variables for environment-specific configuration",
+      "Converted from procedural BTEQ to declarative DBT model"
+    ]
+  },
+  "warnings": [
+    "Uses SELECT * - consider explicit column selection"
+  ],
+  "execution_time_ms": 34801
+}

@@ -1,0 +1,6 @@
+-- Count query for PDCBODS.CBA_FNCL_SERV_GL_DATA
+-- Snowflake table: PS_CLD_RW.PDCBODS.CBA_FNCL_SERV_GL_DATA
+-- Teradata counterpart: PDCBODS.CBA_FNCL_SERV_GL_DATA
+
+SELECT count(1) AS record_count
+FROM PDCBODS.CBA_FNCL_SERV_GL_DATA; 

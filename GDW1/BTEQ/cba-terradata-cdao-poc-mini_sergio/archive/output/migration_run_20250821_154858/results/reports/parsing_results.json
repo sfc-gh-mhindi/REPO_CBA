@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "total_files": 1,
+    "successfully_parsed": 0,
+    "failed_files": 1,
+    "total_sql_blocks": 0,
+    "total_controls": 0
+  },
+  "detailed_results": [
+    {
+      "file": "ACCT_BALN_BKDT_STG_ISRT.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    }
+  ]
+}

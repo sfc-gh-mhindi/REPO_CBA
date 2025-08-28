@@ -1,0 +1,6 @@
+-- Count query for PDDSTG.ACCT_BALN_BKDT_ADJ_RULE
+-- Snowflake table: PS_CLD_RW.PDDSTG.ACCT_BALN_BKDT_ADJ_RULE
+-- Teradata counterpart: PDDSTG.ACCT_BALN_BKDT_ADJ_RULE
+
+SELECT count(1) AS record_count
+FROM PDDSTG.ACCT_BALN_BKDT_ADJ_RULE; 

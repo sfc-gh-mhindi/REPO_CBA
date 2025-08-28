@@ -1,0 +1,8 @@
+{
+  "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+  "dbt_enabled": true,
+  "dbt_conversion_success": false,
+  "has_stored_procedure": false,
+  "has_dbt_model": false,
+  "output_types": []
+}

@@ -1,0 +1,134 @@
+# LLM Response
+Interaction ID: 20250821_154745_1c1cd98e
+Success: True
+Processing Time: 14815ms
+Quality Score: None
+
+# Response
+```sql
+{%- set process_name = 'ACCT_BALN_BKDT_RECN' -%}
+{%- set stream_name = 'ACCT_BALN_BKDT_RECN_STREAM' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('target_database'),
+    schema='target_schema',
+    tags=['reconciliation', 'acct_baln_bkdt_recn'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_RECN process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_RECN process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model Documentation
+    Purpose: Reconciliation process for ACCT_BALN_BKDT_RECN
+    Business Logic: Capture the Latest Pros Key from UTIL PARM table and update UTIL PROS ISAC
+    Dependencies: UTIL_PARM, UTIL_PROS_ISAC, GRD_RPRT_CALR_CLYR
+*/
+
+WITH latest_pros_key AS (
+    SELECT 
+        PARM_LTRL_N + 1 AS PROS_KEY_I
+    FROM 
+        {{ source('vtech', 'UTIL_PARM') }} PARM
+    WHERE 
+        PARM.PARM_M = 'PROS_KEY'
+),
+
+latest_batch_run_date AS (
+    SELECT 
+        MAX(BTCH_RUN_D) AS BTCH_RUN_D
+    FROM 
+        {{ source('vtech', 'UTIL_PROS_ISAC') }}
+    WHERE 
+        TRGT_M = 'ACCT_BALN_BKDT' 
+        AND SRCE_SYST_M = 'GDW'
+        AND COMT_F = 'Y'  
+        AND SUCC_F = 'Y'
+),
+
+latest_batch_run_date_curr AS (
+    SELECT 
+        MAX(BTCH_RUN_D) AS BTCH_RUN_D
+    FROM 
+        {{ source('vtech', 'UTIL_PROS_ISAC') }}
+    WHERE 
+        TRGT_M = 'ACCT_BALN_BKDT' 
+        AND SRCE_SYST_M = 'GDW'
+),
+
+batch_run_dates AS (
+    SELECT 
+        CAL.CALR_CALR_D AS BTCH_RUN_D
+    FROM 
+        {{ source('vtech', 'GRD_RPRT_CALR_CLYR') }} CAL
+    CROSS JOIN 
+        latest_batch_run_date BKDT_PREV
+    CROSS JOIN 
+        latest_batch_run_date_curr BKDT_CURR
+    WHERE 
+        CAL.CALR_CALR_D > BKDT_PREV.BTCH_RUN_D 
+        AND CAL.CALR_CALR_D <= BKDT_CURR.BTCH_RUN_D
+),
+
+final AS (
+    SELECT 
+        lp.PROS_KEY_I,
+        'CAD_X01_ACCT_BALN_BKDT_RECN' AS CONV_M,
+        'TD' AS CONV_TYPE_M,
+        CURRENT_TIMESTAMP(0) AS PROS_RQST_S,
+        CURRENT_TIMESTAMP(0) AS PROS_LAST_RQST_S,
+        1 AS PROS_RQST_Q,
+        b.BTCH_RUN_D AS BTCH_RUN_D,
+        NULL AS BTCH_KEY_I,
+        'GDW' AS SRCE_SYST_M,
+        'ACCT_BALN_BKDT' AS SRCE_M,
+        'ACCT_BALN_BKDT_RECN' AS TRGT_M,
+        'N' AS SUCC_F,
+        'N' AS COMT_F,
+        NULL AS COMT_S,
+        NULL AS MLTI_LOAD_EFFT_D,
+        NULL AS SYST_S,
+        NULL AS MLTI_LOAD_COMT_S,
+        NULL AS SYST_ET_Q,
+        NULL AS SYST_UV_Q,
+        NULL AS SYST_INS_Q,
+        NULL AS SYST_UPD_Q,
+        NULL AS SYST_DEL_Q,
+        NULL AS SYST_ET_TABL_M,
+        NULL AS SYST_UV_TABL_M,
+        NULL AS SYST_HEAD_ET_TABL_M,
+        NULL AS SYST_HEAD_UV_TABL_M,
+        NULL AS SYST_TRLR_ET_TABL_M,
+        NULL AS SYST_TRLR_UV_TABL_M,
+        NULL AS PREV_PROS_KEY_I,
+        NULL AS HEAD_RECD_TYPE_C,
+        NULL AS HEAD_FILE_M,
+        NULL AS HEAD_BTCH_RUN_D,
+        NULL AS HEAD_FILE_CRAT_S,
+        NULL AS HEAD_GENR_PRGM_M,
+        NULL AS HEAD_BTCH_KEY_I,
+        NULL AS HEAD_PROS_KEY_I,
+        NULL AS HEAD_PROS_PREV_KEY_I,
+        NULL AS TRLR_RECD_TYPE_C,
+        NULL AS TRLR_RECD_Q,
+        NULL AS TRLR_HASH_TOTL_A,
+        NULL AS TRLR_COLM_HASH_TOTL_M,
+        NULL AS TRLR_EROR_RECD_Q,
+        NULL AS TRLR_FILE_COMT_S,
+        NULL AS TRLR_RECD_ISRT_Q,
+        NULL AS TRLR_RECD_UPDT_Q,
+        NULL AS TRLR_RECD_DELT_Q
+    FROM 
+        latest_pros_key lp
+    CROSS JOIN 
+        batch_run_dates b
+)
+
+SELECT * FROM final
+```

@@ -1,0 +1,1893 @@
+{
+  "summary": {
+    "total_files_processed": 47,
+    "total_unique_tables": 130,
+    "total_schemas": 10,
+    "total_databases": 0,
+    "files_with_errors": 2
+  },
+  "all_tables": [
+    "%%CAD_PROD_DATA%%.ACCT_BALN_BKDT",
+    "%%CAD_PROD_DATA%%.ACCT_BALN_BKDT_AUDT",
+    "%%CAD_PROD_DATA%%.ACCT_BALN_BKDT_RECN",
+    "%%CAD_PROD_DATA%%.UTIL_PROS_ISAC",
+    "ACCT_PATY_INSS_FIX",
+    "ACCT_REL_TRNF_PRTP_2",
+    "BSDY_4.CALR_CALR_D",
+    "DGRDDB.GRD_PRTF_TYPE_ENHC_HIST_PSST",
+    "DGRDDB.GRD_PRTF_TYPE_ENHC_PSST",
+    "LOAD_MISSING_ACCTS1",
+    "PDDSTG.ACCT_BALN_BKDT_ADJ_RULE",
+    "PDDSTG.ACCT_BALN_BKDT_STG1",
+    "PDDSTG.ACCT_BALN_BKDT_STG2",
+    "PDDSTG.ACCT_PATY_DEDUP",
+    "PDDSTG.ACCT_PATY_REL_THA",
+    "PDDSTG.ACCT_PATY_REL_WSS",
+    "PDDSTG.ACCT_PATY_THA_NEW_RNGE",
+    "PDDSTG.ACCT_REL_HLS_REME",
+    "PDDSTG.ACCT_REL_HLS_REME_HIST",
+    "PDDSTG.ACCT_REL_WSS_DITPS",
+    "PDDSTG.DERV_ACCT_PATY_ADD",
+    "PDDSTG.DERV_ACCT_PATY_CHG",
+    "PDDSTG.DERV_ACCT_PATY_CURR",
+    "PDDSTG.DERV_ACCT_PATY_DEL",
+    "PDDSTG.DERV_ACCT_PATY_FLAG",
+    "PDDSTG.DERV_ACCT_PATY_NON_RM",
+    "PDDSTG.DERV_ACCT_PATY_RM",
+    "PDDSTG.DERV_ACCT_PATY_ROW_SECU_FIX",
+    "PDDSTG.DERV_PRTF_ACCT_PATY_PSST",
+    "PDDSTG.DERV_PRTF_ACCT_PATY_STAG",
+    "PDDSTG.DERV_PRTF_ACCT_STAG",
+    "PDDSTG.DERV_PRTF_PATY_STAG",
+    "PDDSTG.GRD_GNRC_MAP_BUSN_SEGM_PRTY",
+    "PDDSTG.GRD_GNRC_MAP_DERV_PATY_HOLD",
+    "PDDSTG.GRD_GNRC_MAP_DERV_PATY_REL",
+    "PDDSTG.GRD_GNRC_MAP_DERV_UNID_PATY",
+    "PDDSTG.GRD_GNRC_MAP_PATY_HOLD_PRTY",
+    "PDDSTG.UTIL_PROS_SAP_RUN",
+    "PVCBODS.ACCT_MSTR_DATA",
+    "PVCBODS.ACCT_MSTR_DATA_GENL",
+    "PVCBODS.BUSN_PTNR",
+    "PVCBODS.CNCT_HEAD",
+    "PVCBODS.MSTR_CNCT_BALN_TRNF_PRTP",
+    "PVCBODS.MSTR_CNCT_MSTR_DATA_GENL",
+    "PVCBODS.MSTR_CNCT_PRXY_ACCT",
+    "PVCBODS.PTNR_IDNN_NUMB",
+    "PVCBODS.WUL_NON_SAP_ACCT",
+    "PVDATA.INT_GRUP_DEPT_CURR",
+    "PVDATA.PATY_INT_GRUP_CURR",
+    "PVPATY.UTIL_PROS_ISAC",
+    "PVTECH.ACCT_BALN",
+    "PVTECH.ACCT_BALN_ADJ",
+    "PVTECH.ACCT_BALN_BKDT",
+    "PVTECH.ACCT_BALN_BKDT_RECN",
+    "PVTECH.ACCT_INT_GRUP",
+    "PVTECH.ACCT_PATY",
+    "PVTECH.ACCT_PATY_TAX_INSS",
+    "PVTECH.ACCT_REL",
+    "PVTECH.ACCT_UNID_PATY",
+    "PVTECH.ACCT_XREF_BPS_CBS",
+    "PVTECH.ACCT_XREF_MAS_DAR",
+    "PVTECH.CALENDAR",
+    "PVTECH.CLS_FCLY",
+    "PVTECH.CLS_UNID_PATY",
+    "PVTECH.DAR_ACCT",
+    "PVTECH.DEPT_DIMN_NODE_ANCS_CURR",
+    "PVTECH.DERV_ACCT_PATY",
+    "PVTECH.DERV_PRTF_ACCT",
+    "PVTECH.DERV_PRTF_ACCT_HIST_PSST",
+    "PVTECH.DERV_PRTF_ACCT_INT_GRUP_PSST",
+    "PVTECH.DERV_PRTF_ACCT_PSST",
+    "PVTECH.DERV_PRTF_ACCT_REL",
+    "PVTECH.DERV_PRTF_INT_GRUP_ENHC_PSST",
+    "PVTECH.DERV_PRTF_INT_GRUP_OWN_PSST",
+    "PVTECH.DERV_PRTF_INT_HIST_PSST",
+    "PVTECH.DERV_PRTF_INT_PSST",
+    "PVTECH.DERV_PRTF_OWN_HIST_PSST",
+    "PVTECH.DERV_PRTF_OWN_PSST",
+    "PVTECH.DERV_PRTF_OWN_REL",
+    "PVTECH.DERV_PRTF_PATY",
+    "PVTECH.DERV_PRTF_PATY_HIST_PSST",
+    "PVTECH.DERV_PRTF_PATY_INT_GRUP_PSST",
+    "PVTECH.DERV_PRTF_PATY_PSST",
+    "PVTECH.DERV_PRTF_PATY_REL",
+    "PVTECH.GRD_DEPT_FLAT_CURR",
+    "PVTECH.GRD_GNRC_MAP_CURR",
+    "PVTECH.GRD_PRTF_TYPE_ENHC",
+    "PVTECH.GRD_PRTF_TYPE_ENHC_HIST_PSST",
+    "PVTECH.GRD_PRTF_TYPE_ENHC_PSST",
+    "PVTECH.GRD_RPRT_CALR_CLYR",
+    "PVTECH.INT_GRUP",
+    "PVTECH.INT_GRUP_DEPT",
+    "PVTECH.INT_GRUP_EMPL",
+    "PVTECH.MAP_SAP_ACCT_REL",
+    "PVTECH.MAP_SAP_IDNN_STUS",
+    "PVTECH.MAP_SAP_IDNN_TYPE",
+    "PVTECH.MAP_SAP_INVL_PDCT",
+    "PVTECH.MAP_SAP_RESI_STUS",
+    "PVTECH.MOS_FCLY",
+    "PVTECH.MOS_LOAN",
+    "PVTECH.ODS_RULE",
+    "PVTECH.PATY_INT_GRUP",
+    "PVTECH.THA_ACCT",
+    "PVTECH.UTIL_BTCH_ISAC",
+    "PVTECH.UTIL_PARM",
+    "PVTECH.UTIL_PROS_ISAC",
+    "STAR_CAD_PROD_DATA.ACCT_PATY_TAX_INSS",
+    "STAR_CAD_PROD_DATA.ACCT_REL",
+    "STAR_CAD_PROD_DATA.DERV_ACCT_PATY",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_INT_GRUP_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_OWN_REL",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_ACCT_REL",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_GRUP_ENHC_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_GRUP_OWN_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_INT_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_OWN_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_OWN_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_OWN_REL",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_HIST_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_INT_GRUP_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_OWN_REL",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_PSST",
+    "STAR_CAD_PROD_DATA.DERV_PRTF_PATY_REL",
+    "STAR_CAD_PROD_DATA.UTIL_BTCH_ISAC",
+    "STAR_CAD_PROD_DATA.UTIL_PROS_ISAC",
+    "UTILSTG.CBM_UTIL_RUN_STRM_OCCR_CNTL_H",
+    "UTIL_PROS_SAP_RUN"
+  ],
+  "by_schema": {
+    "PDDSTG": {
+      "table_count": 28,
+      "tables": [
+        "ACCT_BALN_BKDT_ADJ_RULE",
+        "ACCT_BALN_BKDT_STG1",
+        "ACCT_BALN_BKDT_STG2",
+        "ACCT_PATY_DEDUP",
+        "ACCT_PATY_REL_THA",
+        "ACCT_PATY_REL_WSS",
+        "ACCT_PATY_THA_NEW_RNGE",
+        "ACCT_REL_HLS_REME",
+        "ACCT_REL_HLS_REME_HIST",
+        "ACCT_REL_WSS_DITPS",
+        "DERV_ACCT_PATY_ADD",
+        "DERV_ACCT_PATY_CHG",
+        "DERV_ACCT_PATY_CURR",
+        "DERV_ACCT_PATY_DEL",
+        "DERV_ACCT_PATY_FLAG",
+        "DERV_ACCT_PATY_NON_RM",
+        "DERV_ACCT_PATY_RM",
+        "DERV_ACCT_PATY_ROW_SECU_FIX",
+        "DERV_PRTF_ACCT_PATY_PSST",
+        "DERV_PRTF_ACCT_PATY_STAG",
+        "DERV_PRTF_ACCT_STAG",
+        "DERV_PRTF_PATY_STAG",
+        "GRD_GNRC_MAP_BUSN_SEGM_PRTY",
+        "GRD_GNRC_MAP_DERV_PATY_HOLD",
+        "GRD_GNRC_MAP_DERV_PATY_REL",
+        "GRD_GNRC_MAP_DERV_UNID_PATY",
+        "GRD_GNRC_MAP_PATY_HOLD_PRTY",
+        "UTIL_PROS_SAP_RUN"
+      ]
+    },
+    "PVTECH": {
+      "table_count": 56,
+      "tables": [
+        "ACCT_BALN",
+        "ACCT_BALN_ADJ",
+        "ACCT_BALN_BKDT",
+        "ACCT_BALN_BKDT_RECN",
+        "ACCT_INT_GRUP",
+        "ACCT_PATY",
+        "ACCT_PATY_TAX_INSS",
+        "ACCT_REL",
+        "ACCT_UNID_PATY",
+        "ACCT_XREF_BPS_CBS",
+        "ACCT_XREF_MAS_DAR",
+        "CALENDAR",
+        "CLS_FCLY",
+        "CLS_UNID_PATY",
+        "DAR_ACCT",
+        "DEPT_DIMN_NODE_ANCS_CURR",
+        "DERV_ACCT_PATY",
+        "DERV_PRTF_ACCT",
+        "DERV_PRTF_ACCT_HIST_PSST",
+        "DERV_PRTF_ACCT_INT_GRUP_PSST",
+        "DERV_PRTF_ACCT_PSST",
+        "DERV_PRTF_ACCT_REL",
+        "DERV_PRTF_INT_GRUP_ENHC_PSST",
+        "DERV_PRTF_INT_GRUP_OWN_PSST",
+        "DERV_PRTF_INT_HIST_PSST",
+        "DERV_PRTF_INT_PSST",
+        "DERV_PRTF_OWN_HIST_PSST",
+        "DERV_PRTF_OWN_PSST",
+        "DERV_PRTF_OWN_REL",
+        "DERV_PRTF_PATY",
+        "DERV_PRTF_PATY_HIST_PSST",
+        "DERV_PRTF_PATY_INT_GRUP_PSST",
+        "DERV_PRTF_PATY_PSST",
+        "DERV_PRTF_PATY_REL",
+        "GRD_DEPT_FLAT_CURR",
+        "GRD_GNRC_MAP_CURR",
+        "GRD_PRTF_TYPE_ENHC",
+        "GRD_PRTF_TYPE_ENHC_HIST_PSST",
+        "GRD_PRTF_TYPE_ENHC_PSST",
+        "GRD_RPRT_CALR_CLYR",
+        "INT_GRUP",
+        "INT_GRUP_DEPT",
+        "INT_GRUP_EMPL",
+        "MAP_SAP_ACCT_REL",
+        "MAP_SAP_IDNN_STUS",
+        "MAP_SAP_IDNN_TYPE",
+        "MAP_SAP_INVL_PDCT",
+        "MAP_SAP_RESI_STUS",
+        "MOS_FCLY",
+        "MOS_LOAN",
+        "ODS_RULE",
+        "PATY_INT_GRUP",
+        "THA_ACCT",
+        "UTIL_BTCH_ISAC",
+        "UTIL_PARM",
+        "UTIL_PROS_ISAC"
+      ]
+    },
+    "%%CAD_PROD_DATA%%": {
+      "table_count": 4,
+      "tables": [
+        "ACCT_BALN_BKDT",
+        "ACCT_BALN_BKDT_AUDT",
+        "ACCT_BALN_BKDT_RECN",
+        "UTIL_PROS_ISAC"
+      ]
+    },
+    "STAR_CAD_PROD_DATA": {
+      "table_count": 22,
+      "tables": [
+        "ACCT_PATY_TAX_INSS",
+        "ACCT_REL",
+        "DERV_ACCT_PATY",
+        "DERV_PRTF_ACCT_HIST_PSST",
+        "DERV_PRTF_ACCT_INT_GRUP_PSST",
+        "DERV_PRTF_ACCT_OWN_REL",
+        "DERV_PRTF_ACCT_PSST",
+        "DERV_PRTF_ACCT_REL",
+        "DERV_PRTF_INT_GRUP_ENHC_PSST",
+        "DERV_PRTF_INT_GRUP_OWN_PSST",
+        "DERV_PRTF_INT_HIST_PSST",
+        "DERV_PRTF_INT_PSST",
+        "DERV_PRTF_OWN_HIST_PSST",
+        "DERV_PRTF_OWN_PSST",
+        "DERV_PRTF_OWN_REL",
+        "DERV_PRTF_PATY_HIST_PSST",
+        "DERV_PRTF_PATY_INT_GRUP_PSST",
+        "DERV_PRTF_PATY_OWN_REL",
+        "DERV_PRTF_PATY_PSST",
+        "DERV_PRTF_PATY_REL",
+        "UTIL_BTCH_ISAC",
+        "UTIL_PROS_ISAC"
+      ]
+    },
+    "PVDATA": {
+      "table_count": 2,
+      "tables": [
+        "INT_GRUP_DEPT_CURR",
+        "PATY_INT_GRUP_CURR"
+      ]
+    },
+    "BSDY_4": {
+      "table_count": 1,
+      "tables": [
+        "CALR_CALR_D"
+      ]
+    },
+    "PVPATY": {
+      "table_count": 1,
+      "tables": [
+        "UTIL_PROS_ISAC"
+      ]
+    },
+    "PVCBODS": {
+      "table_count": 9,
+      "tables": [
+        "ACCT_MSTR_DATA",
+        "ACCT_MSTR_DATA_GENL",
+        "BUSN_PTNR",
+        "CNCT_HEAD",
+        "MSTR_CNCT_BALN_TRNF_PRTP",
+        "MSTR_CNCT_MSTR_DATA_GENL",
+        "MSTR_CNCT_PRXY_ACCT",
+        "PTNR_IDNN_NUMB",
+        "WUL_NON_SAP_ACCT"
+      ]
+    },
+    "UTILSTG": {
+      "table_count": 1,
+      "tables": [
+        "CBM_UTIL_RUN_STRM_OCCR_CNTL_H"
+      ]
+    },
+    "DGRDDB": {
+      "table_count": 2,
+      "tables": [
+        "GRD_PRTF_TYPE_ENHC_HIST_PSST",
+        "GRD_PRTF_TYPE_ENHC_PSST"
+      ]
+    }
+  },
+  "by_database": {},
+  "file_dependencies": {
+    "DERV_ACCT_PATY_03_SET_ACCT_PRTF.bteq": {
+      "tables": [
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_PATY_STAG"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_STAG"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 4,
+      "control_statements": 12,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_01_SP_GET_BTCH_KEY.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 12,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_RECN_GET_PROS_KEY.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PARM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_RPRT_CALR_CLYR"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "prtf_tech_paty_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_PSST"
+        ]
+      ],
+      "table_count": 7,
+      "sql_blocks": 6,
+      "control_statements": 12,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_05_SET_PRTF_PRFR_FLAG.bteq": {
+      "tables": [
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_PATY_STAG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_RM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_DEPT_FLAT_CURR"
+        ],
+        [
+          null,
+          "PVDATA",
+          "INT_GRUP_DEPT_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_PATY_STAG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_STAG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_DERV_PATY_HOLD"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_PATY_PSST"
+        ],
+        [
+          null,
+          "PVDATA",
+          "PATY_INT_GRUP_CURR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ODS_RULE"
+        ]
+      ],
+      "table_count": 11,
+      "sql_blocks": 6,
+      "control_statements": 21,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_AVG_CALL_PROC.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 7,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_07_CRAT_DELTAS.bteq": {
+      "tables": [
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_ADD"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_DEL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_ACCT_PATY"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CHG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_FLAG"
+        ]
+      ],
+      "table_count": 5,
+      "sql_blocks": 6,
+      "control_statements": 17,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_ADJ_RULE_ISRT.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "GRD_RPRT_CALR_CLYR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_ADJ_RULE"
+        ],
+        [
+          null,
+          "BSDY_4",
+          "CALR_CALR_D"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_BALN_ADJ"
+        ]
+      ],
+      "table_count": 5,
+      "sql_blocks": 2,
+      "control_statements": 7,
+      "errors": []
+    },
+    "sp_get_pros_key.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 12,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 1,
+      "control_statements": 8,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_DELT.bteq": {
+      "tables": [
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "ACCT_BALN_BKDT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG1"
+        ]
+      ],
+      "table_count": 2,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_AUDT_GET_PROS_KEY.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PARM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_RPRT_CALR_CLYR"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "sp_comt_btch_key.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "UTIL_BTCH_ISAC"
+        ]
+      ],
+      "table_count": 1,
+      "sql_blocks": 1,
+      "control_statements": 8,
+      "errors": []
+    },
+    "prtf_tech_acct_own_rel_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_REL"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_OWN_REL"
+        ]
+      ],
+      "table_count": 3,
+      "sql_blocks": 2,
+      "control_statements": 11,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_RECN_ISRT.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_BALN_BKDT_RECN"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "ACCT_BALN_BKDT_RECN"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_BALN_BKDT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG2"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_BALN"
+        ]
+      ],
+      "table_count": 7,
+      "sql_blocks": 5,
+      "control_statements": 11,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_STG_ISRT.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_BALN_BKDT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG2"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_ADJ_RULE"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG1"
+        ]
+      ],
+      "table_count": 5,
+      "sql_blocks": 4,
+      "control_statements": 9,
+      "errors": []
+    },
+    "prtf_tech_acct_int_grup_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_INT_GRUP"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_HIST_PSST"
+        ]
+      ],
+      "table_count": 10,
+      "sql_blocks": 8,
+      "control_statements": 16,
+      "errors": []
+    },
+    "bteq_login.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 1,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_06_SET_MAX_PRFR_FLAG_CHG0379808.bteq": {
+      "tables": [
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_RM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_DEPT_FLAT_CURR"
+        ],
+        [
+          null,
+          "PVDATA",
+          "INT_GRUP_DEPT_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_PATY_STAG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_DERV_PATY_HOLD"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_NON_RM"
+        ],
+        [
+          null,
+          "PVDATA",
+          "PATY_INT_GRUP_CURR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ODS_RULE"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_FLAG"
+        ]
+      ],
+      "table_count": 10,
+      "sql_blocks": 5,
+      "control_statements": 13,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_99_DROP_WORK_TABL.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 70,
+      "errors": []
+    },
+    "prtf_tech_int_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_HIST_PSST"
+        ]
+      ],
+      "table_count": 2,
+      "sql_blocks": 2,
+      "control_statements": 8,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_99_DROP_WORK_TABL_CHG0379808.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 0,
+      "control_statements": 64,
+      "errors": []
+    },
+    "prtf_tech_acct_rel_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_PSST"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 2,
+      "control_statements": 11,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_04_POP_CURR_TABL.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "ACCT_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_UNID_PATY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "CLS_UNID_PATY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_XREF_BPS_CBS"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_PATY_DEDUP"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_DERV_PATY_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "CLS_FCLY"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_PATY_THA_NEW_RNGE"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MOS_FCLY"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_PATY_REL_WSS"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DAR_ACCT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_DERV_UNID_PATY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_XREF_MAS_DAR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CURR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MOS_LOAN"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_PATY"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_REL_WSS_DITPS"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_PATY_REL_THA"
+        ],
+        [
+          null,
+          "PVTECH",
+          "THA_ACCT"
+        ]
+      ],
+      "table_count": 19,
+      "sql_blocks": 21,
+      "control_statements": 91,
+      "errors": []
+    },
+    "prtf_tech_own_rel_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_OWN_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 2,
+      "control_statements": 11,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_00_DATAWATCHER.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_BTCH_ISAC"
+        ],
+        [
+          null,
+          "PVPATY",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PARM"
+        ]
+      ],
+      "table_count": 3,
+      "sql_blocks": 2,
+      "control_statements": 12,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_UTIL_PROS_UPDT.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG2"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG1"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_AUDT_ISRT.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG2"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_ADJ_RULE"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "ACCT_BALN_BKDT_AUDT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG1"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 6,
+      "sql_blocks": 2,
+      "control_statements": 7,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_06_SET_MAX_PRFR_FLAG.bteq": {
+      "tables": [
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_RM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_DEPT_FLAT_CURR"
+        ],
+        [
+          null,
+          "PVDATA",
+          "INT_GRUP_DEPT_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_PRTF_ACCT_PATY_STAG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_BUSN_SEGM_PRTY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_GNRC_MAP_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CURR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DEPT_DIMN_NODE_ANCS_CURR"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_PATY_HOLD_PRTY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "PATY_INT_GRUP"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP_DEPT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "GRD_GNRC_MAP_DERV_PATY_HOLD"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_NON_RM"
+        ],
+        [
+          null,
+          "PVDATA",
+          "PATY_INT_GRUP_CURR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ODS_RULE"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_FLAG"
+        ]
+      ],
+      "table_count": 17,
+      "sql_blocks": 7,
+      "control_statements": 19,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_ISRT.bteq": {
+      "tables": [
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "ACCT_BALN_BKDT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_BALN_BKDT_STG2"
+        ]
+      ],
+      "table_count": 2,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "sp_comt_pros_key.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 1,
+      "sql_blocks": 1,
+      "control_statements": 8,
+      "errors": []
+    },
+    "prtf_tech_paty_own_rel_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_OWN_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_REL"
+        ]
+      ],
+      "table_count": 3,
+      "sql_blocks": 2,
+      "control_statements": 11,
+      "errors": []
+    },
+    "prtf_tech_int_grup_own_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP_EMPL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_OWN_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_OWN_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP_DEPT"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_GRUP_OWN_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_GRUP_OWN_PSST"
+        ]
+      ],
+      "table_count": 11,
+      "sql_blocks": 8,
+      "control_statements": 16,
+      "errors": []
+    },
+    "prtf_tech_paty_int_grup_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "PATY_INT_GRUP"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_PSST"
+        ]
+      ],
+      "table_count": 10,
+      "sql_blocks": 8,
+      "control_statements": 16,
+      "errors": []
+    },
+    "prtf_tech_daly_datawatcher_c.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PARM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 2,
+      "sql_blocks": 1,
+      "control_statements": 8,
+      "errors": []
+    },
+    "BTEQ_TAX_INSS_MNLY_LOAD.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          null,
+          "ACCT_PATY_INSS_FIX"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "ACCT_PATY_TAX_INSS"
+        ],
+        [
+          null,
+          null,
+          "UTIL_PROS_SAP_RUN"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_PATY_TAX_INSS"
+        ],
+        [
+          null,
+          null,
+          "LOAD_MISSING_ACCTS1"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_IDNN_STUS"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_INVL_PDCT"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "PTNR_IDNN_NUMB"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "ACCT_MSTR_DATA_GENL"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "BUSN_PTNR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_RESI_STUS"
+        ],
+        [
+          null,
+          "UTILSTG",
+          "CBM_UTIL_RUN_STRM_OCCR_CNTL_H"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_IDNN_TYPE"
+        ]
+      ],
+      "table_count": 14,
+      "sql_blocks": 7,
+      "control_statements": 19,
+      "errors": []
+    },
+    "prtf_tech_paty_rel_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_PATY_REL"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_PATY_PSST"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 2,
+      "control_statements": 11,
+      "errors": []
+    },
+    "prtf_tech_own_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_OWN_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_OWN_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_HIST_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_OWN_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_GRUP_OWN_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_GRUP_OWN_PSST"
+        ]
+      ],
+      "table_count": 7,
+      "sql_blocks": 12,
+      "control_statements": 21,
+      "errors": []
+    },
+    "BTEQ_SAP_EDO_WKLY_LOAD.bteq": {
+      "tables": [
+        [
+          null,
+          "PVCBODS",
+          "MSTR_CNCT_PRXY_ACCT"
+        ],
+        [
+          null,
+          "PVTECH",
+          "ACCT_REL"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_ACCT_REL"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "UTIL_PROS_SAP_RUN"
+        ],
+        [
+          null,
+          null,
+          "ACCT_REL_TRNF_PRTP_2"
+        ],
+        [
+          null,
+          "PVTECH",
+          "MAP_SAP_INVL_PDCT"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_REL_HLS_REME_HIST"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "WUL_NON_SAP_ACCT"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "ACCT_MSTR_DATA"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "MSTR_CNCT_BALN_TRNF_PRTP"
+        ],
+        [
+          null,
+          "UTILSTG",
+          "CBM_UTIL_RUN_STRM_OCCR_CNTL_H"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "MSTR_CNCT_MSTR_DATA_GENL"
+        ],
+        [
+          null,
+          "PVCBODS",
+          "CNCT_HEAD"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "ACCT_REL"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "ACCT_REL_HLS_REME"
+        ]
+      ],
+      "table_count": 16,
+      "sql_blocks": 11,
+      "control_statements": 32,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_99_SP_COMT_BTCH_KEY.bteq": {
+      "tables": [
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "UTIL_BTCH_ISAC"
+        ]
+      ],
+      "table_count": 1,
+      "sql_blocks": 1,
+      "control_statements": 8,
+      "errors": []
+    },
+    "sp_get_btch_key.bteq": {
+      "tables": [],
+      "table_count": 0,
+      "sql_blocks": 1,
+      "control_statements": 13,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_08_APPLY_DELTAS.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_ACCT_PATY"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_ACCT_PATY"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_CHG"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_ADD"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_ROW_SECU_FIX"
+        ],
+        [
+          null,
+          "PDDSTG",
+          "DERV_ACCT_PATY_FLAG"
+        ]
+      ],
+      "table_count": 7,
+      "sql_blocks": 8,
+      "control_statements": 20,
+      "errors": []
+    },
+    "prtf_tech_acct_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_ACCT_INT_GRUP_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_ACCT_HIST_PSST"
+        ]
+      ],
+      "table_count": 7,
+      "sql_blocks": 6,
+      "control_statements": 12,
+      "errors": []
+    },
+    "ACCT_BALN_BKDT_GET_PROS_KEY.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_PARM"
+        ],
+        [
+          null,
+          "PVTECH",
+          "UTIL_PROS_ISAC"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_RPRT_CALR_CLYR"
+        ],
+        [
+          null,
+          "%%CAD_PROD_DATA%%",
+          "UTIL_PROS_ISAC"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 1,
+      "control_statements": 6,
+      "errors": []
+    },
+    "prtf_tech_int_grup_enhc_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "CALENDAR"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_HIST_PSST"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_GRUP_ENHC_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "INT_GRUP"
+        ],
+        [
+          null,
+          "STAR_CAD_PROD_DATA",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_GRUP_ENHC_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "DERV_PRTF_INT_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ]
+      ],
+      "table_count": 8,
+      "sql_blocks": 6,
+      "control_statements": 15,
+      "errors": []
+    },
+    "prtf_tech_grd_prtf_type_enhc_psst.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC_PSST"
+        ],
+        [
+          null,
+          "PVTECH",
+          "GRD_PRTF_TYPE_ENHC"
+        ],
+        [
+          null,
+          "DGRDDB",
+          "GRD_PRTF_TYPE_ENHC_HIST_PSST"
+        ],
+        [
+          null,
+          "DGRDDB",
+          "GRD_PRTF_TYPE_ENHC_PSST"
+        ]
+      ],
+      "table_count": 4,
+      "sql_blocks": 4,
+      "control_statements": 12,
+      "errors": []
+    },
+    "DERV_ACCT_PATY_01_SP_GET_PROS_KEY.bteq": {
+      "tables": [
+        [
+          null,
+          "PVTECH",
+          "UTIL_BTCH_ISAC"
+        ]
+      ],
+      "table_count": 1,
+      "sql_blocks": 1,
+      "control_statements": 16,
+      "errors": []
+    }
+  },
+  "parsing_errors": {
+    "DERV_ACCT_PATY_02_CRAT_WORK_TABL.bteq": [
+      "Error processing file DERV_ACCT_PATY_02_CRAT_WORK_TABL.bteq: 'utf-8' codec can't decode byte 0x96 in position 22523: invalid start byte"
+    ],
+    "DERV_ACCT_PATY_02_CRAT_WORK_TABL_CHG0379808.bteq": [
+      "Error processing file DERV_ACCT_PATY_02_CRAT_WORK_TABL_CHG0379808.bteq: 'utf-8' codec can't decode byte 0x96 in position 22201: invalid start byte"
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "sql_blocks": [],
+  "controls": [
+    {
+      "type": "RUN",
+      "raw": ".RUN FILE=${ETL_APP_BTEQ}/bteq_login.sql",
+      "args": null,
+      "line_no": 1
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 2
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 23
+    },
+    {
+      "type": "OS_CMD",
+      "raw": ".OS rm /cba_app/CBMGDW/PROD/schedule/DERV_ACCT_PATY_%%TBSHORT%%PROS_KEY.txt",
+      "args": null,
+      "line_no": 26
+    },
+    {
+      "type": "IMPORT",
+      "raw": ".IMPORT VARTEXT FILE=/cba_app/CBMGDW/PROD/schedule/DERV_ACCT_PATY_BTCH_KEY.txt",
+      "args": null,
+      "line_no": 28
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT DATA FILE=/cba_app/CBMGDW/PROD/schedule/DERV_ACCT_PATY_%%TBSHORT%%PROS_KEY.txt",
+      "args": null,
+      "line_no": 30
+    },
+    {
+      "type": "CALL_SP",
+      "raw": "CALL STAR_CAD_PROD_MACRO.SP_GET_PROS_KEY(        \n  '%%GDW_USER%%',           -- From the config.pass parameters\n  'DERIVED_ACCOUNT_PARTY',          \n  'DERIVED_ACCOUNT_PARTY',           \n  'DERV_ACCT_PATY',           \n  CAST(trim(:BTCHKEY) as DECIMAL(10,0)),\n  CAST(%%INDATE%% as DATE FORMAT'YYYYMMDD'),            \n  'N',                -- Restart Flag\n  'MVS',                     \n  IPROCESSKEY (CHAR(100))",
+      "args": null,
+      "line_no": 36
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 48
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 50
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 53
+    },
+    {
+      "type": "LABEL",
+      "raw": ".LABEL EXITERR",
+      "args": null,
+      "line_no": 55
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 57
+    }
+  ],
+  "errors": []
+}

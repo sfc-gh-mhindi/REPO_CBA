@@ -1,0 +1,2 @@
+PartitionKey,FileName,Caller_CodeUnit,Caller_CodeUnit_Database,Caller_CodeUnit_Schema,Caller_CodeUnit_Name,Caller_CodeUnit_FullName,Referenced_Element_Database,Referenced_Element_Schema,Referenced_Element_Name,Referenced_Element_FullName,Line,Relation_Type
+62d6f220-9b9b-476b-b4a1-7fb42c59ca71,TMP2.sql,CREATE VIEW,N/A,PVTECH,ACCT_BALN_ADJ,PVTECH.ACCT_BALN_ADJ,N/A,PVSECURITY,ROW_LEVL_SECU_USER_PRFL,PVSECURITY.ROW_LEVL_SECU_USER_PRFL,77,SELECT - FROM

@@ -1,0 +1,149 @@
+﻿#*** Generated code is based on the SnowConvert Python Helpers version 2.0.6 ***
+ 
+import os
+import sys
+import snowconvert.helpers
+from snowconvert.helpers import Export
+from snowconvert.helpers import exec
+from snowconvert.helpers import BeginLoading
+con = None
+#** SSC-FDM-TD0022 - SHELL VARIABLES FOUND, RUNNING THIS CODE IN A SHELL SCRIPT IS REQUIRED **
+def main():
+  snowconvert.helpers.configure_log()
+  con = snowconvert.helpers.log_on()
+
+  for statement in snowconvert.helpers.readrun(fr"%%BTEQ_LOGON_SCRIPT%%"):
+    eval(statement)
+
+  if snowconvert.helpers.error_code != 0:
+    EXITERR()
+    return
+  #.SET QUIET OFF
+  !!!RESOLVE EWI!!! /*** SSC-EWI-0073 - PENDING FUNCTIONAL EQUIVALENCE REVIEW FOR 'Quiet' NODE ***/!!!
+  None
+  #.SET ECHOREQ ON
+  !!!RESOLVE EWI!!! /*** SSC-EWI-0073 - PENDING FUNCTIONAL EQUIVALENCE REVIEW FOR 'Echoreq' NODE ***/!!!
+  None
+  #.SET FORMAT OFF
+  !!!RESOLVE EWI!!! /*** SSC-EWI-0073 - PENDING FUNCTIONAL EQUIVALENCE REVIEW FOR 'Format' NODE ***/!!!
+  None
+  #** SSC-EWI-TD0005 - THE STATEMENT WAS CONVERTED BUT ITS FUNCTIONALITY IS NOT IMPLEMENTED YET **
+  Export.width(120)
+  #----------------------------------------------------------------------------
+  # Object Name             :  prtf_tech_paty_own_rel_psst.sql
+  # Object Type             :  BTEQ
+  #                           
+  # Description             :  Persist rows for DERV_PRTF_PATY_OWN view
+  #----------------------------------------------------------------------------
+  #   Modification history
+  #----------------------------------------------------------------------------                       --
+  #  Ver  Date                   Modified By        Description
+  #  ---- -----------------    ------------             ---------------------------------------
+  #  1.0  09/01/2014    Helen Zak            Initial Version
+  #----------------------------------------------------------------------------
+  # This info is for CBM use only
+  # $LastChangedBy: zakhe $
+  # $LastChangedDate: 2014-01-10 14:56:29 +1100 (Fri, 10 Jan 2014) $
+  # $LastChangedRevision: 13159 $
+  #
+  exec("""
+    !!!RESOLVE EWI!!! /*** SSC-EWI-0013 - EXCEPTION THROWN WHILE CONVERTING ITEM: Mobilize.T12Data.Sql.Ast.TdDelete. LINE: 30 OF FILE: /Users/psundaram/Documents/prjs/cba/agentic/cba-terradata-cdao-poc/current_state/prtf_tech_paty_own_rel_psst.bteq ***/!!!
+    Delete
+-- ** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '30' COLUMN '7' OF THE SOURCE CODE STARTING AT 'from'. EXPECTED 'FROM' GRAMMAR. LAST MATCHING TOKEN WAS 'from' ON LINE '30' COLUMN '7'. FAILED TOKEN WAS '%' ON LINE '30' COLUMN '12'. **
+--           from %%STARDATADB%%.DERV_PRTF_PATY_OWN_REL All
+    """)
+
+  if snowconvert.helpers.error_code != 0:
+    EXITERR()
+    return
+  #** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '36' COLUMN '2' OF THE SOURCE CODE STARTING AT 'COLLECT'. EXPECTED 'STATEMENT' GRAMMAR. LAST MATCHING TOKEN WAS 'COLLECT' ON LINE '36' COLUMN '2'. **
+  #
+  #---- Collect stats after deletion so that the optimiser "knows" that the table is empty
+  #
+  #-- COLLECT STATS  %%STARDATADB%%.DERV_PRTF_PATY_OWN_REL
+   
+
+  if snowconvert.helpers.error_code != 0:
+    EXITERR()
+    return
+  exec("""
+
+-- ** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '40' COLUMN '0' OF THE SOURCE CODE STARTING AT 'Insert'. EXPECTED 'Insert' GRAMMAR. LAST MATCHING TOKEN WAS 'into' ON LINE '40' COLUMN '7'. **
+--Insert into %%STARDATADB%%.DERV_PRTF_PATY_OWN_REL
+--( PATY_I
+--, INT_GRUP_I
+--, DERV_PRTF_CATG_C
+-- , DERV_PRTF_CLAS_C
+-- , DERV_PRTF_TYPE_C
+-- , PRTF_PATY_VALD_FROM_D
+-- , PRTF_PATY_VALD_TO_D
+-- , PRTF_PATY_EFFT_D
+-- , PRTF_PATY_EXPY_D
+--  , PRTF_OWN_VALD_FROM_D
+--  , PRTF_OWN_VALD_TO_D
+--  , PRTF_OWN_EFFT_D
+--   , PRTF_OWN_EXPY_D
+--    , PTCL_N
+--    , REL_MNGE_I
+--    , PRTF_CODE_X
+--    , DERV_PRTF_ROLE_C
+--     , ROLE_PLAY_TYPE_X
+--     , ROLE_PLAY_I
+--     , SRCE_SYST_C
+--      , ROW_SECU_ACCS_C
+--       )
+--       SELECT
+--         PP4.PATY_I AS PATY_I
+--       , PP4.INT_GRUP_I AS INT_GRUP_I
+--       , PP4.DERV_PRTF_CATG_C AS DERV_PRTF_CATG_C
+--       , PP4.DERV_PRTF_CLAS_C AS DERV_PRTF_CLAS_C
+--       , PP4.DERV_PRTF_TYPE_C AS DERV_PRTF_TYPE_C
+--       , PP4.VALD_FROM_D AS PRTF_PATY_VALD_FROM_D
+--       , PP4.VALD_TO_D AS PRTF_PATY_VALD_TO_D
+--       , PP4.EFFT_D AS PRTF_PATY_EFFT_D
+--       , PP4.EXPY_D AS PRTF_PATY_EXPY_D
+--       , PO4.VALD_FROM_D AS PRTF_OWN_VALD_FROM_D
+--       , PO4.VALD_TO_D AS PRTF_OWN_VALD_TO_D
+--       , PO4.EFFT_D AS PRTF_OWN_EFFT_D
+--        , PO4.EXPY_D AS PRTF_OWN_EXPY_D
+--        , PP4.PTCL_N AS PTCL_N
+--        , PP4.REL_MNGE_I AS REL_MNGE_I
+--        , PP4.PRTF_CODE_X AS PRTF_CODE_X
+--        , PO4.DERV_PRTF_ROLE_C AS DERV_PRTF_ROLE_C
+--         , PO4.ROLE_PLAY_TYPE_X AS ROLE_PLAY_TYPE_X
+--         , PO4.ROLE_PLAY_I AS ROLE_PLAY_I
+--          , PP4.SRCE_SYST_C AS SRCE_SYST_C
+--          , PP4.ROW_SECU_ACCS_C AS ROW_SECU_ACCS_C
+
+--FROM %%VTECH%%.DERV_PRTF_PATY_REL PP4
+--INNER JOIN %%VTECH%%.DERV_PRTF_OWN_REL PO4
+--ON PO4.INT_GRUP_I = PP4.INT_GRUP_I
+--AND PO4.DERV_PRTF_TYPE_C = PP4.DERV_PRTF_TYPE_C
+""")
+
+  if snowconvert.helpers.error_code != 0:
+EXITERR()
+return
+  #** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '94' COLUMN '3' OF THE SOURCE CODE STARTING AT 'COLLECT'. EXPECTED 'STATEMENT' GRAMMAR. LAST MATCHING TOKEN WAS 'COLLECT' ON LINE '94' COLUMN '3'. **
+  #
+  #--  COLLECT STATS  %%STARDATADB%%.DERV_PRTF_PATY_OWN_REL
+   
+
+  if snowconvert.helpers.error_code != 0:
+EXITERR()
+return
+  snowconvert.helpers.quit_application(0)
+  #** SSC-FDM-0027 - REMOVED NEXT STATEMENT, NOT APPLICABLE IN SNOWFLAKE. LOGOFF **
+  #.LOGOFF
+   
+  EXITERR()
+  snowconvert.helpers.quit_application()
+def EXITERR():
+  snowconvert.helpers.quit_application(1)
+  #** SSC-FDM-0027 - REMOVED NEXT STATEMENT, NOT APPLICABLE IN SNOWFLAKE. LOGOFF **
+  #.LOGOFF
+   
+  snowconvert.helpers.quit_application()
+
+if __name__ == "__main__":
+  main()

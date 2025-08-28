@@ -1,0 +1,28 @@
+{
+  "mode": "v5_claude_dbt",
+  "files_processed": 1,
+  "results": [
+    {
+      "file_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT.sql",
+      "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+      "sp_generation_success": false,
+      "dbt_conversion_success": false,
+      "has_dbt_model": true,
+      "llm_calls_count": 1,
+      "migration_summary": {
+        "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+        "dbt_enabled": true,
+        "dbt_conversion_success": false,
+        "has_stored_procedure": true,
+        "has_dbt_model": true,
+        "output_types": [
+          "stored_procedure",
+          "dbt_model"
+        ]
+      },
+      "direct_conversion": true
+    }
+  ],
+  "total_llm_calls": 1,
+  "dbt_conversions": 1
+}
