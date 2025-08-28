@@ -32,6 +32,50 @@ CSEL/
 
 ### 1. Snowflake Database Structure
 
+```mermaid
+graph TB
+    subgraph "Snowflake Environment"
+        subgraph "NPD_D12_DMN_GDWMIG Database"
+            subgraph "TMP Schema"
+                PROC[P_EXECUTE_DBT_CSEL<br/>Stored Procedure]
+                TASK[T_EXECUTE_DBT_CSEL<br/>Scheduled Task]
+                DBT[GDW1_DBT<br/>DBT Project]
+            end
+        end
+        
+        subgraph "NPD_D12_DMN_GDWMIG_IBRG_V Database"
+            subgraph "P_V_OUT_001_STD_0 Schema"
+                LOG[DCF_T_EXEC_LOG<br/>Audit Table]
+                CTRL[RUN_STRM_TMPL<br/>Control Table]
+            end
+            
+            subgraph "DBT Models Output"
+                VIEWS[Materialized Views]
+                TABLES[Data Tables]
+            end
+        end
+    end
+    
+    subgraph "External Systems"
+        WORKSPACE[Snowflake<br/>DBT Workspace]
+        WAREHOUSE[wh_usr_npd_d12_gdwmig_001<br/>Compute Warehouse]
+    end
+    
+    subgraph "Scheduling"
+        CRON[Daily 3 AM<br/>Australia/Sydney]
+    end
+    
+    CRON --> TASK
+    TASK --> PROC
+    PROC --> DBT
+    DBT --> WORKSPACE
+    DBT --> WAREHOUSE
+    PROC --> LOG
+    PROC --> CTRL
+    DBT --> VIEWS
+    DBT --> TABLES
+```
+
 - **Primary Database**: `NPD_D12_DMN_GDWMIG`
 - **Schema**: `TMP`
 - **DBT Project Name**: `GDW1_DBT`
@@ -64,6 +108,62 @@ models:
 **Procedure Name**: `NPD_D12_DMN_GDWMIG.TMP.P_EXECUTE_DBT_CSEL()`
 
 This stored procedure orchestrates the execution of 18 sequential DBT model steps:
+
+```mermaid
+flowchart TD
+    START([Start P_EXECUTE_DBT_CSEL]) --> CTRL_UPDATE[Update Control Tables<br/>RUN_STRM_ABRT_F = 'N'<br/>RUN_STRM_ACTV_F = 'I']
+    
+    CTRL_UPDATE --> STEP1[Step 1: processrunstreamstatuscheck<br/>Validate stream processing status]
+    STEP1 --> STEP2[Step 2: utilprosisacprevloadcheck<br/>Check previous load completion]
+    STEP2 --> STEP3[Step 3: loadgdwproskeyseq<br/>Load GDW process key sequences]
+    STEP3 --> STEP4[Step 4: ldmap_cse_pack_pdct_pllkp<br/>Load product mapping lookups]
+    STEP4 --> STEP5[Step 5: processrunstreamfinishingpoint<br/>Set processing checkpoints]
+    
+    STEP5 --> STEP6[Step 6: processrunstreamstatuscheck<br/>with CSE_CPL_BUS_APP variable]
+    STEP6 --> STEP7[Step 7: extpl_app<br/>Extract application data]
+    STEP7 --> STEP8[Step 8: xfmpl_appfrmext<br/>Transform application data]
+    STEP8 --> STEP9[Step 9: ldtmp_appt_deptrmxfm<br/>Load appointment department temp data]
+    
+    STEP9 --> STEP10[Step 10: dltappt_deptfrmtmp_appt_dept<br/>Delta processing for appointment departments]
+    STEP10 --> STEP11[Step 11: ldapptdeptupd<br/>Update appointment department data]
+    STEP11 --> STEP12[Step 12: ldapptdeptins<br/>Insert new appointment department data]
+    
+    STEP12 --> STEP13[Step 13: ldtmp_appt_pdctfrmxfm<br/>Load appointment product temp data]
+    STEP13 --> STEP14[Step 14: dltappt_pdctfrmtmp_appt_pdct<br/>Delta processing for appointment products]
+    STEP14 --> STEP15[Step 15: ldapptpdctupd<br/>Update appointment product data]
+    STEP15 --> STEP16[Step 16: ldapptpdctins<br/>Insert new appointment product data]
+    
+    STEP16 --> STEP17[Step 17: ldapptdeptupd<br/>with dept_appt target table]
+    STEP17 --> STEP18[Step 18: ldapptdeptins<br/>with dept_appt target table]
+    
+    STEP18 --> SUCCESS[SUCCESS<br/>Log completion<br/>Return JSON result]
+    
+    STEP1 --> ERROR{Step Failed?}
+    STEP2 --> ERROR
+    STEP3 --> ERROR
+    STEP4 --> ERROR
+    STEP5 --> ERROR
+    STEP6 --> ERROR
+    STEP7 --> ERROR
+    STEP8 --> ERROR
+    STEP9 --> ERROR
+    STEP10 --> ERROR
+    STEP11 --> ERROR
+    STEP12 --> ERROR
+    STEP13 --> ERROR
+    STEP14 --> ERROR
+    STEP15 --> ERROR
+    STEP16 --> ERROR
+    STEP17 --> ERROR
+    STEP18 --> ERROR
+    
+    ERROR --> FAIL[FAILED<br/>Log error details<br/>Return failure JSON]
+    
+    style START fill:#e1f5fe
+    style SUCCESS fill:#c8e6c9
+    style FAIL fill:#ffcdd2
+    style ERROR fill:#fff3e0
+```
 
 #### Execution Steps:
 1. **processrunstreamstatuscheck** - Validates stream processing status
@@ -113,6 +213,60 @@ AS
 ## Monitoring and Troubleshooting
 
 ### 5. Monitoring Methods
+
+```mermaid
+graph LR
+    subgraph "CSEL DBT Execution Monitoring"
+        EXEC[P_EXECUTE_DBT_CSEL<br/>Execution]
+    end
+    
+    subgraph "Monitoring Methods"
+        subgraph "1. DBT Workspace Monitoring"
+            WS[Snowflake DBT<br/>Workspace]
+            WS_CMD[SHOW TASKS<br/>Commands]
+        end
+        
+        subgraph "2. Query History Monitoring"
+            QH[Query History<br/>Analysis]
+            TASK_HIST[TASK_HISTORY<br/>Function]
+            RESULT_SCAN[RESULT_SCAN<br/>Function]
+        end
+        
+        subgraph "3. Audit Table Monitoring"
+            AUDIT[DCF_T_EXEC_LOG<br/>Audit Table]
+            LOG_QUERY[Status Queries<br/>Recent/Failed Executions]
+        end
+    end
+    
+    subgraph "Monitoring Outputs"
+        REAL_TIME[Real-time Status<br/>Active Executions]
+        HISTORY[Execution History<br/>Performance Metrics]
+        DETAILED[Detailed Logs<br/>Step-by-step Status]
+    end
+    
+    EXEC --> WS
+    EXEC --> QH
+    EXEC --> AUDIT
+    
+    WS --> WS_CMD
+    WS_CMD --> REAL_TIME
+    
+    QH --> TASK_HIST
+    QH --> RESULT_SCAN
+    TASK_HIST --> HISTORY
+    RESULT_SCAN --> HISTORY
+    
+    AUDIT --> LOG_QUERY
+    LOG_QUERY --> DETAILED
+    
+    style EXEC fill:#e3f2fd
+    style WS fill:#f3e5f5
+    style QH fill:#e8f5e8
+    style AUDIT fill:#fff3e0
+    style REAL_TIME fill:#c8e6c9
+    style HISTORY fill:#c8e6c9
+    style DETAILED fill:#c8e6c9
+```
 
 #### A. DBT Project Monitoring
 Monitor execution directly from the Snowflake DBT Workspace:
@@ -220,4 +374,79 @@ SET RUN_STRM_ABRT_F = 'N', RUN_STRM_ACTV_F = 'I'
 WHERE RUN_STRM_C IN ('CSE_L4_PRE_PROC','CSE_CPL_BUS_APP') 
   AND SYST_C = 'CSEL4';
 ```
+
+## Database Structure & Model Relationships
+
+The following diagram shows the database structure and relationships between different components:
+
+```mermaid
+graph TB
+    subgraph "Database Structure"
+        subgraph "NPD_D12_DMN_GDWMIG"
+            subgraph "TMP Schema"
+                PROC2[P_EXECUTE_DBT_CSEL<br/>Stored Procedure]
+                TASK2[T_EXECUTE_DBT_CSEL<br/>Scheduled Task]
+                DBT2[GDW1_DBT<br/>DBT Project]
+            end
+        end
+        
+        subgraph "NPD_D12_DMN_GDWMIG_IBRG_V"
+            subgraph "P_V_OUT_001_STD_0"
+                LOG2[DCF_T_EXEC_LOG<br/>📊 Audit Logs]
+                CTRL2[RUN_STRM_TMPL<br/>⚙️ Control Table]
+            end
+            
+            subgraph "Model Outputs"
+                PROC_KEY[02processkey<br/>🔑 Process Keys]
+                MAPPING[04MappingLookupSets<br/>🗺️ Lookups]
+                EXTRACT[08extraction<br/>📥 Data Extraction]
+                TRANSFORM[12MappingTransformation<br/>🔄 Transformations]
+                TEMP[14loadtotemp<br/>📝 Temp Tables]
+                DELTA[16transformdelta<br/>🔺 Delta Processing]
+                LOAD[18loadtogdw<br/>📤 Final Load]
+                META[24processmetadata<br/>📋 Metadata]
+                APPT[appt_pdct<br/>📅 Appointments]
+            end
+        end
+    end
+    
+    TASK2 --> PROC2
+    PROC2 --> DBT2
+    PROC2 --> LOG2
+    PROC2 --> CTRL2
+    
+    DBT2 --> PROC_KEY
+    DBT2 --> MAPPING
+    DBT2 --> EXTRACT
+    DBT2 --> TRANSFORM
+    DBT2 --> TEMP
+    DBT2 --> DELTA
+    DBT2 --> LOAD
+    DBT2 --> META
+    DBT2 --> APPT
+    
+    style PROC2 fill:#e1f5fe
+    style TASK2 fill:#f3e5f5
+    style DBT2 fill:#e8f5e8
+    style LOG2 fill:#fff3e0
+    style CTRL2 fill:#fce4ec
+```
+
+## Troubleshooting Guide
+
+### Common Issues:
+1. **Step Failure**: Check the `DCF_T_EXEC_LOG` table for detailed error messages
+2. **Task Not Running**: Verify task status with `SHOW TASKS` and check warehouse availability
+3. **DBT Model Errors**: Review individual model logs in the DBT workspace
+4. **Permission Issues**: Ensure proper database and schema access rights
+
+### Support Contacts:
+- **Database Team**: For Snowflake infrastructure issues
+- **ETL Team**: For data processing and transformation issues
+- **Business Team**: For data validation and business logic questions
+
+---
+
+*Last Updated: [Current Date]*
+*Version: 1.0*
 
