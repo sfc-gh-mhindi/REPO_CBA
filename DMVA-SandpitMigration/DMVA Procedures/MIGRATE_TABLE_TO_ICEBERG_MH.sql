@@ -381,6 +381,11 @@ AS '
 		regex = /COLLATE\\s*\\''\\S*?\\''/gi
 		valRet = valRet.replaceAll(regex, '' '')
 
+		// -- Remove DEFAULT values from column definitions
+		// Handles: DEFAULT 1, DEFAULT ''text'', DEFAULT NULL, DEFAULT CURRENT_TIMESTAMP(), DEFAULT (expression), etc.
+		regex = /\\s+DEFAULT\\s+(?:[^,\\)]+|\\([^)]*\\))/gi
+		valRet = valRet.replaceAll(regex, '''')
+
 		// -- Replace VARCHAR
 		regex = /VARCHAR\\(\\d*\\)/gi
 		valRet = valRet.replaceAll(regex, ''STRING'')

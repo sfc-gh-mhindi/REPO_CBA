@@ -1,0 +1,12 @@
+{
+  "interaction_id": "1ead3b2c",
+  "conversion_type": "bteq2dbt",
+  "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+  "model": "claude-4-sonnet",
+  "success": true,
+  "processing_time_ms": 83043,
+  "response_length": 8723,
+  "quality_score": 0.95,
+  "error_message": null,
+  "timestamp": "2025-08-22T16:33:05.122207"
+}

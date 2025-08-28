@@ -1,0 +1,63 @@
+-- =====================================================================
+-- DBT Model: target_tables.txt
+-- Converted from BTEQ: target_tables.txt
+-- Category: misc
+-- Original Size: 0.7KB, 35 lines
+-- Complexity Score: 0
+-- Generated: 2025-08-21 16:26:38
+-- =====================================================================
+
+{{
+    config(
+        materialized='table',
+        docs={'show': true}
+    )
+}}
+
+-- This model performs data modification operations
+-- Execute via post-hook or separate run
+
+{{ config(
+    materialized='table',
+    post_hook=[
+        "ACCT_BALN_BKDT
+ACCT_BALN_BKDT_ADJ_RULE
+ACCT_BALN_BKDT_AUDT
+ACCT_BALN_BKDT_RECN
+ACCT_BALN_BKDT_STG1
+ACCT_BALN_BKDT_STG2
+ACCT_PATY_DEDUP
+ACCT_PATY_REL_THA
+ACCT_PATY_REL_WSS
+ACCT_PATY_TAX_INSS
+ACCT_PATY_THA_NEW_RNGE
+ACCT_REL
+ACCT_REL_HLS_REME
+ACCT_REL_HLS_REME_HIST
+ACCT_REL_WSS_DITPS
+DERV_ACCT_PATY
+DERV_ACCT_PATY_ADD
+DERV_ACCT_PATY_CHG
+DERV_ACCT_PATY_CURR
+DERV_ACCT_PATY_DEL
+DERV_ACCT_PATY_FLAG
+DERV_ACCT_PATY_NON_RM
+DERV_ACCT_PATY_RM
+DERV_ACCT_PATY_ROW_SECU_FIX
+DERV_PRTF_ACCT_PATY_PSST
+DERV_PRTF_ACCT_PATY_STAG
+DERV_PRTF_ACCT_STAG
+DERV_PRTF_PATY_STAG
+GRD_GNRC_MAP_BUSN_SEGM_PRTY
+GRD_GNRC_MAP_DERV_PATY_HOLD
+GRD_GNRC_MAP_DERV_PATY_REL
+GRD_GNRC_MAP_DERV_UNID_PATY
+GRD_GNRC_MAP_PATY_HOLD_PRTY
+UTIL_PROS_ISAC
+UTIL_PROS_SAP_RUN
+"
+    ]
+) }}
+
+-- Placeholder query for DBT execution
+SELECT 1 as operation_complete

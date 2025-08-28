@@ -1,0 +1,25 @@
+{
+  "mode": "v3_dbt_conversion",
+  "files_processed": 1,
+  "results": [
+    {
+      "file_name": "ACCT_BALN_BKDT_GET_PROS_KEY.sql",
+      "procedure_name": "ACCT_BALN_BKDT_GET_PROS_KEY",
+      "dbt_conversion_success": false,
+      "has_dbt_model": true,
+      "dbt_model_length": 3601,
+      "migration_summary": {
+        "procedure_name": "ACCT_BALN_BKDT_GET_PROS_KEY",
+        "dbt_enabled": true,
+        "dbt_conversion_success": false,
+        "has_stored_procedure": true,
+        "has_dbt_model": true,
+        "output_types": [
+          "stored_procedure",
+          "dbt_model"
+        ]
+      }
+    }
+  ],
+  "dbt_conversions": 1
+}

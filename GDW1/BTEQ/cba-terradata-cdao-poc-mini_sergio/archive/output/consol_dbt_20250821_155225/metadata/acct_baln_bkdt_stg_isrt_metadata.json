@@ -1,0 +1,41 @@
+{
+  "success": false,
+  "quality_score": 1.0,
+  "model_sql": "{%- set process_name = 'ACCT_BALN_BKDT_STG_ISRT' -%}\n{%- set stream_name = 'ACCOUNT_BALANCE_BACKDATE' -%}\n\n{{\n  config(\n    materialized='table',\n    database=var('ddstg_database'),\n    schema='ddstg_schema',\n    tags=['staging', 'account_balance', 'backdate'],\n    pre_hook=[\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_STG_ISRT Process started') }}\"\n    ],\n    post_hook=[\n        \"{{ log_dcf_exec_msg('ACCT_BALN_BKDT_STG_ISRT Process ended') }}\"\n    ]\n  )\n}}\n\n/*\n    Model: ACCT_BALN_BKDT_STG2\n    Purpose: Loading ACCT_I that need to be adjusted into staging area\n    Business Logic: Calculate adjusted balance values by combining balance amounts with adjustment amounts\n    Dependencies: ACCT_BALN_BKDT, ACCT_BALN_BKDT_STG1, ACCT_BALN_BKDT_ADJ_RULE, UTIL_PROS_ISAC\n*/\n\nWITH acct_baln_candidates AS (\n    -- Identify suitable candidates for processing to avoid pulling entire history\n    SELECT\t\n        ACCT_I, \n        MIN(BKDT_ADJ_FROM_D) AS BKDT_ADJ_FROM_D\n    FROM\t\n        {{ ref('acct_baln_bkdt_adj_rule') }}\n    GROUP BY 1\n),\n\nacct_baln_bkdt_stg1 AS (\n    -- Current balances that need to be adjusted\n    SELECT\t\n        A.ACCT_I,\n        A.BALN_TYPE_C,\n        A.CALC_FUNC_C,                  \n        A.TIME_PERD_C,                  \n        A.BKDT_EFFT_D,\n        A.BKDT_EXPY_D,\n        A.BALN_A,\n        A.CALC_F,\n        A.PROS_KEY_EFFT_I,\n        A.PROS_KEY_EXPY_I,\n        A.BKDT_PROS_KEY_I,\n        A.ORIG_SRCE_SYST_C,\n        A.SRCE_SYST_C,\n        A.LOAD_D\n    FROM\t\n        {{ source('vtech', 'ACCT_BALN_BKDT') }} A\n    INNER JOIN acct_baln_candidates B\n        ON A.ACCT_I = B.ACCT_I\n    WHERE\t\n        A.BKDT_EXPY_D >= B.BKDT_ADJ_FROM_D\n),\n\ntime_period_endpoints AS (\n    -- Identify END points OF ALL TIME periods OF interest FOR EACH ACCT_I\n    SELECT ACCT_I, BKDT_EXPY_D          \n    FROM acct_baln_bkdt_stg1\n    \n    UNION\t \t            \n    SELECT ACCT_I, ADJ_TO_D            \n    FROM {{ ref('acct_baln_bkdt_adj_rule') }}\n    \n    UNION\t                \n    SELECT ACCT_I, BKDT_EFFT_D - 1                \n    FROM acct_baln_bkdt_stg1\n    \n    UNION\t                \n    SELECT ACCT_I, BKDT_ADJ_FROM_D - 1             \n    FROM {{ ref('acct_baln_bkdt_adj_rule') }}\n),\n\ntime_periods AS (\n    -- Identify ALL TIME periods OF interest FOR EACH ACCT_I\n    SELECT\t\n        DT0.ACCT_I,\n        -- Calculate start points of time periods of interest based on end point of previous time period\n        (MAX(DT0.BKDT_EXPY_D) OVER (\n            PARTITION BY DT0.ACCT_I \n            ORDER BY DT0.BKDT_EXPY_D \n            ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING\n        ) + 1) AS BKDT_EFFT_D,\n        DT0.BKDT_EXPY_D\n    FROM time_period_endpoints DT0\n    -- Ignore record where there is no start point\n    QUALIFY BKDT_EFFT_D IS NOT NULL\n),\n\npros_key_lookup AS (\n    -- Update the latest PROS_KEY_I into subsequent inserts\n    SELECT MAX(PROS_KEY_I) AS BKDT_PROS_KEY_I\n    FROM {{ source('vtech', 'UTIL_PROS_ISAC') }}\n    WHERE CONV_M = 'CAD_X01_ACCT_BALN_BKDT'\n),\n\nfinal AS (\n    SELECT DISTINCT\t\n        DT1.ACCT_I AS ACCT_I,\n        -- The BALN_TYPE_C in ACCT_BALN_BKDT table is hardcoded to 'BDCL'\n        COALESCE(B.BALN_TYPE_C, 'BDCL') AS BALN_TYPE_C,\n        COALESCE(B.CALC_FUNC_C, 'SPOT') AS CALC_FUNC_C,              \n        COALESCE(B.TIME_PERD_C, 'E') AS TIME_PERD_C,\n        DT1.BKDT_EFFT_D AS BKDT_EFFT_D,\n        DT1.BKDT_EXPY_D AS BKDT_EXPY_D,\n        -- Calculate the adjusted balance value as the sum of all relevant adjustments plus the relevant balance value\n        -- Note that MAX is used for BAL amount simply to identify the single balance valid during the time period\n        MAX(COALESCE(B.BALN_A, 0.0)) OVER (\n            PARTITION BY DT1.ACCT_I, DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D\n        ) + SUM(COALESCE(A.ADJ_A, 0.0)) OVER (\n            PARTITION BY DT1.ACCT_I, DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D\n        ) AS BALN_A,\n        COALESCE(B.CALC_F, 'N') AS CALC_F,\n        B.PROS_KEY_EFFT_I,\n        B.PROS_KEY_EXPY_I,\n        PKEY.BKDT_PROS_KEY_I AS BKDT_PROS_KEY_I,\n        A.PROS_KEY_EFFT_I AS ADJ_PROS_KEY_EFFT_I,\n        COALESCE(B.ORIG_SRCE_SYST_C, 'SAP') AS ORIG_SRCE_SYST_C,\n        COALESCE(B.SRCE_SYST_C, 'GDW') AS SRCE_SYST_C,\n        CURRENT_DATE AS LOAD_D\n    FROM time_periods DT1\n    -- Join to balance table based on ACCT_I and intersection with time periods of interest\n    -- Note that there may be no balance amount related to a time period\n    LEFT OUTER JOIN acct_baln_bkdt_stg1 B\n        ON DT1.ACCT_I = B.ACCT_I\n        AND (\n            (DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D) OVERLAPS (B.BKDT_EFFT_D, B.BKDT_EXPY_D)\n            -- as Overlaps does not include equality\n            OR DT1.BKDT_EFFT_D = B.BKDT_EFFT_D\n            OR DT1.BKDT_EXPY_D = B.BKDT_EXPY_D\n        )\n    -- Join to adjustment table based on ACCT_I and intersection with time periods of interest\n    -- Note that there may be multiple adjustments or no adjustments related to a time period\n    LEFT OUTER JOIN {{ ref('acct_baln_bkdt_adj_rule') }} A\n        ON DT1.ACCT_I = A.ACCT_I                   \n        AND (\n            (DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D) OVERLAPS (A.BKDT_ADJ_FROM_D, A.ADJ_TO_D)\n            OR DT1.BKDT_EFFT_D = A.BKDT_ADJ_FROM_D\n            OR DT1.BKDT_EXPY_D = A.ADJ_TO_D\n        )\n    CROSS JOIN pros_key_lookup PKEY\n)\n\nSELECT * FROM final",
+  "metadata": {
+    "models_used": [
+      "claude-4-sonnet",
+      "snowflake-llama-3.3-70b"
+    ],
+    "preferred_model": "claude-4-sonnet",
+    "quality_score": 1.0,
+    "dbt_features": [
+      "config",
+      "variables",
+      "references",
+      "sources",
+      "macros",
+      "jinja_variables",
+      "pre_hooks",
+      "post_hooks",
+      "tags",
+      "tests"
+    ],
+    "total_time_ms": 41808,
+    "comparison_notes": [
+      "Selected claude-4-sonnet as preferred model",
+      "claude-4-sonnet: Quality=1.000, Features=10, Time=23773ms",
+      "snowflake-llama-3.3-70b: Quality=0.910, Features=8, Time=18021ms"
+    ],
+    "migration_notes": [
+      "Organized logic using CTEs for better readability",
+      "Added DBT configuration for materialization and metadata",
+      "Used DBT variables for environment-specific configuration",
+      "Converted from procedural BTEQ to declarative DBT model"
+    ]
+  },
+  "warnings": [
+    "Uses SELECT * - consider explicit column selection"
+  ],
+  "execution_time_ms": 41808
+}

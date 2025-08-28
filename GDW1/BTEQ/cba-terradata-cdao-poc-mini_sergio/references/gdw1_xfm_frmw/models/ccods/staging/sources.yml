@@ -1,0 +1,87 @@
+version: 2
+
+sources:
+  - name: gdw1_raw
+    description: "Raw GDW1 data sources - structured EBCDIC data converted to proper data types"
+    database: ps_cld_rw
+    schema: stg
+    tables:
+      - name: bcfinsg
+        description: "BCFINSG Plan Balance Segment Master data (converted from EBCDIC COMP-3 to proper data types)"
+        columns:
+          - name: BCF_ACCOUNT_NO1
+            description: "Account number (16 characters)"
+          - name: BCF_PLAN_ID
+            description: "Plan identifier (6 characters)"
+          - name: BCF_PLAN_SEQ
+            description: "Plan sequence number (INTEGER)"
+          - name: BCF_DT_FIRST_TRANS
+            description: "First transaction date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_SPEC_TERMS_END
+            description: "Special terms end date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_INTEREST_DEFER
+            description: "Interest defer date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_PAYMENT_DEFER
+            description: "Payment defer date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_PAID_OFF
+            description: "Paid off date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_LAST_PAYMENT
+            description: "Last payment date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DT_LAST_MAINT
+            description: "Last maintenance date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_PLAN_DUE_DATE
+            description: "Plan due date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_DATE_END_INTEREST_FREE
+            description: "End interest free date (INTEGER from EBCDIC COMP-3)"
+          - name: BCF_OPENING_BALANCE
+            description: "Opening balance amount (DECIMAL)"
+          - name: BCF_PLAN_TYPE
+            description: "Plan type code"
+          - name: BCF_STORE_ID
+            description: "Store identifier"
+          - name: BCF_ORIGINAL_STATE
+            description: "Original state code"
+          - name: BCF_PLAN_CATEGORY
+            description: "Plan category code"
+          - name: BCF_POST_PURCHASE_STATUS
+            description: "Post purchase status"
+          - name: BCF_TERMS_STATUS
+            description: "Terms status"
+          - name: BCF_INTEREST_DEFER_STATUS
+            description: "Interest defer status"
+          - name: BCF_PAYMENT_DEFER_STATUS
+            description: "Payment defer status"
+          - name: BCF_TIMES_BILLED
+            description: "Number of times billed (INTEGER)"
+          - name: BCF_SPECIAL_TERMS_CYCLES
+            description: "Special terms cycles (INTEGER)"
+          - name: BCF_INTEREST_DEFER_CYCLES
+            description: "Interest defer cycles (INTEGER)"
+          - name: BCF_PAYMENT_DEFER_CYCLES
+            description: "Payment defer cycles (INTEGER)"
+          - name: BCF_LTD_HIGH_BALANCE
+            description: "Life to date high balance (DECIMAL)"
+          - name: BCF_PYMT_TBL_HIGH_BALANCE
+            description: "Payment table high balance (DECIMAL)"
+          - name: BCF_LTD_INTEREST_CHGD
+            description: "Life to date interest charged (DECIMAL)"
+          - name: BCF_LTD_INTEREST_WAIVED
+            description: "Life to date interest waived (DECIMAL)"
+          - name: BCF_FIXED_PAY_AMT
+            description: "Fixed payment amount (DECIMAL)"
+          - name: BCF_FIXED_PAY_CYCLES
+            description: "Fixed payment cycles (INTEGER)"
+          - name: BCF_LAST_INT_RATE
+            description: "Last interest rate (DECIMAL)"
+          - name: BCF_MIN_PAY_AMT
+            description: "Minimum payment amount (DECIMAL)"
+          - name: BCF_MIN_PAY_DUE
+            description: "Minimum payment due (DECIMAL)"
+          - name: BCF_LAST_RATE_CODE
+            description: "Last rate code"
+          - name: BCF_LAST_RATE_CODE_SEQ
+            description: "Last rate code sequence (INTEGER)"
+          - name: BCF_LAST_MIN_PAY_CODE
+            description: "Last minimum payment code"
+          - name: BCF_LAST_MIN_PAY_CODE_SEQ
+            description: "Last minimum payment code sequence (INTEGER)"

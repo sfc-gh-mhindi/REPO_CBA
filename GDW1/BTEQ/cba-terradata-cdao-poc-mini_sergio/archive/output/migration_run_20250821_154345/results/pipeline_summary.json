@@ -1,0 +1,76 @@
+{
+  "pipeline_success": true,
+  "output_directory": "output/migration_run_20250821_154345/results",
+  "timestamp": "2025-08-21T15:44:25.991062",
+  "substitution": {
+    "substituted_dir": "output/migration_run_20250821_154345/results/substituted",
+    "summary": {
+      "total_files": 1,
+      "successful_files": 1,
+      "failed_files": 0,
+      "total_substitutions": 0,
+      "average_substitutions_per_file": 0.0,
+      "failed_file_names": []
+    },
+    "results": [
+      {
+        "input_file": "/var/folders/bh/3493d6zj65b0h50_jplhm_gr0000gn/T/tmpe6bzi9e2/ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+        "output_file": "output/migration_run_20250821_154345/results/substituted/ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+        "original_size": 1093,
+        "substituted_size": 1093,
+        "substitution_count": 0,
+        "success": true
+      }
+    ]
+  },
+  "parsing": {
+    "parsed_dir": "output/migration_run_20250821_154345/results/parsed",
+    "summary": {
+      "total_files": 1,
+      "successfully_parsed": 1,
+      "failed_files": 0,
+      "total_sql_blocks": 0,
+      "total_controls": 7
+    },
+    "results": [
+      {
+        "file": "ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+        "success": true,
+        "parsed_file": "output/migration_run_20250821_154345/results/parsed/ACCT_BALN_BKDT_AVG_CALL_PROC_parsed.json",
+        "sql_blocks_count": 0,
+        "controls_count": 7,
+        "errors": []
+      }
+    ]
+  },
+  "generation": {
+    "generated_procedures": [
+      {
+        "file": "ACCT_BALN_BKDT_AVG_CALL_PROC",
+        "procedure_name": "ACCT_BALN_BKDT_AVG_CALL_PROC",
+        "procedure_file": "output/migration_run_20250821_154345/results/snowflake_sp/ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+        "metadata_file": "output/migration_run_20250821_154345/results/snowflake_sp/ACCT_BALN_BKDT_AVG_CALL_PROC_metadata.json",
+        "quality_score": 0.0,
+        "llm_enhanced": false,
+        "versions_generated": [
+          "prescriptive"
+        ],
+        "preferred_version": "prescriptive"
+      }
+    ],
+    "errors": [],
+    "summary": {
+      "successfully_generated": 1,
+      "failed_generation": 0,
+      "llm_enhanced": 0,
+      "template_fallback": 1
+    }
+  },
+  "summary": {
+    "total_files_processed": 1,
+    "successful_substitutions": 1,
+    "successful_parsing": 1,
+    "successful_generation": 1,
+    "total_substitutions_made": 0
+  }
+}

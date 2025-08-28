@@ -1,0 +1,35 @@
+{
+  "procedure_name": "SP_GET_PROS_KEY",
+  "parameters": [
+    "OUTPUT_PATH STRING DEFAULT '/tmp/output'",
+    "INPUT_PATH STRING DEFAULT '/tmp/input'",
+    "OUTPUT_PATH STRING DEFAULT '/tmp/output'",
+    "OUTPUT_PATH STRING DEFAULT '/tmp/output'",
+    "ERROR_TABLE STRING DEFAULT 'PROCESS_ERROR_LOG'",
+    "PROCESS_KEY STRING DEFAULT 'UNKNOWN_PROCESS'"
+  ],
+  "warnings": [
+    "Line 23: EXPORT converted to OUTPUT_PATH parameter",
+    "Line 28: IMPORT converted to INPUT_PATH parameter",
+    "Line 30: EXPORT converted to OUTPUT_PATH parameter",
+    "Line 48: EXPORT converted to OUTPUT_PATH parameter",
+    "Line 23: File I/O requires manual conversion to Snowflake stages",
+    "Line 26: OS commands not supported in Snowflake stored procedures",
+    "Line 28: File I/O requires manual conversion to Snowflake stages",
+    "Line 30: File I/O requires manual conversion to Snowflake stages",
+    "Line 48: File I/O requires manual conversion to Snowflake stages"
+  ],
+  "llm_enhancements": [],
+  "quality_score": 0.0,
+  "migration_notes": [],
+  "generation_timestamp": "2025-08-22T15:57:36.059237",
+  "versions_generated": [
+    "prescriptive"
+  ],
+  "preferred_version": "prescriptive",
+  "preferred_file": "sp_get_pros_key_prescriptive.sql",
+  "available_files": {
+    "prescriptive": "sp_get_pros_key_prescriptive.sql",
+    "preferred": "sp_get_pros_key.sql"
+  }
+}

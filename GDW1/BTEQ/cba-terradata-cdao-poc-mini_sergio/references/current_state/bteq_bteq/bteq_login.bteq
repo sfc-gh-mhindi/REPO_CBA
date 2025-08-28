@@ -1,0 +1,1 @@
+.logon %%GDW_HOST%%/%%GDW_USER%%,%%GDW_PASS%%; 

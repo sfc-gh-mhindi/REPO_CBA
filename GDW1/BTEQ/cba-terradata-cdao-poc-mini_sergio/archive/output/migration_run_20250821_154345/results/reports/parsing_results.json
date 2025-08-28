@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_files": 1,
+    "successfully_parsed": 1,
+    "failed_files": 0,
+    "total_sql_blocks": 0,
+    "total_controls": 7
+  },
+  "detailed_results": [
+    {
+      "file": "ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250821_154345/results/parsed/ACCT_BALN_BKDT_AVG_CALL_PROC_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 7,
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+﻿!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.RUN FILE=%%BTEQ_LOGON_SCRIPT%%
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.IF ERRORCODE <> 0    THEN .GOTO EXITERR
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.SET QUIET OFF
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.SET ECHOREQ ON
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.SET FORMAT OFF
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.SET WIDTH 120
+
+------------------------------------------------------------------------------
+--
+--
+--  Ver  Date       Modified By            Description
+--  ---- ---------- ---------------------- -----------------------------------
+--  1.0  11/06/2013 T Jelliffe             Initial Version
+------------------------------------------------------------------------------
+--
+-- This info is for CBM use only
+-- $LastChangedBy: jelifft $
+-- $LastChangedDate: 2013-09-02 13:49:23 +1000 (Mon, 02 Sep 2013) $
+-- $LastChangedRevision: 12581 $
+--
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.EXPORT RESET
+
+-- Remove the existing Batch Key file
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.OS rm /cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.EXPORT DATA FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.SET FORMAT OFF
+
+-- ** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '32' COLUMN '0' OF THE SOURCE CODE STARTING AT 'CALL'. EXPECTED 'Call' GRAMMAR. LAST MATCHING TOKEN WAS 'CALL' ON LINE '32' COLUMN '0'. FAILED TOKEN WAS '%' ON LINE '32' COLUMN '5'. **
+--CALL %%STARMACRDB%%.SP_GET_BTCH_KEY(
+--  '%%SRCE_SYST_M%%'
+--  ,CAST(%%INDATE%% as date format'yyyymmdd')
+--  ,IBATCHKEY (CHAR(80))
+--)
+ ;
+
+/* NOTE: BTCH_KEY is returned as a string in the format where     */
+/* First 24 characters ignored then next 10 are the actual number */!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.EXPORT RESET
+
+-- Remove the existing DATE file
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.OS rm /cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_DATE.txt
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.EXPORT DATA FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_DATE.txt
+-- ** SSC-EWI-0001 - UNRECOGNIZED TOKEN ON LINE '47' COLUMN '0' OF THE SOURCE CODE STARTING AT 'Select'. EXPECTED 'SELECT' GRAMMAR. LAST MATCHING TOKEN WAS '(' ON LINE '48' COLUMN '8'. **
+--Select
+--  (CAST(%%INDATE%% as date format'yyyymmdd'))(CHAR(8))
+;
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.SET FORMAT OFF
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.IF ERRORCODE <> 0    THEN .GOTO EXITERR
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.QUIT 0
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.LOGOFF
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+
+.LABEL EXITERR
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.QUIT 1
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.LOGOFF
+
+!!!RESOLVE EWI!!! /*** SSC-EWI-0040 - THE STATEMENT IS NOT SUPPORTED IN SNOWFLAKE ***/!!!
+.EXIT

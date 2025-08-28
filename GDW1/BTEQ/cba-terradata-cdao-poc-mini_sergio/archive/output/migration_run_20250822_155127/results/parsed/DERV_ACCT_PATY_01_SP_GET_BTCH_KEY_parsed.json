@@ -1,0 +1,78 @@
+{
+  "sql_blocks": [],
+  "controls": [
+    {
+      "type": "RUN",
+      "raw": ".RUN FILE=%%BTEQ_LOGON_SCRIPT%%",
+      "args": null,
+      "line_no": 1
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 2
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 28
+    },
+    {
+      "type": "OS_CMD",
+      "raw": ".OS rm /cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt",
+      "args": null,
+      "line_no": 31
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT DATA FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_BTCH_KEY.txt",
+      "args": null,
+      "line_no": 33
+    },
+    {
+      "type": "IMPORT",
+      "raw": ".IMPORT VARTEXT FILE=/cba_app/CBMGDW/%%ENV_C%%/schedule/%%STRM_C%%_extr_date.txt",
+      "args": null,
+      "line_no": 40
+    },
+    {
+      "type": "CALL_SP",
+      "raw": "CALL %%STARMACRDB%%.SP_GET_BTCH_KEY(     \n  '%%SRCE_SYST_M%%'\n  ,CAST(:EXTR_D AS DATE) (FORMAT'YYYYMMDD')(CHAR(8))",
+      "args": null,
+      "line_no": 43
+    },
+    {
+      "type": "EXPORT",
+      "raw": ".EXPORT RESET",
+      "args": null,
+      "line_no": 52
+    },
+    {
+      "type": "IF_ERRORCODE",
+      "raw": ".IF ERRORCODE <> 0    THEN .GOTO EXITERR",
+      "args": null,
+      "line_no": 54
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 57
+    },
+    {
+      "type": "LABEL",
+      "raw": ".LABEL EXITERR",
+      "args": null,
+      "line_no": 59
+    },
+    {
+      "type": "LOGOFF",
+      "raw": ".LOGOFF",
+      "args": null,
+      "line_no": 61
+    }
+  ],
+  "errors": []
+}

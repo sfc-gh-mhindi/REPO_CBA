@@ -1989,7 +1989,7 @@ create iceberg table NPD_D12_DMN_GDWMIG_IBRG.STARCADPRODDATA.UTIL_PARM (
 	PARM_LTRL_A DECIMAL(18,4)
 )COMMENT='{ \"origin\": \"sf_sc\", \"name\": \"snowconvert\", \"version\": {  \"major\": 1,  \"minor\": 11,  \"patch\": \"0.0\" }, \"attributes\": {  \"component\": \"teradata\",  \"convertedOn\": \"07/11/2025\",  \"domain\": \"snowflake\" }}'
 ;
-reate iceberg table NPD_D12_DMN_GDWMIG_IBRG.STARCADPRODDATA.UTIL_PROS_ISAC (
+create iceberg table NPD_D12_DMN_GDWMIG_IBRG.STARCADPRODDATA.UTIL_PROS_ISAC (
     PROS_KEY_I DECIMAL(10,0) NOT NULL,
     CONV_M STRING,
     CONV_TYPE_M STRING,

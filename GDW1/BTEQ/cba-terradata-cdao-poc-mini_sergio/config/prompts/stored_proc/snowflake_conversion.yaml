@@ -1,0 +1,106 @@
+name: "BTEQ to Snowflake Stored Procedure Conversion - Enhanced"
+version: "2.3"
+description: "Converts BTEQ scripts to clean, focused Snowflake stored procedures with comprehensive syntax handling"
+
+system_prompt: |
+  You are an expert in migrating Teradata BTEQ scripts to clean, focused Snowflake stored procedures. 
+  Keep it simple - preserve the core business logic without adding excessive validation or complexity.
+
+task_description: |
+  Convert this BTEQ script to a clean Snowflake stored procedure that focuses on the core business logic.
+  Avoid over-engineering - keep validation minimal and stay close to the original BTEQ structure.
+
+requirements:
+  code_quality:
+    - "Create a complete, executable Snowflake stored procedure"
+    - "Preserve all business logic from the original BTEQ exactly as written"
+    - "Use clean, readable Snowflake SQL syntax"
+    - "Include basic error handling only where the original BTEQ had error checks"
+    - "Use proper variable declarations for control flow only"
+    - "Add concise comments for the main business logic"
+    - "Return simple status messages (success/failure)"
+
+  bteq_pattern_migration:
+    - "Handle control flow (.IF, .GOTO, .LABEL) using Snowflake constructs only when present in original"
+    - "Convert BTEQ variable substitution (%%VAR%%) to procedure parameters"
+    - "Handle ERRORCODE checks with basic exception handling only where original BTEQ checked them"
+    - "Preserve transaction boundaries only if explicitly defined in original BTEQ"
+
+  snowflake_optimization:
+    - "Use standard Snowflake SQL syntax"
+    - "Convert Teradata DELETE syntax 'DELETE table_alias FROM table1, table2' to Snowflake 'DELETE FROM table WHERE EXISTS (SELECT 1 FROM ...)'"
+    - "Specific DELETE conversion example: 'DELETE A FROM table1 A, table2 B WHERE A.id=B.id' becomes 'DELETE FROM table1 WHERE EXISTS (SELECT 1 FROM table2 B WHERE table1.id=B.id)'"
+    - "Always qualify procedure name with 'PS_GDW1_BTEQ.BTEQ_SPS.' schema"
+    - "Use consistent table naming: PS_CLD_RW.STARCADPRODDATA.table_name and PS_CLD_RW.PDDSTG.table_name"
+    - "In EXISTS subqueries, reference the target table columns without prefix (e.g., ACCT_BALN_BKDT.column_name)"
+    - "Use standard dollar quoting: $$ (not $DOLLAR$ or other variants)"
+    - "Variable references in SQL statements must use colon prefix: ':variable_name'"
+    - "Variable assignments use no colon prefix: 'variable_name := value'"
+    - "Schema references should use correct names: 'ps_gdw1_bteq.PVTECH' not 'PS_CLD_RW.PVTECH'"
+    - "Convert OVERLAPS operations: '(date1, date2) OVERLAPS (date3, date4)' becomes 'date1 <= date4 AND date2 >= date3'"
+    - "Use 'row_count := SQLROWCOUNT;' for row counting, never 'GET DIAGNOSTICS'"
+    - "Keep the same JOIN patterns as the original unless clearly suboptimal"
+    - "Use explicit column lists only if original BTEQ used them"
+
+  critical_syntax_fixes:
+    - "NEVER use 'GET DIAGNOSTICS row_count = ROW_COUNT;' - Snowflake does not support this PostgreSQL syntax"
+    - "Use 'row_count := SQLROWCOUNT;' instead of GET DIAGNOSTICS for row counting"
+    - "NEVER use OVERLAPS operator - Snowflake does not support it. Convert (a,b) OVERLAPS (c,d) to 'a <= d AND b >= c'"
+    - "Use 'ELSEIF' not 'ELSIF' in IF statements - Snowflake uses different syntax than Oracle/PL/SQL"
+    - "Convert multi-table DELETE syntax: 'DELETE A FROM table1 A, table2 B WHERE...' to 'DELETE FROM table1 WHERE EXISTS (SELECT 1 FROM table2 B WHERE...)'"
+    - "Ensure column references match actual table schemas - verify ROW_N vs GRUP_N, PROS_KEY_I vs PROS_KEY_EFFT_I"
+    - "Original BTEQ scripts do NOT use row counting logic - avoid adding unnecessary row tracking"
+    - "BTEQ error handling uses '.IF ERRORCODE <> 0 THEN .GOTO EXITERR' - convert to simple exception blocks only"
+    - "Do not add performance monitoring or row counting unless explicitly present in the original BTEQ"
+    - "Stick to the original BTEQ patterns - do not enhance with additional database features"
+    - "For large/complex queries, maintain the exact same logic flow as the original without optimization"
+
+  iceberg_table_requirements:
+    - "MANDATORY: Use CREATE ICEBERG TABLE syntax for all table definitions"
+    - "MANDATORY: Use DROP ICEBERG TABLE IF EXISTS for table cleanup"
+    - "MANDATORY: Convert VARCHAR(n)/CHAR(n) to STRING data type for ICEBERG compatibility"
+    - "MANDATORY: Remove ALL DEFAULT clauses from table definitions (catalog-linked database limitation)"
+    - "Example: 'ROW_SECU_ACCS_C INTEGER' not 'ROW_SECU_ACCS_C INTEGER DEFAULT 0'"
+    - "Example: 'EXPY_D DATE NOT NULL' not 'EXPY_D DATE NOT NULL DEFAULT '9999-12-31''"
+    - "Implement individual error handling blocks for each table operation"
+
+  documentation:
+    - "Add basic header with procedure name and purpose"
+    - "Include original author and date information if present in BTEQ"
+    - "Document parameters briefly"
+    - "No extensive migration notes unless critical"
+
+  common_conversion_pitfalls:
+    - "Dollar delimiter issues: Use '$$' not '$DOLLAR$' (post-processor will fix automatically)"
+    - "Variable scope: Declare only variables used in control flow, avoid unnecessary counters/trackers"
+    - "Schema references: Verify ps_gdw1_bteq.PVTECH vs PS_CLD_RW.PDDSTG patterns match original context"
+    - "Column naming consistency: Verify actual table column names - don't assume GRUP_N exists if table has ROW_N"
+    - "Date range comparisons: Always use explicit >= and <= operators, never OVERLAPS"
+    - "Control flow syntax: Use ELSEIF, not ELSIF for conditional logic"
+    - "Avoid line breaks in generated SQL that could cause compilation errors"
+    - "Multi-table operations: Convert Teradata-style multi-table DELETE/UPDATE to EXISTS subqueries"
+
+  response_completeness:
+    - "CRITICAL: Always complete the entire stored procedure including the closing END;$$ delimiter"
+    - "If response length is a concern, prioritize completeness over extensive comments"
+    - "Ensure all opened statements (SELECT, INSERT, DELETE, IF blocks) are properly closed"
+    - "End every procedure with proper exception handling and return statements"
+    - "Never truncate in the middle of SQL statements or logical blocks"
+
+output_format:
+  instruction: "Provide ONLY the complete Snowflake stored procedure SQL. No explanation, no markdown formatting, just clean SQL that can be executed directly."
+  start_marker: "## Stored Procedure SQL"
+  format: "sql_only"
+
+context_sections:
+  - "input_bteq_script"
+  - "target_procedure_name"
+  - "reference_deterministic_sp"  # Optional - can be disabled to save tokens
+  - "analysis_notes"
+  - "complexity_hints"
+
+# Token optimization settings
+token_optimization:
+  include_deterministic_reference: false  # Set to false to reduce prompt size for large BTEQ files
+  max_bteq_preview_lines: null  # Optional: limit BTEQ content lines (null = include all)
+  include_examples: true  # Include conversion examples in prompt
