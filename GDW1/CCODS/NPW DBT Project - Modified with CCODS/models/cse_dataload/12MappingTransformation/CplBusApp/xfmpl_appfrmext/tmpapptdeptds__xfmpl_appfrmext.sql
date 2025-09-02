@@ -21,7 +21,7 @@ WITH tmpapptdeptds as
 	
 	FROM {{ ref('xfmbusinessrules__xfmpl_appfrmext') }}
 	
-	//WHERE svLoadApptDept = 'Y' MH20250902
+	WHERE svLoadApptDept = 'Y'
 )
 
 SELECT
