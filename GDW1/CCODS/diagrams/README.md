@@ -26,18 +26,30 @@ Mermaid diagrams may not render properly in all Git repository viewers. This fol
 - **Pros**: Professional appearance, easy to create, multiple export formats
 - **Cons**: Requires external tool, binary files in repo
 - **Best for**: Complex architecture diagrams, professional presentations
+- **Files**: `infrastructure_drawio.xml`
 
 **Steps to create**:
 1. Go to https://app.diagrams.net/
-2. Create your diagram
-3. Export as SVG (vector, scalable) or PNG (raster, smaller file)
-4. Save to this `diagrams/` folder
-5. Reference in README: `![Diagram](diagrams/your_diagram.svg)`
+2. Open existing file: `File → Open → infrastructure_drawio.xml`
+3. Edit the diagram as needed
+4. Export as SVG (vector, scalable) or PNG (raster, smaller file)
+5. Save both XML source and exported image to this `diagrams/` folder
+6. Reference in README: `![Diagram](diagrams/your_diagram.svg)`
+
+**To use existing XML**:
+- Copy the XML content from `infrastructure_drawio.xml`
+- Paste into Draw.io editor
+- Modify and export as needed
 
 ### **4. Graphviz DOT Format**
 - **Pros**: Code-based, version controllable, automatic layout
 - **Cons**: Learning curve, limited GitHub support
 - **Best for**: Network diagrams, dependency graphs
+- **Files**: `execution_flow.dot`
+
+**Usage**:
+- Online: https://dreampuf.github.io/GraphvizOnline/
+- Command line: `dot -Tpng execution_flow.dot -o execution_flow.png`
 
 ### **5. Static Image Files**
 - **Pros**: Universal compatibility, professional appearance
@@ -58,8 +70,10 @@ Mermaid diagrams may not render properly in all Git repository viewers. This fol
 diagrams/
 ├── README.md                    # This guide
 ├── execution_flow.puml          # PlantUML execution flow
+├── execution_flow.dot           # Graphviz DOT execution flow
 ├── infrastructure_ascii.md      # ASCII infrastructure diagram
-├── architecture.svg             # (Future) Draw.io architecture
+├── infrastructure_drawio.xml    # Draw.io infrastructure diagram
+├── architecture.svg             # (Future) Draw.io exported SVG
 ├── monitoring_flow.png          # (Future) Monitoring diagram
 └── installation_sequence.dot    # (Future) Graphviz installation
 ```
