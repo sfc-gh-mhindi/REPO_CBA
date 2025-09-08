@@ -1,0 +1,216 @@
+
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'np_projects_commbank_sf_dbt'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'np_projects_commbank_sf_dbt'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+# files and datasets are 
+models:
+  np_projects_commbank_sf_dbt:
+    +materialized: view
+    +database: NPD_D12_DMN_GDWMIG_IBRG_V #GDW1_STG
+# seeds:
+#   np_projects_commbank_sf_dbt:
+#     +schema: TMP #cse4_ctl 
+
+#     project_config:
+#       +column_types:
+#         context: string
+#         parameter_name: string
+#         parameter_value: string
+#       +quote_columns: false # Typically not needed unless columns have special chars
+
+flags:
+  warn_error_options:
+    error: all
+ 
+
+vars:
+  files_schema: P_V_OUT_001_STD_0 #files
+  datasets_schema: P_V_OUT_001_STD_0 #datasets
+  mart_db: NPD_D12_DMN_GDWMIG_IBRG #GDW1_IBRG # Loads final models here
+  intermediate_db: NPD_D12_DMN_GDWMIG_IBRG_V #GDW1_STG # loads FILES, DATASETS and model views are created here
+  stg_ctl_db: NPD_D12_DMN_GDWMIG_IBRG_V #GDW1 # Loads oracle control tables, teradats TEMP tables, Teradat control sps
+  etl_process_dt_tbl: 20250807 #YYYYMMDD
+  
+  base_dir: cba_app__csel4__csel4dev #20250812 - added by mhindi and skumar
+  inprocess_source_override: NPD_D12_DMN_GDWMIG_IBRG.PDSSTG.CSE_CPL_BUS_APP #20250813 - added by mhindi to use ingested table instead of the one in the source
+  envs:
+    env_apt_startup_status: 'True'
+    env_apt_show_component_calls: 'True'
+    env_ds_pxdebug: '0'
+    env_apt_disable_combination: 'True'
+    env_apt_no_sort_insertion: 'True'
+    env_cc_tera_truncate_string_with_null: '1'
+    env_apt_string_allpads_not_empty: 'True'
+  job_params:
+    processrunstreamstatuscheck:
+      ctl_schema: P_V_OUT_001_STD_0 #CSE4_CTL
+      ctl_database: NPD_D12_DMN_GDWMIG_IBRG_V #cse2dev
+      ctl_user: cse3_ctl
+      run_stream: CSE_L4_PRE_PROC #CSE_ICE_BUS_DEAL changed by jithendra
+      app_release: CSEL4
+      #base_dir: cba_app__csel4__csel4dev
+      etl_process_dt: 20250807
+    xfmpl_appfrmext:
+      #base_dir: cba_app__csel4__csel4dev #suresh
+      run_stream: CSE_CPL_BUS_APP
+      etl_process_dt: 20250807
+    extpl_app:
+      # 20250812 commented by mhindi base_dir: cba_app__csel4__csel4dev
+      run_stream: CSE_CPL_BUS_APP
+      etl_process_dt: 20250807
+      stg_schema: P_V_OUT_001_STD_0 #CSE4_STG
+    ldmap_cse_pack_pdct_pllkp:
+      # 20250812 commented by mhindi base_dir: cba_app__csel4__csel4dev
+      etl_process_dt: 20250807
+      gdw_server: teradata.gdw.cba
+      gdw_user: sindih
+      gdw_passwd:
+      gdw_acct_vw: pvtech
+    processrunstreamfinishingpoint:
+      ctl_schema: P_V_OUT_001_STD_0 #CSE4_CTL
+      ctl_database: NPD_D12_DMN_GDWMIG_IBRG_V #cse2dev
+      ctl_user: cse2_ctl
+      run_stream: CBA_APP__CSEL4__PROD
+      # 20250812 commented by mhindi base_dir: cba_app__csel4__csel4dev
+      etl_process_dt: 20250807
+    ldapptdeptupd:
+      # 20250812 commented by mhindi base_dir: cba_app__csel4__csel4dev
+      run_stream: CSE_CPL_BUS_APP
+      gdw_server: teradata.gdw.cba
+      gdw_acct_db: 'starcadproddata'
+      etl_process_dt: 20250807
+      tgt_table: appt_dept #20250812 - mhindi - removed single quotes
+      tgt_table_tbl: appt_dept
+    ldapptdeptins:
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL4__CSEL4DEV
+      run_stream: CSE_CPL_BUS_APP
+      gdw_server: teradata.gdw.cba
+      gdw_acct_db: 'starcadproddata'
+      etl_process_dt: 20250807
+      tgt_table: appt_dept #20250812 - mhindi - removed single quotes
+      tgt_table_tbl: appt_dept
+    ldtmp_appt_deptrmxfm:
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL4__CSEL4DEV
+      run_stream: CSE_CPL_BUS_APP
+      gdw_stag_db: P_V_OUT_001_STD_0 #PDDSTG
+      tgt_table: TMP_APPT_DEPT
+    dltappt_deptfrmtmp_appt_dept:
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL4__CSEL4DEV
+      tgt_table: appt_dept
+      gdw_stag_db: P_V_OUT_001_STD_0 #PDDSTG
+      gdw_acct_vw: pvtech
+      run_stream: CSE_CPL_BUS_APP
+      etl_process_dt: 20250807
+      refr_pk: 1
+      refr_pk_mirror: 1
+    dltappt_pdctfrmtmp_appt_pdct:
+      # 20250812 commented by mhindi base_dir: cba_app__csel4__dev
+      tgt_table: appt_pdct
+      gdw_stg_db: P_V_OUT_001_STD_0 #PDDSTG
+      gdw_acct_vw: pvtech
+      run_stream: CSE_CPL_BUS_APP
+      refr_pk: 1
+      etl_process_dt: 20250807
+    ldapptpdctins:
+      gdw_user: chintabr
+      gdw_passwd: LLJ@1;VA=9;>0FEI=;J41OAEF<?
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL4__DEV
+      run_stream: CSE_CPL_BUS_APP
+      gdw_server: teradata.gdw.cba
+      gdw_acct_db: 'starcadproddata'
+      gdw_amp_max: '16'
+      gdw_util_db: TDCSELDPUTIL
+      etl_process_dt: '20250807'
+      tgt_table: 'appt_pdct'
+      tgt_table_tbl: appt_pdct
+      cntrl_m: APPT
+    ldtmp_appt_pdctfrmxfm:
+      gdw_user: reddyva
+      gdw_passwd: LL;@1;V@=9;M0N7I48J4AOADF<=
+      # 20250812 commented by mhindi base_dir: cba_app__LPXS__LPXS_DEV #suresh
+      run_stream: CSE_CPL_BUS_APP
+      gdw_server: teradata.gdw.cba
+      gdw_stag_db: P_V_OUT_001_STD_0 #PDDSTG
+      gdw_amp_max: '16'
+      gdw_util_db: PUTIL
+      etl_process_dt: '20250807'
+      cntrl_m: APPT
+      tgt_table: TMP_APPT_PDCT
+    ldapptpdctupd:
+      gdw_user: suyantel
+      gdw_passwd: LDJ@1:VH>93=0G7I4IJ<COAGF<<
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL4__CSEL4DEV
+      run_stream: CSE_CPL_BUS_APP
+      gdw_server: teradata.gdw.cba
+      gdw_acct_db: 'starcadproddata'
+      gdw_amp_max: '16'
+      gdw_util_db: TDCSAD
+      etl_process_dt: '20250807'
+      cntrl_m: APPT
+      tgt_table: 'appt_pdct' #20250812 - modified by mhindi 'appt_pdct_acct'
+      tgt_table_tbl: appt_pdct #20250812 - modified by mhindi appt_pdct_acct
+    processrunstreamerrorhandler:
+      run_stream: CSE_CPL_BUS_APP
+      etl_process_dt: '20250807'
+      # 20250812 commented by mhindi base_dir: cba_app__csel2dev
+      ctl_database: NPD_D12_DMN_GDWMIG_IBRG_V #CSE2DEV
+      ctl_user: CSE2_CTL
+      ctl_passwd: L4:@IIV0<=3?0>EILIJL0K87
+      ctl_schema: P_V_OUT_001_STD_0 #CSE4_CTL
+      err_msg: Error in stream
+      smtp_server: 10.1.1
+      send_mail: sunil.reddy@cba.com.au
+      receive_mail: sunil.reddy@cba.com.au
+    processrunstreamstepoccrbeginandend:
+      # 20250812 commented by mhindi base_dir: cba_app__CSEL2DEV
+      ctl_schema: P_V_OUT_001_STD_0 #CSE4_CTL
+      run_stream: CSE_CPL_BUS_APP
+      etl_process_dt: 20250807
+      step_name: S10_VAL_DEAL
+      step_phase: V
+    utilprosisacprevloadcheck:
+      gdw_proc_acct_db: 'P_V_OUT_001_STD_0' #STAR_CAD_PROD_DATA
+      # gdw_acct_db: 'starcadproddata'
+      gdw_acct_sc: 'PDPATY'
+      gdw_user: 'chanci'
+      etl_process_dt: 20250807
+      app_release: CSEL4
+      # 20250812 commented by mhindi base_dir: 'CBA_APP__HLT__DEV__'
+      send_email: 'cindy.chang@cba.co'
+      receive_email: 'cindy.chang@cba.co'
+      smtp_server: '10.26.32.12'
+    loadgdwproskeyseq:
+      gdw_proc_acct_db: 'P_V_OUT_001_STD_0' #STAR_CAD_PROD_DATA
+      # 20250812 commented by mhindi base_dir: 'CBA_APP__CSEL4__CSEL4DEV__'
+      # gdw_acct_db: 'starcadproddata'
+      gdw_acct_sc: 'PDPATY'
+      gdw_user: 'chanci'
+      etl_process_dt: 20250807
+      app_release: CSEL4

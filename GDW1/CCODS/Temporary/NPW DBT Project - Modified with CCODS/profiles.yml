@@ -1,0 +1,13 @@
+np_projects_commbank_sf_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: '' #COMMONWEALTHBANKOFAUSTRALIA.CDAO_CDL_NONPROD
+      user: '' #HINDIMA
+      role: R_DEV_NPD_D12_GDWMIG
+      database: NPD_D12_DMN_GDWMIG_IBRG_V #
+      password: '' #9vruH!AyhmDKKExV
+      threads: 4
+      warehouse: wh_usr_npd_d12_gdwmig_001
+      schema: P_V_OUT_001_STD_0 #stage_views
