@@ -1,0 +1,104 @@
+digraph CSEL_CCODS_Execution {
+    // Graph attributes
+    rankdir=TB;
+    bgcolor="white";
+    fontname="Arial";
+    fontsize=14;
+    
+    // Node defaults
+    node [
+        shape=box,
+        style=filled,
+        fontname="Arial",
+        fontsize=12,
+        margin=0.2
+    ];
+    
+    // Edge defaults
+    edge [
+        fontname="Arial",
+        fontsize=10,
+        color="#666666"
+    ];
+    
+    // Subgraph for CSEL Process
+    subgraph cluster_csel {
+        label="CSEL Process (18 Steps)\n3:00 AM Australia/Sydney";
+        style=filled;
+        fillcolor="#E1F5FE";
+        fontsize=14;
+        fontname="Arial Bold";
+        
+        // CSEL nodes
+        csel_start [label="Start\nP_EXECUTE_DBT_CSEL", fillcolor="#B3E5FC"];
+        csel_step1 [label="Step 1\nProcess Stream Status", fillcolor="#E1F5FE"];
+        csel_step2 [label="Step 2\nUtil Pros ISAC Check", fillcolor="#E1F5FE"];
+        csel_step3 [label="Step 3\nLoad GDW Process Keys", fillcolor="#E1F5FE"];
+        csel_step4 [label="Step 4\nLoad Mapping Lookups", fillcolor="#E1F5FE"];
+        csel_step5 [label="Step 5\nProcess Finishing Point", fillcolor="#E1F5FE"];
+        csel_steps6_18 [label="Steps 6-18\n• Extract Applications\n• Transform Data\n• Load to Temp\n• Delta Processing\n• Load to GDW", fillcolor="#E1F5FE", shape=box];
+        csel_success [label="CSEL Complete\n✓ All 18 Steps", fillcolor="#C8E6C9"];
+        csel_error [label="CSEL Failed\n✗ Log Error", fillcolor="#FFCDD2"];
+        
+        // CSEL flow
+        csel_start -> csel_step1;
+        csel_step1 -> csel_step2;
+        csel_step2 -> csel_step3;
+        csel_step3 -> csel_step4;
+        csel_step4 -> csel_step5;
+        csel_step5 -> csel_steps6_18;
+        csel_steps6_18 -> csel_success;
+        
+        // Error paths
+        csel_step1 -> csel_error [color="red", style=dashed, label="fail"];
+        csel_step2 -> csel_error [color="red", style=dashed, label="fail"];
+        csel_step3 -> csel_error [color="red", style=dashed, label="fail"];
+        csel_step4 -> csel_error [color="red", style=dashed, label="fail"];
+        csel_step5 -> csel_error [color="red", style=dashed, label="fail"];
+        csel_steps6_18 -> csel_error [color="red", style=dashed, label="fail"];
+    }
+    
+    // Buffer node
+    buffer [label="1 Hour Buffer\nEnsure CSEL Completion", fillcolor="#FFF3E0", shape=diamond];
+    
+    // Subgraph for CCODS Process
+    subgraph cluster_ccods {
+        label="CCODS Process (2 Steps)\n4:00 AM Australia/Sydney";
+        style=filled;
+        fillcolor="#F3E5F5";
+        fontsize=14;
+        fontname="Arial Bold";
+        
+        // CCODS nodes
+        ccods_start [label="Start\nP_EXECUTE_DBT_CCODS", fillcolor="#E1BEE7"];
+        ccods_step1 [label="Step 1\nTransform BCFINSG\n(40_transform)", fillcolor="#F3E5F5"];
+        ccods_step2 [label="Step 2\nLoad to GDW\n(60_load_gdw)", fillcolor="#F3E5F5"];
+        ccods_success [label="CCODS Complete\n✓ PLAN_BALN_SEGM_MSTR\nPopulated", fillcolor="#C8E6C9"];
+        ccods_error [label="CCODS Failed\n✗ Log Error", fillcolor="#FFCDD2"];
+        
+        // CCODS flow
+        ccods_start -> ccods_step1;
+        ccods_step1 -> ccods_step2;
+        ccods_step2 -> ccods_success;
+        
+        // Error paths
+        ccods_step1 -> ccods_error [color="red", style=dashed, label="fail"];
+        ccods_step2 -> ccods_error [color="red", style=dashed, label="fail"];
+    }
+    
+    // Final completion
+    final_complete [label="Both Processes\nComplete\n🎯 Production Ready", fillcolor="#4CAF50", fontcolor="white"];
+    
+    // Main flow connections
+    csel_success -> buffer [color="#4CAF50", penwidth=2];
+    buffer -> ccods_start [color="#4CAF50", penwidth=2];
+    ccods_success -> final_complete [color="#4CAF50", penwidth=2];
+    
+    // Error terminations
+    csel_error -> end_error [style=invis];
+    ccods_error -> end_error [style=invis];
+    end_error [label="Process Terminated", fillcolor="#F44336", fontcolor="white", style=invis];
+    
+    // Invisible nodes for better layout
+    {rank=same; csel_error; ccods_error;}
+} 
