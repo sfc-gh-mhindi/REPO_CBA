@@ -47,7 +47,7 @@ CSEL/
 
 #### CSEL Execution Flow (18 Steps)
 
-![CSEL Execution Flow](README images/csel_execution_flow.png)
+![CSEL Execution Flow](images/csel_execution_flow.png)
 
 *The CSEL process executes 18 sequential steps organized into 4 distinct phases, starting at 3:00 AM Australia/Sydney.*
 
@@ -94,7 +94,7 @@ CCODS/
 
 #### CCODS Execution Flow (2 Steps)
 
-![CCODS Execution Flow](README images/ccods_execution_flow.png)
+![CCODS Execution Flow](images/ccods_execution_flow.png)
 
 *The CCODS process executes 2 sequential steps starting at 4:00 AM Australia/Sydney, one hour after CSEL completion.*
 
@@ -124,7 +124,7 @@ CCODS/
 
 ### Snowflake Database Structure
 
-![Snowflake Infrastructure](README images/snowflake_infrastructure.png)
+![Snowflake Infrastructure](images/snowflake_infrastructure.png)
 
 *Complete Snowflake environment showing scheduling, execution layer, shared resources, and outputs with audit capabilities.*
 
@@ -198,7 +198,7 @@ CCODS/
 
 ### Installation Order
 
-![Installation Sequence](README images/installation_sequence.png)
+![Installation Sequence](images/installation_sequence.png)
 
 *Step-by-step installation process organized into 4 main phases from database setup through operational deployment.*
 
@@ -217,7 +217,7 @@ CCODS/
 
 ### Unified Monitoring Methods
 
-![Monitoring Overview](README images/monitoring_methods.png)
+![Monitoring Overview](images/monitoring_methods.png)
 
 *Comprehensive monitoring approach showing three complementary methods and their respective outputs for both CSEL and CCODS processes.*
 
