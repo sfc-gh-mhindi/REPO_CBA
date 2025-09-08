@@ -47,60 +47,34 @@ CSEL/
 
 #### CSEL Execution Flow (18 Steps)
 
+> **Note**: If Mermaid diagrams don't render in your Git viewer, see alternative formats in the [`diagrams/`](diagrams/) folder:
+> - [PlantUML version](diagrams/execution_flow.puml) 
+> - [ASCII art version](diagrams/infrastructure_ascii.md)
+
 ```mermaid
-flowchart TD
-    START_CSEL([Start P_EXECUTE_DBT_CSEL]) --> CTRL_UPDATE_CSEL[Update Control Tables<br/>RUN_STRM_ABRT_F = 'N'<br/>RUN_STRM_ACTV_F = 'I']
+flowchart LR
+    START([Start CSEL]) --> PHASE1[Phase 1: Control Setup<br/>Steps 1-5<br/>🔧 Stream Status, ISAC Check<br/>Process Keys, Lookups]
     
-    CTRL_UPDATE_CSEL --> STEP1[Step 1: processrunstreamstatuscheck<br/>Validate stream processing status]
-    STEP1 --> STEP2[Step 2: utilprosisacprevloadcheck<br/>Check previous load completion]
-    STEP2 --> STEP3[Step 3: loadgdwproskeyseq<br/>Load GDW process key sequences]
-    STEP3 --> STEP4[Step 4: ldmap_cse_pack_pdct_pllkp<br/>Load product mapping lookups]
-    STEP4 --> STEP5[Step 5: processrunstreamfinishingpoint<br/>Set processing checkpoints]
+    PHASE1 --> PHASE2[Phase 2: Data Processing<br/>Steps 6-12<br/>📥 Extract Apps, Transform<br/>Load Temp, Delta, Update/Insert]
     
-    STEP5 --> STEP6[Step 6: processrunstreamstatuscheck<br/>with CSE_CPL_BUS_APP variable]
-    STEP6 --> STEP7[Step 7: extpl_app<br/>Extract application data]
-    STEP7 --> STEP8[Step 8: xfmpl_appfrmext<br/>Transform application data]
-    STEP8 --> STEP9[Step 9: ldtmp_appt_deptrmxfm<br/>Load appointment department temp data]
+    PHASE2 --> PHASE3[Phase 3: Product Processing<br/>Steps 13-16<br/>📦 Load Product Temp<br/>Delta, Update/Insert Products]
     
-    STEP9 --> STEP10[Step 10: dltappt_deptfrmtmp_appt_dept<br/>Delta processing for appointment departments]
-    STEP10 --> STEP11[Step 11: ldapptdeptupd<br/>Update appointment department data]
-    STEP11 --> STEP12[Step 12: ldapptdeptins<br/>Insert new appointment department data]
+    PHASE3 --> PHASE4[Phase 4: Final Loading<br/>Steps 17-18<br/>🎯 Update/Insert<br/>Department Appointments]
     
-    STEP12 --> STEP13[Step 13: ldtmp_appt_pdctfrmxfm<br/>Load appointment product temp data]
-    STEP13 --> STEP14[Step 14: dltappt_pdctfrmtmp_appt_pdct<br/>Delta processing for appointment products]
-    STEP14 --> STEP15[Step 15: ldapptpdctupd<br/>Update appointment product data]
-    STEP15 --> STEP16[Step 16: ldapptpdctins<br/>Insert new appointment product data]
+    PHASE4 --> SUCCESS[✅ SUCCESS<br/>All 18 Steps Complete<br/>JSON Result]
     
-    STEP16 --> STEP17[Step 17: ldapptdeptupd<br/>with dept_appt target table]
-    STEP17 --> STEP18[Step 18: ldapptdeptins<br/>with dept_appt target table]
+    PHASE1 -.-> ERROR[❌ FAILED<br/>Log Error Details<br/>Return Failure]
+    PHASE2 -.-> ERROR
+    PHASE3 -.-> ERROR
+    PHASE4 -.-> ERROR
     
-    STEP18 --> SUCCESS_CSEL[SUCCESS<br/>Log completion<br/>Return JSON result]
-    
-    STEP1 --> ERROR_CSEL{Step Failed?}
-    STEP2 --> ERROR_CSEL
-    STEP3 --> ERROR_CSEL
-    STEP4 --> ERROR_CSEL
-    STEP5 --> ERROR_CSEL
-    STEP6 --> ERROR_CSEL
-    STEP7 --> ERROR_CSEL
-    STEP8 --> ERROR_CSEL
-    STEP9 --> ERROR_CSEL
-    STEP10 --> ERROR_CSEL
-    STEP11 --> ERROR_CSEL
-    STEP12 --> ERROR_CSEL
-    STEP13 --> ERROR_CSEL
-    STEP14 --> ERROR_CSEL
-    STEP15 --> ERROR_CSEL
-    STEP16 --> ERROR_CSEL
-    STEP17 --> ERROR_CSEL
-    STEP18 --> ERROR_CSEL
-    
-    ERROR_CSEL --> FAIL_CSEL[FAILED<br/>Log error details<br/>Return failure JSON]
-    
-    style START_CSEL fill:#e1f5fe
-    style SUCCESS_CSEL fill:#c8e6c9
-    style FAIL_CSEL fill:#ffcdd2
-    style ERROR_CSEL fill:#fff3e0
+    style START fill:#e1f5fe
+    style PHASE1 fill:#f3e5f5
+    style PHASE2 fill:#fff3e0
+    style PHASE3 fill:#e8f5e8
+    style PHASE4 fill:#fce4ec
+    style SUCCESS fill:#c8e6c9
+    style ERROR fill:#ffcdd2
 ```
 
 ---
@@ -141,39 +115,25 @@ CCODS/
 #### CCODS Execution Flow (2 Steps)
 
 ```mermaid
-flowchart TD
-    START_CCODS([Start P_EXECUTE_DBT_CCODS]) --> LOG_START[Log Process Start<br/>CCODS DBT Execution<br/>2 Sequential Model Groups]
+flowchart LR
+    START([Start CCODS<br/>4:00 AM]) --> STEP1[Step 1: Transform<br/>🔄 BCFINSG Data<br/>40_transform models]
     
-    LOG_START --> STEP1_CCODS[Step 1: 40_transform<br/>xfmplanbalnsegmmstrfrombcfinsg<br/>🔄 BCFINSG Data Transformation]
+    STEP1 --> CHECK1{Success?}
+    CHECK1 -->|✅ Yes| STEP2[Step 2: Load GDW<br/>📤 Final Loading<br/>PLAN_BALN_SEGM_MSTR]
+    CHECK1 -->|❌ No| FAIL1[❌ Transform Failed<br/>Log Error & Stop]
     
-    STEP1_CCODS --> VALIDATE1[Validate Transformation<br/>✅ Check Success Flag<br/>📊 Log Results]
+    STEP2 --> CHECK2{Success?}
+    CHECK2 -->|✅ Yes| SUCCESS[✅ CCODS Complete<br/>2 Steps Successful<br/>JSON Result]
+    CHECK2 -->|❌ No| FAIL2[❌ Load Failed<br/>Log Error & Stop]
     
-    VALIDATE1 --> STEP1_SUCCESS{Step 1<br/>Success?}
-    
-    STEP1_SUCCESS -->|✅ Yes| LOG_TRANSFORM[Log Transformation Success<br/>All BCFINSG models executed<br/>plan_baln_segm_mstr_i ready]
-    
-    STEP1_SUCCESS -->|❌ No| FAIL1[FAILED at Step 1<br/>🚨 Transformation Failed<br/>Log Error & Return]
-    
-    LOG_TRANSFORM --> STEP2_CCODS[Step 2: 60_load_gdw<br/>ldbcfinsgplanbalnsegmmstr<br/>📤 Final GDW Loading]
-    
-    STEP2_CCODS --> VALIDATE2[Validate Load<br/>✅ Check Success Flag<br/>📊 Log Results]
-    
-    VALIDATE2 --> STEP2_SUCCESS{Step 2<br/>Success?}
-    
-    STEP2_SUCCESS -->|✅ Yes| LOG_LOAD[Log Load Success<br/>PLAN_BALN_SEGM_MSTR<br/>Population Complete]
-    
-    STEP2_SUCCESS -->|❌ No| FAIL2[FAILED at Step 2<br/>🚨 Load Failed<br/>Log Error & Return]
-    
-    LOG_LOAD --> SUCCESS_CCODS[SUCCESS<br/>📋 Complete Process Log<br/>🎯 Return JSON Result<br/>Total Steps: 2]
-    
-    style START_CCODS fill:#e1f5fe
-    style STEP1_CCODS fill:#f3e5f5
-    style STEP2_CCODS fill:#e8f5e8
-    style SUCCESS_CCODS fill:#c8e6c9
+    style START fill:#e1f5fe
+    style STEP1 fill:#f3e5f5
+    style STEP2 fill:#e8f5e8
+    style SUCCESS fill:#c8e6c9
     style FAIL1 fill:#ffcdd2
     style FAIL2 fill:#ffcdd2
-    style STEP1_SUCCESS fill:#fff3e0
-    style STEP2_SUCCESS fill:#fff3e0
+    style CHECK1 fill:#fff3e0
+    style CHECK2 fill:#fff3e0
 ```
 
 #### CCODS Model Details
@@ -199,67 +159,46 @@ flowchart TD
 ### Snowflake Database Structure
 
 ```mermaid
-graph TB
-    subgraph "Snowflake Environment"
-        subgraph "NPD_D12_DMN_GDWMIG Database"
-            subgraph "TMP Schema"
-                PROC_CSEL[P_EXECUTE_DBT_CSEL<br/>🔄 CSEL Procedure<br/>18 Steps]
-                TASK_CSEL[T_EXECUTE_DBT_CSEL<br/>⏰ 3:00 AM Daily]
-                PROC_CCODS[P_EXECUTE_DBT_CCODS<br/>🔄 CCODS Procedure<br/>2 Steps]
-                TASK_CCODS[T_EXECUTE_DBT_CCODS<br/>⏰ 4:00 AM Daily]
-                DBT[GDW1_DBT<br/>📦 Shared DBT Project]
-            end
-        end
-        
-        subgraph "NPD_D12_DMN_GDWMIG_IBRG_V Database"
-            subgraph "P_V_OUT_001_STD_0 Schema"
-                LOG[DCF_T_EXEC_LOG<br/>📊 Unified Audit Table]
-                CTRL[RUN_STRM_TMPL<br/>⚙️ Control Table]
-            end
-            
-            subgraph "CSEL Model Outputs"
-                CSEL_VIEWS[📋 CSE Data Models<br/>Appointments, Products, Departments]
-                CSEL_TABLES[📊 Service Layer Tables]
-            end
-            
-            subgraph "CCODS Model Outputs"
-                CCODS_VIEWS[📈 BCFINSG Transformations]
-                CCODS_TABLES[🎯 PLAN_BALN_SEGM_MSTR]
-            end
-        end
+graph LR
+    subgraph "⏰ Scheduling"
+        CRON_CSEL[3:00 AM<br/>CSEL]
+        CRON_CCODS[4:00 AM<br/>CCODS]
     end
     
-    subgraph "External Systems"
-        WORKSPACE[Snowflake<br/>DBT Workspace]
-        WAREHOUSE[wh_usr_npd_d12_gdwmig_001<br/>Compute Warehouse]
+    subgraph "🏗️ Execution Layer"
+        TASK_CSEL[T_EXECUTE_DBT_CSEL<br/>📅 Daily Task]
+        TASK_CCODS[T_EXECUTE_DBT_CCODS<br/>📅 Daily Task]
+        PROC_CSEL[P_EXECUTE_DBT_CSEL<br/>🔄 18 Steps]
+        PROC_CCODS[P_EXECUTE_DBT_CCODS<br/>🔄 2 Steps]
     end
     
-    subgraph "Scheduling"
-        CRON_CSEL[3:00 AM<br/>Australia/Sydney]
-        CRON_CCODS[4:00 AM<br/>Australia/Sydney]
+    subgraph "📦 Shared Resources"
+        DBT[GDW1_DBT<br/>Shared Project]
+        WORKSPACE[DBT Workspace]
+        WAREHOUSE[Compute Warehouse]
     end
     
-    CRON_CSEL --> TASK_CSEL
-    CRON_CCODS --> TASK_CCODS
-    TASK_CSEL --> PROC_CSEL
-    TASK_CCODS --> PROC_CCODS
+    subgraph "📊 Outputs & Audit"
+        LOG[DCF_T_EXEC_LOG<br/>Unified Audit]
+        CSEL_OUT[📋 CSEL Models<br/>Appointments, Products]
+        CCODS_OUT[📈 CCODS Models<br/>PLAN_BALN_SEGM_MSTR]
+    end
+    
+    CRON_CSEL --> TASK_CSEL --> PROC_CSEL
+    CRON_CCODS --> TASK_CCODS --> PROC_CCODS
     PROC_CSEL --> DBT
     PROC_CCODS --> DBT
     DBT --> WORKSPACE
     DBT --> WAREHOUSE
     PROC_CSEL --> LOG
     PROC_CCODS --> LOG
-    PROC_CSEL --> CTRL
-    DBT --> CSEL_VIEWS
-    DBT --> CSEL_TABLES
-    DBT --> CCODS_VIEWS
-    DBT --> CCODS_TABLES
+    DBT --> CSEL_OUT
+    DBT --> CCODS_OUT
     
     style PROC_CSEL fill:#e1f5fe
     style PROC_CCODS fill:#f3e5f5
-    style TASK_CSEL fill:#e8f5e8
-    style TASK_CCODS fill:#fff3e0
     style DBT fill:#fce4ec
+    style LOG fill:#c8e6c9
 ```
 
 ### Deployment Configuration
@@ -313,37 +252,23 @@ graph TB
 ### Installation Order
 
 ```mermaid
-sequenceDiagram
-    participant Admin as Database Admin
-    participant CSEL as CSEL Installation
-    participant CCODS as CCODS Installation
-    participant DBT as DBT Workspace
+flowchart LR
+    ADMIN([Database Admin]) --> PHASE1[Phase 1: CSEL Setup<br/>🔧 Database, Control Data<br/>Procedure, Task]
     
-    Admin->>CSEL: 1. Deploy CSEL Database Setup
-    CSEL->>Admin: ✅ Tables & Views Created
+    PHASE1 --> PHASE2[Phase 2: CCODS Setup<br/>🔧 Procedure, Task<br/>Dependencies]
     
-    Admin->>CSEL: 2. Deploy CSEL Control Data
-    CSEL->>Admin: ✅ Reference Data Populated
+    PHASE2 --> PHASE3[Phase 3: DBT Deploy<br/>📦 Upload Shared Project<br/>GDW1_DBT Workspace]
     
-    Admin->>CSEL: 3. Deploy CSEL Procedure
-    CSEL->>Admin: ✅ P_EXECUTE_DBT_CSEL Created
+    PHASE3 --> PHASE4[Phase 4: Activation<br/>▶️ Resume Both Tasks<br/>Operational Status]
     
-    Admin->>CSEL: 4. Deploy CSEL Task
-    CSEL->>Admin: ✅ T_EXECUTE_DBT_CSEL Created
+    PHASE4 --> COMPLETE[✅ Installation Complete<br/>Both Projects Scheduled<br/>Ready for Production]
     
-    Admin->>CCODS: 5. Deploy CCODS Procedure
-    CCODS->>Admin: ✅ P_EXECUTE_DBT_CCODS Created
-    
-    Admin->>CCODS: 6. Deploy CCODS Task
-    CCODS->>Admin: ✅ T_EXECUTE_DBT_CCODS Created
-    
-    Admin->>DBT: 7. Upload Shared DBT Project
-    DBT->>Admin: ✅ GDW1_DBT Workspace Ready
-    
-    Admin->>CSEL: 8. Resume CSEL Task
-    Admin->>CCODS: 9. Resume CCODS Task
-    
-    Note over Admin, DBT: Both projects now scheduled and operational
+    style ADMIN fill:#e3f2fd
+    style PHASE1 fill:#e1f5fe
+    style PHASE2 fill:#f3e5f5
+    style PHASE3 fill:#e8f5e8
+    style PHASE4 fill:#fff3e0
+    style COMPLETE fill:#c8e6c9
 ```
 
 ---
@@ -353,62 +278,26 @@ sequenceDiagram
 ### Unified Monitoring Methods
 
 ```mermaid
-graph LR
-    subgraph "Execution Monitoring"
-        CSEL_EXEC[CSEL Execution<br/>P_EXECUTE_DBT_CSEL]
-        CCODS_EXEC[CCODS Execution<br/>P_EXECUTE_DBT_CCODS]
-    end
+flowchart LR
+    EXEC[🔄 Process Execution<br/>CSEL + CCODS] --> METHOD1[📊 DBT Workspace<br/>SHOW TASKS<br/>Real-time Status]
     
-    subgraph "Monitoring Methods"
-        subgraph "1. DBT Workspace Monitoring"
-            WS[Snowflake DBT<br/>Workspace]
-            WS_CMD[SHOW TASKS<br/>Commands]
-        end
-        
-        subgraph "2. Query History Monitoring"
-            QH[Query History<br/>Analysis]
-            TASK_HIST[TASK_HISTORY<br/>Function]
-            RESULT_SCAN[RESULT_SCAN<br/>Function]
-        end
-        
-        subgraph "3. Unified Audit Monitoring"
-            AUDIT[DCF_T_EXEC_LOG<br/>Shared Audit Table]
-            LOG_QUERY[Multi-Process Queries<br/>CSEL + CCODS Status]
-        end
-    end
+    EXEC --> METHOD2[📈 Query History<br/>TASK_HISTORY()<br/>RESULT_SCAN()]
     
-    subgraph "Monitoring Outputs"
-        REAL_TIME[Real-time Status<br/>Both Projects]
-        HISTORY[Execution History<br/>Comparative Analysis]
-        DETAILED[Detailed Logs<br/>Process-Specific Status]
-    end
+    EXEC --> METHOD3[📋 Unified Audit<br/>DCF_T_EXEC_LOG<br/>Multi-Process Queries]
     
-    CSEL_EXEC --> WS
-    CCODS_EXEC --> WS
-    CSEL_EXEC --> QH
-    CCODS_EXEC --> QH
-    CSEL_EXEC --> AUDIT
-    CCODS_EXEC --> AUDIT
+    METHOD1 --> OUT1[⚡ Real-time<br/>Current Status<br/>Both Projects]
     
-    WS --> WS_CMD
-    WS_CMD --> REAL_TIME
+    METHOD2 --> OUT2[📊 Historical<br/>Execution Trends<br/>Comparative Analysis]
     
-    QH --> TASK_HIST
-    QH --> RESULT_SCAN
-    TASK_HIST --> HISTORY
-    RESULT_SCAN --> HISTORY
+    METHOD3 --> OUT3[🔍 Detailed<br/>Step-by-Step Logs<br/>Process-Specific]
     
-    AUDIT --> LOG_QUERY
-    LOG_QUERY --> DETAILED
-    
-    style CSEL_EXEC fill:#e1f5fe
-    style CCODS_EXEC fill:#f3e5f5
-    style WS fill:#e8f5e8
-    style QH fill:#fff3e0
-    style AUDIT fill:#fce4ec
-    style REAL_TIME fill:#c8e6c9
-    style HISTORY fill:#c8e6c9
-    style DETAILED fill:#c8e6c9
+    style EXEC fill:#e3f2fd
+    style METHOD1 fill:#e8f5e8
+    style METHOD2 fill:#fff3e0
+    style METHOD3 fill:#fce4ec
+    style OUT1 fill:#c8e6c9
+    style OUT2 fill:#c8e6c9
+    style OUT3 fill:#c8e6c9
 ```
 
 ### Monitoring Queries
