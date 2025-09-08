@@ -1,4 +1,4 @@
-# CSEL & CCODS DBT Projects - Static Images Version
+# CSEL & CCODS DBT Projects - Snowflake Deployment Guide
 
 ## Overview
 
@@ -47,15 +47,35 @@ CSEL/
 
 #### CSEL Execution Flow (18 Steps)
 
-![CSEL Execution Flow](images/csel_execution_flow.png)
+> **Note**: If Mermaid diagrams don't render in your Git viewer, see alternative formats in the [`diagrams/`](diagrams/) folder:
+> - [PlantUML version](diagrams/execution_flow.puml) 
+> - [ASCII art version](diagrams/infrastructure_ascii.md)
 
-*The CSEL process executes 18 sequential steps organized into 4 distinct phases, starting at 3:00 AM Australia/Sydney.*
-
-**Key Phases:**
-- **Phase 1 (Steps 1-5)**: Control Setup - Stream Status, ISAC Check, Process Keys, Lookups
-- **Phase 2 (Steps 6-12)**: Data Processing - Extract Apps, Transform, Load Temp, Delta, Update/Insert
-- **Phase 3 (Steps 13-16)**: Product Processing - Load Product Temp, Delta, Update/Insert Products
-- **Phase 4 (Steps 17-18)**: Final Loading - Update/Insert Department Appointments
+```mermaid
+flowchart LR
+    START([Start CSEL]) --> PHASE1[Phase 1: Control Setup<br/>Steps 1-5<br/>🔧 Stream Status, ISAC Check<br/>Process Keys, Lookups]
+    
+    PHASE1 --> PHASE2[Phase 2: Data Processing<br/>Steps 6-12<br/>📥 Extract Apps, Transform<br/>Load Temp, Delta, Update/Insert]
+    
+    PHASE2 --> PHASE3[Phase 3: Product Processing<br/>Steps 13-16<br/>📦 Load Product Temp<br/>Delta, Update/Insert Products]
+    
+    PHASE3 --> PHASE4[Phase 4: Final Loading<br/>Steps 17-18<br/>🎯 Update/Insert<br/>Department Appointments]
+    
+    PHASE4 --> SUCCESS[✅ SUCCESS<br/>All 18 Steps Complete<br/>JSON Result]
+    
+    PHASE1 -.-> ERROR[❌ FAILED<br/>Log Error Details<br/>Return Failure]
+    PHASE2 -.-> ERROR
+    PHASE3 -.-> ERROR
+    PHASE4 -.-> ERROR
+    
+    style START fill:#e1f5fe
+    style PHASE1 fill:#f3e5f5
+    style PHASE2 fill:#fff3e0
+    style PHASE3 fill:#e8f5e8
+    style PHASE4 fill:#fce4ec
+    style SUCCESS fill:#c8e6c9
+    style ERROR fill:#ffcdd2
+```
 
 ---
 
@@ -94,13 +114,27 @@ CCODS/
 
 #### CCODS Execution Flow (2 Steps)
 
-![CCODS Execution Flow](images/ccods_execution_flow.png)
-
-*The CCODS process executes 2 sequential steps starting at 4:00 AM Australia/Sydney, one hour after CSEL completion.*
-
-**Process Steps:**
-- **Step 1**: Transform BCFINSG Data (`models/ccods/40_transform/`) - Data cleansing, validation, and structuring
-- **Step 2**: Load to GDW (`models/ccods/60_load_gdw/`) → Populates `PLAN_BALN_SEGM_MSTR`
+```mermaid
+flowchart LR
+    START([Start CCODS<br/>4:00 AM]) --> STEP1[Step 1: Transform<br/>🔄 BCFINSG Data<br/>40_transform models]
+    
+    STEP1 --> CHECK1{Success?}
+    CHECK1 -->|✅ Yes| STEP2[Step 2: Load GDW<br/>📤 Final Loading<br/>PLAN_BALN_SEGM_MSTR]
+    CHECK1 -->|❌ No| FAIL1[❌ Transform Failed<br/>Log Error & Stop]
+    
+    STEP2 --> CHECK2{Success?}
+    CHECK2 -->|✅ Yes| SUCCESS[✅ CCODS Complete<br/>2 Steps Successful<br/>JSON Result]
+    CHECK2 -->|❌ No| FAIL2[❌ Load Failed<br/>Log Error & Stop]
+    
+    style START fill:#e1f5fe
+    style STEP1 fill:#f3e5f5
+    style STEP2 fill:#e8f5e8
+    style SUCCESS fill:#c8e6c9
+    style FAIL1 fill:#ffcdd2
+    style FAIL2 fill:#ffcdd2
+    style CHECK1 fill:#fff3e0
+    style CHECK2 fill:#fff3e0
+```
 
 #### CCODS Model Details
 
@@ -124,29 +158,48 @@ CCODS/
 
 ### Snowflake Database Structure
 
-![Snowflake Infrastructure](images/snowflake_infrastructure.png)
-
-*Complete Snowflake environment showing scheduling, execution layer, shared resources, and outputs with audit capabilities.*
-
-**Key Components:**
-
-#### Scheduling Layer
-- **CSEL**: 3:00 AM Australia/Sydney daily execution
-- **CCODS**: 4:00 AM Australia/Sydney daily execution (1-hour buffer after CSEL)
-
-#### Execution Layer
-- **Tasks**: `T_EXECUTE_DBT_CSEL`, `T_EXECUTE_DBT_CCODS`
-- **Procedures**: `P_EXECUTE_DBT_CSEL` (18 steps), `P_EXECUTE_DBT_CCODS` (2 steps)
-
-#### Shared Resources
-- **DBT Project**: `GDW1_DBT` shared workspace
-- **Compute Warehouse**: `wh_usr_npd_d12_gdwmig_001`
-- **DBT Workspace**: Snowflake development environment
-
-#### Outputs & Audit
-- **Unified Audit**: `DCF_T_EXEC_LOG` for both processes
-- **CSEL Models**: Appointments, Products, Departments
-- **CCODS Models**: BCFINSG transformations, `PLAN_BALN_SEGM_MSTR`
+```mermaid
+graph LR
+    subgraph "⏰ Scheduling"
+        CRON_CSEL[3:00 AM<br/>CSEL]
+        CRON_CCODS[4:00 AM<br/>CCODS]
+    end
+    
+    subgraph "🏗️ Execution Layer"
+        TASK_CSEL[T_EXECUTE_DBT_CSEL<br/>📅 Daily Task]
+        TASK_CCODS[T_EXECUTE_DBT_CCODS<br/>📅 Daily Task]
+        PROC_CSEL[P_EXECUTE_DBT_CSEL<br/>🔄 18 Steps]
+        PROC_CCODS[P_EXECUTE_DBT_CCODS<br/>🔄 2 Steps]
+    end
+    
+    subgraph "📦 Shared Resources"
+        DBT[GDW1_DBT<br/>Shared Project]
+        WORKSPACE[DBT Workspace]
+        WAREHOUSE[Compute Warehouse]
+    end
+    
+    subgraph "📊 Outputs & Audit"
+        LOG[DCF_T_EXEC_LOG<br/>Unified Audit]
+        CSEL_OUT[📋 CSEL Models<br/>Appointments, Products]
+        CCODS_OUT[📈 CCODS Models<br/>PLAN_BALN_SEGM_MSTR]
+    end
+    
+    CRON_CSEL --> TASK_CSEL --> PROC_CSEL
+    CRON_CCODS --> TASK_CCODS --> PROC_CCODS
+    PROC_CSEL --> DBT
+    PROC_CCODS --> DBT
+    DBT --> WORKSPACE
+    DBT --> WAREHOUSE
+    PROC_CSEL --> LOG
+    PROC_CCODS --> LOG
+    DBT --> CSEL_OUT
+    DBT --> CCODS_OUT
+    
+    style PROC_CSEL fill:#e1f5fe
+    style PROC_CCODS fill:#f3e5f5
+    style DBT fill:#fce4ec
+    style LOG fill:#c8e6c9
+```
 
 ### Deployment Configuration
 
@@ -198,18 +251,25 @@ CCODS/
 
 ### Installation Order
 
-![Installation Sequence](images/installation_sequence.png)
-
-*Step-by-step installation process organized into 4 main phases from database setup through operational deployment.*
-
-**Installation Phases:**
-
-1. **Phase 1: CSEL Setup** → Database setup, control data, procedure, task creation
-2. **Phase 2: CCODS Setup** → Procedure and task creation with dependencies  
-3. **Phase 3: DBT Deploy** → Upload shared DBT project to GDW1_DBT workspace
-4. **Phase 4: Activation** → Resume both tasks for operational status
-
-**Results**: ✅ Both projects scheduled and ready for production
+```mermaid
+flowchart LR
+    ADMIN([Database Admin]) --> PHASE1[Phase 1: CSEL Setup<br/>🔧 Database, Control Data<br/>Procedure, Task]
+    
+    PHASE1 --> PHASE2[Phase 2: CCODS Setup<br/>🔧 Procedure, Task<br/>Dependencies]
+    
+    PHASE2 --> PHASE3[Phase 3: DBT Deploy<br/>📦 Upload Shared Project<br/>GDW1_DBT Workspace]
+    
+    PHASE3 --> PHASE4[Phase 4: Activation<br/>▶️ Resume Both Tasks<br/>Operational Status]
+    
+    PHASE4 --> COMPLETE[✅ Installation Complete<br/>Both Projects Scheduled<br/>Ready for Production]
+    
+    style ADMIN fill:#e3f2fd
+    style PHASE1 fill:#e1f5fe
+    style PHASE2 fill:#f3e5f5
+    style PHASE3 fill:#e8f5e8
+    style PHASE4 fill:#fff3e0
+    style COMPLETE fill:#c8e6c9
+```
 
 ---
 
@@ -217,31 +277,28 @@ CCODS/
 
 ### Unified Monitoring Methods
 
-![Monitoring Overview](images/monitoring_methods.png)
-
-*Comprehensive monitoring approach showing three complementary methods and their respective outputs for both CSEL and CCODS processes.*
-
-**Monitoring Layers:**
-
-1. **DBT Workspace Monitoring**
-   - Real-time task status via `SHOW TASKS` commands
-   - Direct workspace visibility
-   - Immediate error detection
-
-2. **Query History Monitoring**
-   - `TASK_HISTORY()` function for execution history
-   - `RESULT_SCAN()` function for detailed results
-   - Historical analysis and trends
-
-3. **Unified Audit Monitoring**
-   - `DCF_T_EXEC_LOG` table for both CSEL and CCODS
-   - Multi-process status queries
-   - Detailed process-specific logging
-
-**Monitoring Outputs:**
-- **Real-time**: Current status for both projects
-- **Historical**: Execution trends and comparative analysis
-- **Detailed**: Step-by-step logs with process-specific status
+```mermaid
+flowchart LR
+    EXEC[🔄 Process Execution<br/>CSEL + CCODS] --> METHOD1[📊 DBT Workspace<br/>SHOW TASKS<br/>Real-time Status]
+    
+    EXEC --> METHOD2[📈 Query History<br/>TASK_HISTORY Function<br/>RESULT_SCAN Function]
+    
+    EXEC --> METHOD3[📋 Unified Audit<br/>DCF_T_EXEC_LOG<br/>Multi-Process Queries]
+    
+    METHOD1 --> OUT1[⚡ Real-time<br/>Current Status<br/>Both Projects]
+    
+    METHOD2 --> OUT2[📊 Historical<br/>Execution Trends<br/>Comparative Analysis]
+    
+    METHOD3 --> OUT3[🔍 Detailed<br/>Step-by-Step Logs<br/>Process-Specific]
+    
+    style EXEC fill:#e3f2fd
+    style METHOD1 fill:#e8f5e8
+    style METHOD2 fill:#fff3e0
+    style METHOD3 fill:#fce4ec
+    style OUT1 fill:#c8e6c9
+    style OUT2 fill:#c8e6c9
+    style OUT3 fill:#c8e6c9
+```
 
 ### Monitoring Queries
 
@@ -407,80 +464,4 @@ The CCODS project includes specialized debugging tools:
 - **Overlap Prevention**: Both tasks configured with `ALLOW_OVERLAPPING_EXECUTION = FALSE`
 - **Sequential Execution**: CCODS starts after CSEL completion window
 
----
 
-## 📁 **Image Files**
-
-All diagram images are stored in the `images/` directory:
-
-```
-images/
-├── csel_execution_flow.png          # CSEL 4-phase process flow
-├── ccods_execution_flow.png         # CCODS 2-step process flow  
-├── snowflake_infrastructure.png     # Complete infrastructure diagram
-├── monitoring_methods.png           # Monitoring approach overview
-├── installation_sequence.png        # 4-phase installation process
-├── csel_execution_flow.svg          # Vector version (scalable)
-├── ccods_execution_flow.svg         # Vector version (scalable)
-├── snowflake_infrastructure.svg     # Vector version (scalable)
-├── monitoring_methods.svg           # Vector version (scalable)
-└── installation_sequence.svg        # Vector version (scalable)
-```
-
-## 🎨 **Creating Static Images**
-
-To create these static images:
-
-1. **From Mermaid (Recommended)**:
-   - Use Mermaid Live Editor (https://mermaid.live/)
-   - Copy the Mermaid code from the main README.md
-   - Export as PNG (raster) or SVG (vector)
-   - Save to `images/` directory
-
-2. **From Draw.io**: 
-   - Open the XML files in `../diagrams/`
-   - Export as PNG (raster) or SVG (vector)
-   - Save to `images/` directory
-
-3. **From Graphviz**:
-   ```bash
-   dot -Tpng execution_flow.dot -o images/execution_flow.png
-   dot -Tsvg execution_flow.dot -o images/execution_flow.svg
-   ```
-
-4. **From PlantUML**:
-   - Use online PlantUML server
-   - Export as PNG or SVG
-   - Download to `images/` directory
-
-### Mermaid Code Sources
-
-All Mermaid diagrams can be found in the main `README.md` file:
-- **CSEL Execution Flow**: Lines 54-78
-- **CCODS Execution Flow**: Lines 147-181  
-- **Snowflake Infrastructure**: Lines 205-267
-- **Installation Sequence**: Lines 254-272
-- **Monitoring Methods**: Lines 280-301
-
----
-
-## 💡 **Benefits of Static Images**
-
-- **Universal Compatibility**: Works in all Git viewers, documentation systems
-- **Professional Appearance**: High-quality visuals for presentations
-- **Fast Loading**: No rendering required, immediate display
-- **Offline Access**: Available without internet connection
-- **Print Friendly**: Suitable for printed documentation
-- **Screenshot Ready**: Perfect for sharing via screenshots and presentations
-
-## ⚠️ **Considerations**
-
-- **File Size**: PNG files can be large, use SVG when possible
-- **Version Control**: Binary files don't show diffs effectively
-- **Maintenance**: Manual updates required when processes change
-- **Accessibility**: Include alt text for screen readers
-- **Sync**: Keep images updated when main README diagrams change
-
----
-
-*This README demonstrates comprehensive static image integration with complete coverage of all CSEL and CCODS project documentation. Images provide immediate visual clarity while maintaining universal compatibility across all platforms and viewers.* 
