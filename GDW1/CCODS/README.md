@@ -281,7 +281,7 @@ flowchart LR
 flowchart LR
     EXEC[🔄 Process Execution<br/>CSEL + CCODS] --> METHOD1[📊 DBT Workspace<br/>SHOW TASKS<br/>Real-time Status]
     
-    EXEC --> METHOD2[📈 Query History<br/>TASK_HISTORY()<br/>RESULT_SCAN()]
+    EXEC --> METHOD2[📈 Query History<br/>TASK_HISTORY Function<br/>RESULT_SCAN Function]
     
     EXEC --> METHOD3[📋 Unified Audit<br/>DCF_T_EXEC_LOG<br/>Multi-Process Queries]
     
