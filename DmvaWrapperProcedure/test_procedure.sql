@@ -1,4 +1,4 @@
--- Test Script for P_DMVA_WRAPPER_PROCEDURE
+-- Test Script for P_MIGRATE_TERADATA_TO_SNOWFLAKE
 -- This script demonstrates various usage scenarios
 
 -- Set up the environment
@@ -9,7 +9,7 @@ use warehouse wh_usr_npd_d12_gdwmig_001;
 
 -- Example 1: Full Migration with Structure Setup (Default behavior)
 -- This is equivalent to the original sampleCode.sql logic
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG',                                    -- Source database/schema
     'DERV_ACCT_PATY_CHG',                         -- Source table
     'NPD_D12_DMN_GDWMIG',                         -- Target database
@@ -26,7 +26,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 -- Example 2: Incremental Load (No Data Cleanup)
 -- Use this when you want to append/update data without clearing existing records
 /*
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 
     'DERV_ACCT_PATY_CHG', 
     'NPD_D12_DMN_GDWMIG', 
@@ -43,7 +43,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 -- Example 3: Data-Only Migration (Skip Structure Setup)
 -- Use this when structures are already configured and you only need to migrate data
 /*
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 
     'DERV_ACCT_PATY_CHG', 
     'NPD_D12_DMN_GDWMIG', 
@@ -60,7 +60,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 -- Example 4: Large Table Migration with Chunking
 -- Use this for very large tables that need to be migrated in chunks
 /*
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 
     'LARGE_TRANSACTION_TABLE', 
     'NPD_D12_DMN_GDWMIG', 
@@ -79,7 +79,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 -- Example 5: Quick Re-run (Structures Exist, Incremental Data)
 -- Use this for regular incremental updates when structures are already set up
 /*
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 
     'DERV_ACCT_PATY_CHG', 
     'NPD_D12_DMN_GDWMIG', 
