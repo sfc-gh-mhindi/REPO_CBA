@@ -57,20 +57,24 @@ RETURNS VARCHAR
      - Clears target table data
    - **If P_LOAD_TYPE = 'INCREMENTAL'**: Skips cleanup
 
-5. **Step 4.5: Configure Chunking (Optional)**
+### Data Migration Flow (Steps 5.1-5.3) 
+
+The following steps execute regardless of the `P_REFRESH_STRUCTURES_YN` setting:
+
+5. **Step 5.1: Configure Chunking (Optional)**
    - Configures chunking if `P_WITH_CHUNKING_YN = 'Y'`
    - Validates chunking parameters
 
-6. **Step 5: Data Migration**
+6. **Step 5.2: Data Migration**
    - Calls `DMVA_GET_CHECKSUM_TASKS` to migrate data
 
-7. **Step 6: Monitor Migration Tasks**
+7. **Step 5.3: Monitor Migration Tasks**
    - Monitors migration progress (unless skipped)
    - Provides final verification count
 
 ### Data-Only Flow (P_REFRESH_STRUCTURES_YN = 'N')
 
-When `P_REFRESH_STRUCTURES_YN = 'N'`, the procedure jumps directly to **Step 5** (Data Migration), assuming all structures and mappings are already configured.
+When `P_REFRESH_STRUCTURES_YN = 'N'`, the procedure skips structure setup (Steps 1-4) and executes only the data migration flow (Steps 5.1-5.3), assuming all structures and mappings are already configured.
 
 ## Usage Examples
 
