@@ -1,13 +1,13 @@
-# DMVA Wrapper Procedure
+# Teradata to Snowflake Migration Procedure
 
 ## Overview
 
-The `P_DMVA_WRAPPER_PROCEDURE` is a comprehensive stored procedure that automates the DMVA (Data Migration and Validation Automation) process for migrating tables from Teradata to Snowflake. This procedure implements the logic from `sampleCode.sql` with enhanced parameterization and conditional execution flows.
+The `P_MIGRATE_TERADATA_TO_SNOWFLAKE` is a comprehensive stored procedure that automates the DMVA (Data Migration and Validation Automation) process for migrating tables from Teradata to Snowflake. This procedure implements the logic from `sampleCode.sql` with enhanced parameterization and conditional execution flows.
 
 ## Procedure Signature
 
 ```sql
-CREATE OR REPLACE PROCEDURE NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CREATE OR REPLACE PROCEDURE NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     "P_SOURCE_DATABASE_NAME" VARCHAR,      -- Source Teradata database/schema name
     "P_SOURCE_TABLE_NAME" VARCHAR,         -- Source table name
     "P_TARGET_DATABASE_NAME" VARCHAR,      -- Target Snowflake database name
@@ -76,7 +76,7 @@ When `P_REFRESH_STRUCTURES_YN = 'N'`, the procedure jumps directly to **Step 5**
 
 ### Example 1: Full Migration with Structure Setup
 ```sql
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG',                    -- Source database/schema
     'DERV_ACCT_PATY_CHG',         -- Source table
     'NPD_D12_DMN_GDWMIG',         -- Target database
@@ -92,7 +92,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 
 ### Example 2: Incremental Load (No Data Cleanup)
 ```sql
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 'DERV_ACCT_PATY_CHG', 'NPD_D12_DMN_GDWMIG', 'TMP', 
     'PDDSTG_DERV_ACCT_PATY_CHG_20250903',
     'N', null, null, null, 'N',
@@ -103,7 +103,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 
 ### Example 3: Data-Only Migration (Structures Already Exist)
 ```sql
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 'DERV_ACCT_PATY_CHG', 'NPD_D12_DMN_GDWMIG', 'TMP', 
     'PDDSTG_DERV_ACCT_PATY_CHG_20250903',
     'N', null, null, null, 'N',
@@ -114,7 +114,7 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
 
 ### Example 4: With Chunking
 ```sql
-CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_DMVA_WRAPPER_PROCEDURE(
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'K_PDDSTG', 'LARGE_TABLE', 'NPD_D12_DMN_GDWMIG', 'TMP', 
     'MIGRATED_LARGE_TABLE',
     'Y',                          -- Enable chunking
