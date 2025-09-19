@@ -1,0 +1,5 @@
+WAREHOUSE_NAME,SIZE,SCORE,Action plan,% of WH used for 90th %ile,Avg % of WH used,Avg XP duration (mins),Avg % WH idle time in jobs,% of jobs spilled to remote
+WH_USR_PRD_P01_FRAUMD_001,XLARGE,59,No action for now,100,72.82,28.08,10.25,0.02
+WH_USR_PRD_P01_FRAUMD_LABMLFRD_001,XSMALL,44,No action for now,100,100,16.29,3.08,0
+WH_USR_PRD_P01_FRAUMD_LABMLFRD_002,XLARGE,46,No action for now,100,62.04,51.74,20.53,0.03
+WH_USR_PRD_P01_FRAUMD_LABMLFRD_003,XXLARGE,-37,No action for now,100,71.89,125.25,50.14,0.04
