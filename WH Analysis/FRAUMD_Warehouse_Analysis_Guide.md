@@ -70,6 +70,10 @@
 ### Warehouse Utilization Overview
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
+**Query Size Classification:**
+- **Large Queries:** Operations that scan ≥ 1GB of data
+- **Small Queries:** Operations that scan < 1GB of data
+
 | **Warehouse** | **Size** | **Query Count** | **Credits Used** | **Large Queries %** | **Small Queries %** |
 |---------------|----------|-----------------|------------------|--------------------|--------------------|
 | **LABMLFRD_003** | 2X-Large | 2,998 | 9,274 | 40% | 60% |
@@ -78,27 +82,86 @@
 | **LABMLFRD_001** | X-Small | 624 | 20 | 9% | 91% |
 
 ### Query Sizing Band Analysis
-*Based on data volume scanned per query, derived from warehouse utilization SQL code:*
+*Based on data volume scanned per query, categorized into standardized sizing bands:*
 
-```sql
--- Sizing bands classification:
-ROUND(count_below_one_gb / count_queries * 100, 0) AS percent_xs,        -- < 1GB
-ROUND(count_btw_one_and_twenty_gb / count_queries * 100, 0) AS percent_s, -- 1-20GB  
-ROUND(count_btw_twenty_and_fifty_gb / count_queries * 100, 0) AS percent_m, -- 20-50GB
-ROUND(count_btw_fifty_and_one_hundred_gb / count_queries * 100, 0) AS percent_l, -- 50-100GB
-ROUND(count_btw_one_hundred_and_twofifty_gb / count_queries * 100, 0) AS percent_xl, -- 100-250GB
-ROUND(count_over_twofifty_gb / count_queries * 100, 0) AS percent_2xl -- > 250GB
-```
+**Sizing Band Definitions:**
+- **XS (Extra Small):** Operations that scan < 1GB of data
+- **S (Small):** Operations that scan 1-20GB of data
+- **M (Medium):** Operations that scan 20-50GB of data
+- **L (Large):** Operations that scan 50-100GB of data
+- **XL (Extra Large):** Operations that scan 100-250GB of data
+- **2XL (Double Extra Large):** Operations that scan > 250GB of data
+
+*These bands help identify workload patterns and determine optimal warehouse sizing for different query types.*
 
 ### Detailed Sizing Distribution
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+flowchart TB
+    subgraph "🔥 Query Size Distribution Heat Map"
+        subgraph "LABMLFRD_003 (2X-Large SOW)"
+            L003_XS["🔴 XS: 60%<br/>ALARMING"]
+            L003_S["🟡 S: 19%<br/>High"]
+            L003_M["🟢 M: 4%<br/>Normal"]
+            L003_L["🟢 L: 2%<br/>Normal"]
+            L003_XL["🟡 XL: 3%<br/>Medium"]
+            L003_2XL["🔴 2XL: 11%<br/>CRITICAL"]
+        end
+        
+        subgraph "FRAUMD_001 (X-Large Standard)"
+            F001_XS["🟡 XS: 62%<br/>High"]
+            F001_S["🟢 S: 25%<br/>Good"]
+            F001_M["🟢 M: 4%<br/>Normal"]
+            F001_L["🟢 L: 2%<br/>Normal"]
+            F001_XL["🟢 XL: 2%<br/>Low"]
+            F001_2XL["🟡 2XL: 6%<br/>Medium"]
+        end
+        
+        subgraph "LABMLFRD_002 (X-Large High Memory)"
+            L002_XS["🟢 XS: 77%<br/>Optimal"]
+            L002_S["🟢 S: 16%<br/>Good"]
+            L002_M["🟢 M: 1%<br/>Low"]
+            L002_L["🟢 L: 1%<br/>Low"]
+            L002_XL["🟢 XL: 1%<br/>Low"]
+            L002_2XL["🟢 2XL: 4%<br/>Low"]
+        end
+        
+        subgraph "LABMLFRD_001 (X-Small Standard)"
+            L001_XS["🟢 XS: 91%<br/>Perfect"]
+            L001_S["🟢 S: 8%<br/>Good"]
+            L001_M["🟢 M: 0%<br/>None"]
+            L001_L["🟢 L: 0%<br/>None"]
+            L001_XL["🟢 XL: 0%<br/>None"]
+            L001_2XL["🟢 2XL: 0%<br/>None"]
+        end
+    end
+    
+    classDef critical fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
+    classDef warning fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
+    classDef good fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
+    classDef optimal fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    
+    class L003_XS,L003_2XL critical
+    class L003_S,L003_XL,F001_XS,F001_2XL warning
+    class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL good
+    class L002_XS,L002_S,L002_M,L002_L,L002_XL,L002_2XL,L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL optimal
+```
+
+**🚨 Heat Map Legend:**
+- 🔴 **CRITICAL/ALARMING** (60%+ small queries on large warehouses, 10%+ 2XL queries)
+- 🟡 **WARNING/HIGH** (40-60% small queries, 5-10% 2XL queries)  
+- 🟢 **GOOD/OPTIMAL** (Appropriate distribution for warehouse size)
+
+**📊 Raw Distribution Table:**
+
 | **Warehouse** | **XS (<1GB)** | **S (1-20GB)** | **M (20-50GB)** | **L (50-100GB)** | **XL (100-250GB)** | **2XL (>250GB)** |
 |---------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
-| **LABMLFRD_003** | 60% | 19% | 4% | 2% | 3% | 11% |
-| **FRAUMD_001** | 62% | 25% | 4% | 2% | 2% | 6% |
-| **LABMLFRD_002** | 77% | 16% | 1% | 1% | 1% | 4% |
-| **LABMLFRD_001** | 91% | 8% | 0% | 0% | 0% | 0% |
+| **LABMLFRD_003** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
+| **FRAUMD_001** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
+| **LABMLFRD_002** | 🟢 77% | 🟢 16% | 🟢 1% | 🟢 1% | 🟢 1% | 🟢 4% |
+| **LABMLFRD_001** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
 
 ### Key Insights:
 - **LABMLFRD_003**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB)
@@ -221,6 +284,136 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 | 1-5 users | Single cluster | Not needed |
 | 5-15 users | Multi-cluster | 2-3 clusters |
 | 15+ users | Multi-cluster | 3-5 clusters |
+
+### 🌳 Warehouse Selection Decision Tree
+
+> **📄 For complete mermaid code and additional diagrams, see:** [`Warehouse_Selection_Decision_Tree.md`](./Warehouse_Selection_Decision_Tree.md)
+
+```mermaid
+flowchart TD
+    Start([🏁 Choose Warehouse]) --> Workload{What type of workload?}
+    
+    Workload --> SQL[📊 SQL Query<br/>Analytics]
+    Workload --> Snowpark[🐍 Python/Java<br/>Snowpark]
+    Workload --> Metadata[⚙️ Metadata Ops<br/>DDL/ALTER]
+    Workload --> Mixed[🔄 Mixed<br/>Workload]
+    
+    %% Snowpark Path
+    Snowpark --> MemNeeds{Memory intensive?}
+    MemNeeds -->|Yes| LargeSOW[🔴 Large+ SOW<br/>Memory 16X]
+    MemNeeds -->|No| MediumSOW[🟡 Medium+ SOW<br/>Standard]
+    
+    %% Metadata Path
+    Metadata --> XSmallStd[🟢 X-Small<br/>Standard]
+    
+    %% Mixed and SQL Paths
+    Mixed --> DataVol1{Data Volume<br/>Scanned?}
+    SQL --> DataVol2{How much data<br/>scanned?}
+    
+    %% Data Volume Decision Tree
+    DataVol1 --> Vol1[🟢 < 1GB:<br/>X-Small]
+    DataVol1 --> Vol2[🟡 1-20GB:<br/>Small/Medium]
+    DataVol1 --> Vol3[🟠 20-100GB:<br/>Medium/Large]
+    DataVol1 --> Vol4[🔴 > 100GB:<br/>Large+]
+    
+    DataVol2 --> Vol5[🟢 < 1GB:<br/>X-Small]
+    DataVol2 --> Vol6[🟡 1-20GB:<br/>Small/Medium]
+    DataVol2 --> Vol7[🟠 20-100GB:<br/>Medium/Large]
+    DataVol2 --> Vol8[🔴 > 100GB:<br/>Large+]
+    
+    %% Memory Decision for each volume
+    Vol1 --> Mem1{Memory<br/>intensive?}
+    Vol2 --> Mem2{Memory<br/>intensive?}
+    Vol3 --> Mem3{Memory<br/>intensive?}
+    Vol4 --> Mem4{Memory<br/>intensive?}
+    Vol5 --> Mem5{Memory<br/>intensive?}
+    Vol6 --> Mem6{Memory<br/>intensive?}
+    Vol7 --> Mem7{Memory<br/>intensive?}
+    Vol8 --> Mem8{Memory<br/>intensive?}
+    
+    %% Final Recommendations
+    Mem1 -->|No| XSmallStd1[✅ X-Small<br/>Standard]
+    Mem1 -->|Yes| XSmallHM1[🟡 X-Small<br/>High Memory]
+    Mem2 -->|No| SmallStd[✅ Small<br/>Standard]
+    Mem2 -->|Yes| SmallHM[🟡 Small<br/>High Memory]
+    Mem3 -->|No| MediumStd[✅ Medium<br/>Standard]
+    Mem3 -->|Yes| MediumHM[🟡 Medium<br/>High Memory]
+    Mem4 -->|No| LargeStd[✅ Large+<br/>Standard]
+    Mem4 -->|Yes| LargeHM[🔴 Large+<br/>High Memory]
+    
+    Mem5 -->|No| XSmallStd2[✅ X-Small<br/>Standard]
+    Mem5 -->|Yes| XSmallHM2[🟡 X-Small<br/>High Memory]
+    Mem6 -->|No| SmallStd2[✅ Small<br/>Standard]
+    Mem6 -->|Yes| SmallHM2[🟡 Small<br/>High Memory]
+    Mem7 -->|No| MediumStd2[✅ Medium<br/>Standard]
+    Mem7 -->|Yes| MediumHM2[🟡 Medium<br/>High Memory]
+    Mem8 -->|No| LargeStd2[✅ Large+<br/>Standard]
+    Mem8 -->|Yes| LargeHM2[🔴 Large+<br/>High Memory]
+    
+    %% Styling
+    classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
+    classDef warningNode fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
+    classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
+    classDef optimalNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    
+    class LargeSOW,LargeHM,LargeHM2 criticalNode
+    class MediumSOW,XSmallHM1,SmallHM,MediumHM,XSmallHM2,SmallHM2,MediumHM2 warningNode
+    class SmallStd,MediumStd,LargeStd,SmallStd2,MediumStd2,LargeStd2 goodNode
+    class XSmallStd,XSmallStd1,XSmallStd2 optimalNode
+```
+
+### 🎯 Concurrency Decision Branch
+
+```mermaid
+flowchart TD
+    Users{👥 How many<br/>concurrent users?} --> Few[🟢 1-5 Users]
+    Users --> Medium[🟡 5-15 Users]
+    Users --> Many[🟠 15-25 Users]
+    Users --> VeryMany[🔴 25+ Users]
+    
+    Few --> SingleCluster[✅ Single Cluster<br/>🔄 No Auto-Scaling<br/>💰 Cost Efficient]
+    Medium --> MultiCluster2[⚡ Multi-Cluster<br/>📊 2-3 Max Clusters<br/>🔄 Auto-Scale: On]
+    Many --> MultiCluster3[⚡ Multi-Cluster<br/>📊 3-5 Max Clusters<br/>🔄 Auto-Scale: Aggressive]
+    VeryMany --> MultiCluster5[⚡ Multi-Cluster<br/>📊 5+ Max Clusters<br/>💸 High Concurrency Mode]
+    
+    classDef lowConcurrency fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    classDef medConcurrency fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
+    classDef highConcurrency fill:#ff6b6b,stroke:#d63031,stroke-width:2px,color:#fff
+    
+    class Few,SingleCluster lowConcurrency
+    class Medium,Many,MultiCluster2,MultiCluster3 medConcurrency
+    class VeryMany,MultiCluster5 highConcurrency
+```
+
+### 🚨 FRAUMD Warehouse Specific Recommendations
+
+```mermaid
+flowchart TD
+    FRAUMD[🏢 FRAUMD Warehouses<br/>📊 Current Analysis<br/>⏱️ Last 2 Months] --> WH1[🔴 LABMLFRD_003<br/>2X-Large SOW<br/>💸 9,274 Credits]
+    FRAUMD --> WH2[🟡 FRAUMD_001<br/>X-Large Standard<br/>💰 2,855 Credits]
+    FRAUMD --> WH3[🟢 LABMLFRD_002<br/>X-Large High Memory<br/>💰 1,158 Credits]
+    FRAUMD --> WH4[✅ LABMLFRD_001<br/>X-Small Standard<br/>💚 20 Credits]
+    
+    WH1 --> Critical[🔴 CRITICAL ISSUE<br/>⚠️ 60% inappropriate workload<br/>📈 99% small queries on 2X-Large<br/>💸 300%+ cost inefficiency]
+    WH2 --> Optimize[🟡 OPTIMIZATION OPPORTUNITY<br/>📊 82% spare capacity<br/>⚡ Ready for more workload<br/>🎯 Perfect for redistribution]
+    WH3 --> Good[🟢 WELL CONFIGURED<br/>✅ 77% small queries (appropriate)<br/>⚡ Good utilization pattern<br/>🔧 Minor tuning needed]
+    WH4 --> Perfect[✅ PERFECTLY SIZED<br/>🎯 91% small queries<br/>💚 Optimal cost efficiency<br/>🏆 Best practice example]
+    
+    Critical --> Action1[📋 IMMEDIATE ACTIONS<br/>🔄 Move 100K+ SELECT queries<br/>🎯 Redirect to FRAUMD_001<br/>🐍 Keep only Snowpark ops<br/>📉 Downsize to Large SOW]
+    Optimize --> Action2[📋 ENHANCEMENT PLAN<br/>⬆️ Accept workload from 003<br/>⚡ Enable multi-cluster scaling<br/>📊 Monitor utilization closely<br/>🎯 Become primary standard WH]
+    Good --> Action3[📋 MINOR OPTIMIZATIONS<br/>⏰ Extend auto-suspend → 120s<br/>📊 Monitor spillage patterns<br/>✅ Continue current usage]
+    Perfect --> Action4[📋 MAINTENANCE MODE<br/>✅ No changes needed<br/>📊 Continue monitoring<br/>🏆 Use as best practice model]
+    
+    classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
+    classDef optimizeNode fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
+    classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
+    classDef perfectNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    
+    class WH1,Critical,Action1 criticalNode
+    class WH2,Optimize,Action2 optimizeNode
+    class WH3,Good,Action3 goodNode
+    class WH4,Perfect,Action4 perfectNode
+```
 
 ### Performance Monitoring KPIs
 
