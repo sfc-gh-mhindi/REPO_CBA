@@ -1,5 +1,19 @@
 # FRAUMD Warehouses: Usage Analysis & Optimization Guide
 
+## 🧭 Quick Navigation
+- [📋 Overview](#overview)
+- [📚 Definitions](#definitions)
+  - [Warehouse Type Definitions](#warehouse-type-definitions)
+  - [Query Sizing Band Definitions](#query-sizing-band-definitions)
+- [🏗️ Current Warehouse Setup](#current-warehouse-setup)
+- [📊 Current Usage Patterns](#current-usage-patterns)
+- [🚨 Critical Issues](#critical-issues)
+- [🎯 Optimization Plan](#optimization-plan)
+- [🌳 Best Practices Guide](#best-practices)
+- [📋 Appendix](#appendix)
+
+---
+
 ## 📋 Overview
 
 This comprehensive analysis examines the usage patterns, performance characteristics, and cost efficiency of four FRAUMD warehouses over the past two months. The primary objective is to identify optimization opportunities, resolve configuration mismatches, and provide actionable recommendations for improving warehouse utilization and reducing operational costs.
@@ -23,54 +37,33 @@ This comprehensive analysis examines the usage patterns, performance characteris
 
 ### Warehouse Type Definitions
 
-#### Standard Warehouses
-- **Purpose:** General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS)
-- **Compute:** Balanced CPU and memory allocation
-- **Best For:** Traditional data analytics, ETL operations, reporting
-- **Cost:** Standard compute pricing
-
-#### High Memory Warehouses  
-- **Purpose:** Memory-intensive operations requiring large working sets
-- **Compute:** Enhanced memory allocation (2x standard memory)
-- **Best For:** Complex joins, large aggregations, analytical functions
-- **Cost:** ~25% premium over standard
-
-#### Snowpark-Optimized Warehouses (SOW)
-- **Purpose:** Custom code execution (Python, Java, Scala)
-- **Compute:** Specialized for User-Defined Functions (UDFs) and stored procedures
-- **Memory Types:**
-  - **SOW_MEMORY_16X:** 16x memory allocation for intensive ML/analytics
-  - **Standard SOW:** Balanced for general Snowpark operations
-- **Best For:** Machine learning, data science, custom algorithms
-- **Cost:** 3-4x premium over standard warehouses
+| **Warehouse Type** | **Purpose** | **Compute Characteristics** | **Best For** | **Memory Options** |
+|-------------------|-------------|------------------------------|--------------|-------------------|
+| **Standard** | General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS) | Balanced CPU and memory allocation | Traditional data analytics, ETL operations, reporting | Standard allocation |
+| **High Memory** | Memory-intensive operations requiring large working sets | Enhanced memory allocation (2x standard memory) | Complex joins, large aggregations, analytical functions | 2x standard memory |
+| **Snowpark-Optimized (SOW)** | Custom code execution (Python, Java, Scala) | Specialized for User-Defined Functions (UDFs) and stored procedures | Machine learning, data science, custom algorithms | SOW_MEMORY_16X (16x allocation) or Standard SOW |
 
 ### Query Sizing Band Definitions
 
 **Query Size Classification:**
-- **Large Queries:** Operations that scan ≥ 1GB of data
-- **Small Queries:** Operations that scan < 1GB of data
+
+| **Classification** | **Data Volume Scanned** | **Description** |
+|-------------------|-------------------------|-----------------|
+| **Small Queries** | < 1GB | Lightweight operations, ideal for small warehouses |
+| **Large Queries** | ≥ 1GB | Data-intensive operations, require appropriately sized warehouses |
 
 **Detailed Sizing Bands:**
-- **XS (Extra Small):** Operations that scan < 1GB of data
-- **S (Small):** Operations that scan 1-20GB of data
-- **M (Medium):** Operations that scan 20-50GB of data
-- **L (Large):** Operations that scan 50-100GB of data
-- **XL (Extra Large):** Operations that scan 100-250GB of data
-- **2XL (Double Extra Large):** Operations that scan > 250GB of data
+
+| **Size Band** | **Full Name** | **Data Volume Range** | **Typical Use Cases** |
+|---------------|---------------|----------------------|----------------------|
+| **XS** | Extra Small | < 1GB | Metadata queries, small lookups, simple SELECT statements |
+| **S** | Small | 1-20GB | Standard reporting, moderate joins, filtered analytics |
+| **M** | Medium | 20-50GB | Complex analytics, multi-table joins, aggregations |
+| **L** | Large | 50-100GB | Large-scale ETL, comprehensive reporting, data processing |
+| **XL** | Extra Large | 100-250GB | Heavy analytics, large data transformations, ML feature engineering |
+| **2XL** | Double Extra Large | > 250GB | Massive data processing, full table scans, enterprise-wide analytics |
 
 *These bands help identify workload patterns and determine optimal warehouse sizing for different query types.*
-
----
-
-## Quick Navigation
-- [📋 Overview](#overview)
-- [📚 Definitions](#definitions)
-- [🏗️ Current Warehouse Setup](#current-warehouse-setup)
-- [📊 Current Usage Patterns](#current-usage-patterns)
-- [🚨 Critical Issues](#critical-issues)
-- [🎯 Optimization Plan](#optimization-plan)
-- [📚 Best Practices Guide](#best-practices)
-- [📋 Appendix](#appendix)
 
 ---
 
