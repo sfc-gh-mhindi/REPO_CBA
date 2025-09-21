@@ -15,7 +15,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 - **Warehouses Analyzed:** 4 FRAUMD warehouses  
 - **Key Finding:** LABMLFRD_003 warehouse misconfiguration identified  
 - **Primary Recommendation:** Workload redistribution and right-sizing  
-- **Expected Impact:** 60-70% efficiency improvement  
+[//]: # - **Expected Impact:** 60-70% efficiency improvement  
 
 ---
 
