@@ -1,14 +1,71 @@
 # FRAUMD Warehouses: Usage Analysis & Optimization Guide
 
-**Analysis Period:** Last 2 months  
-**Warehouses Analyzed:** 4 FRAUMD warehouses  
-**Key Finding:** LABMLFRD_003 warehouse misconfiguration identified  
-**Primary Recommendation:** Workload redistribution and right-sizing  
-**Expected Impact:** 60-70% efficiency improvement  
+## 📋 Overview
+
+This comprehensive analysis examines the usage patterns, performance characteristics, and cost efficiency of four FRAUMD warehouses over the past two months. The primary objective is to identify optimization opportunities, resolve configuration mismatches, and provide actionable recommendations for improving warehouse utilization and reducing operational costs.
+
+**Key Objectives:**
+- **Identify Misconfigurations:** Detect warehouses running inappropriate workloads for their size and type
+- **Optimize Cost Efficiency:** Recommend right-sizing and workload redistribution strategies
+- **Improve Performance:** Eliminate bottlenecks and enhance query execution patterns
+- **Establish Best Practices:** Provide decision frameworks for future warehouse selection and management
+
+**Analysis Scope:**
+- **Analysis Period:** Last 2 months  
+- **Warehouses Analyzed:** 4 FRAUMD warehouses  
+- **Key Finding:** LABMLFRD_003 warehouse misconfiguration identified  
+- **Primary Recommendation:** Workload redistribution and right-sizing  
+- **Expected Impact:** 60-70% efficiency improvement  
+
+---
+
+## 📚 Definitions
+
+### Warehouse Type Definitions
+
+#### Standard Warehouses
+- **Purpose:** General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS)
+- **Compute:** Balanced CPU and memory allocation
+- **Best For:** Traditional data analytics, ETL operations, reporting
+- **Cost:** Standard compute pricing
+
+#### High Memory Warehouses  
+- **Purpose:** Memory-intensive operations requiring large working sets
+- **Compute:** Enhanced memory allocation (2x standard memory)
+- **Best For:** Complex joins, large aggregations, analytical functions
+- **Cost:** ~25% premium over standard
+
+#### Snowpark-Optimized Warehouses (SOW)
+- **Purpose:** Custom code execution (Python, Java, Scala)
+- **Compute:** Specialized for User-Defined Functions (UDFs) and stored procedures
+- **Memory Types:**
+  - **SOW_MEMORY_16X:** 16x memory allocation for intensive ML/analytics
+  - **Standard SOW:** Balanced for general Snowpark operations
+- **Best For:** Machine learning, data science, custom algorithms
+- **Cost:** 3-4x premium over standard warehouses
+
+### Query Sizing Band Definitions
+
+**Query Size Classification:**
+- **Large Queries:** Operations that scan ≥ 1GB of data
+- **Small Queries:** Operations that scan < 1GB of data
+
+**Detailed Sizing Bands:**
+- **XS (Extra Small):** Operations that scan < 1GB of data
+- **S (Small):** Operations that scan 1-20GB of data
+- **M (Medium):** Operations that scan 20-50GB of data
+- **L (Large):** Operations that scan 50-100GB of data
+- **XL (Extra Large):** Operations that scan 100-250GB of data
+- **2XL (Double Extra Large):** Operations that scan > 250GB of data
+
+*These bands help identify workload patterns and determine optimal warehouse sizing for different query types.*
+
+---
 
 ## Quick Navigation
+- [📋 Overview](#overview)
+- [📚 Definitions](#definitions)
 - [🏗️ Current Warehouse Setup](#current-warehouse-setup)
-- [📚 Warehouse Types Definition](#warehouse-types-definition)
 - [📊 Current Usage Patterns](#current-usage-patterns)
 - [🚨 Critical Issues](#critical-issues)
 - [🎯 Optimization Plan](#optimization-plan)
@@ -38,41 +95,12 @@
 | **LABMLFRD_002** | 0.25 | 12.69% | 97.52% | Low-Medium |
 | **LABMLFRD_001** | 0.11 | 0.15% | 99.79% | Very Low |
 
----
 
-## 📚 Warehouse Types Definition
-
-### Standard Warehouses
-- **Purpose:** General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS)
-- **Compute:** Balanced CPU and memory allocation
-- **Best For:** Traditional data analytics, ETL operations, reporting
-- **Cost:** Standard compute pricing
-
-### High Memory Warehouses  
-- **Purpose:** Memory-intensive operations requiring large working sets
-- **Compute:** Enhanced memory allocation (2x standard memory)
-- **Best For:** Complex joins, large aggregations, analytical functions
-- **Cost:** ~25% premium over standard
-
-### Snowpark-Optimized Warehouses (SOW)
-- **Purpose:** Custom code execution (Python, Java, Scala)
-- **Compute:** Specialized for User-Defined Functions (UDFs) and stored procedures
-- **Memory Types:**
-  - **SOW_MEMORY_16X:** 16x memory allocation for intensive ML/analytics
-  - **Standard SOW:** Balanced for general Snowpark operations
-- **Best For:** Machine learning, data science, custom algorithms
-- **Cost:** 3-4x premium over standard warehouses
-
----
 
 ## 📊 Current Usage Patterns
 
 ### Warehouse Utilization Overview
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
-
-**Query Size Classification:**
-- **Large Queries:** Operations that scan ≥ 1GB of data
-- **Small Queries:** Operations that scan < 1GB of data
 
 | **Warehouse** | **Size** | **Query Count** | **Credits Used** | **Large Queries %** | **Small Queries %** |
 |---------------|----------|-----------------|------------------|--------------------|--------------------|
@@ -82,17 +110,7 @@
 | **LABMLFRD_001** | X-Small | 624 | 20 | 9% | 91% |
 
 ### Query Sizing Band Analysis
-*Based on data volume scanned per query, categorized into standardized sizing bands:*
-
-**Sizing Band Definitions:**
-- **XS (Extra Small):** Operations that scan < 1GB of data
-- **S (Small):** Operations that scan 1-20GB of data
-- **M (Medium):** Operations that scan 20-50GB of data
-- **L (Large):** Operations that scan 50-100GB of data
-- **XL (Extra Large):** Operations that scan 100-250GB of data
-- **2XL (Double Extra Large):** Operations that scan > 250GB of data
-
-*These bands help identify workload patterns and determine optimal warehouse sizing for different query types.*
+*Based on data volume scanned per query, categorized into standardized sizing bands (see [Definitions](#definitions) section for complete sizing band definitions).*
 
 ### Detailed Sizing Distribution
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*

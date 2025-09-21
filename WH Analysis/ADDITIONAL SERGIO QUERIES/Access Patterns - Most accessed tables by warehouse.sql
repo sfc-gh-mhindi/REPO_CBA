@@ -48,8 +48,8 @@ QH AS
        AND QH.BYTES_SCANNED > 0
 ),
 TABLE_ACCESS_DETAILS AS (
-    SELECT
-        f1.value:"objectName"::string AS table_name,
+SELECT
+    f1.value:"objectName"::string AS table_name,
         f1.value:"objectDomain"::string AS object_domain,
         QH.WAREHOUSE_NAME,
         QH.BYTES_SCANNED,
@@ -59,13 +59,13 @@ TABLE_ACCESS_DETAILS AS (
         QH.PARTITIONS_TOTAL,
         QH.EXECUTION_TIME,
         access_history.query_id
-    FROM
-        PST.SVCS.access_history,
+FROM
+    PST.SVCS.access_history,
         LATERAL FLATTEN(input => base_objects_accessed) f1,
         QH
-    WHERE
-        f1.value:"objectDomain"::string = 'Table'
-        AND QH.QUERY_ID = access_history.query_id
+WHERE
+    f1.value:"objectDomain"::string = 'Table'
+AND QH.QUERY_ID = access_history.query_id
         AND f1.value:"objectName"::string IS NOT NULL
 )
 
