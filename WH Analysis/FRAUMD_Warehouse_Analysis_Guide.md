@@ -77,12 +77,12 @@ This comprehensive analysis examines the usage patterns, performance characteris
 ### Current Concurrency Patterns
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
-| **Warehouse** | **Avg Running** | **Queue %** | **>=75% Cost Jobs** | **Peak Concurrency** |
-|---------------|-----------------|-------------|--------------------|--------------------|
-| **LABMLFRD_003 (2XL SOW)** | 1.00 | 8.22% | 97.39% | Always Active |
-| **FRAUMD_001 (XL STD)** | 0.18 | 0.98% | 87.45% | Low Concurrency |
-| **LABMLFRD_002 (XL SOW)** | 0.25 | 12.69% | 97.52% | Low-Medium |
-| **LABMLFRD_001 (XS STD)** | 0.11 | 0.15% | 99.79% | Very Low |
+| **Warehouse** | **Queue %** | **>=75% Cost Jobs** | **Peak Concurrency** |
+|---------------|-------------|--------------------|--------------------|
+| **LABMLFRD_003 (2XL SOW)** | 8.22% | 97.39% | Always Active |
+| **FRAUMD_001 (XL STD)** | 0.98% | 87.45% | Low Concurrency |
+| **LABMLFRD_002 (XL SOW)** | 12.69% | 97.52% | Low-Medium |
+| **LABMLFRD_001 (XS STD)** | 0.15% | 99.79% | Very Low |
 
 ### Current Usage Patterns
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
@@ -232,14 +232,13 @@ flowchart TB
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
 **FRAUMD_001 (XL STD) Capacity Analysis:**
-- **Current Avg Running:** 0.18 (only 18% utilized)
 - **Queue Time:** 0.98% (very low)
-- **Capacity Available:** ~82% unused capacity
+- **Capacity Available:** Significant unused capacity based on low queue times
 
 **Recommendation: Redistribute to FRAUMD_001 (XL STD)**
 
 **Rationale:**
-1. **FRAUMD_001 (XL STD) has significant spare capacity** (82% unused)
+1. **FRAUMD_001 (XL STD) has significant spare capacity** based on low queue times
 2. **Low queue times** (0.98%) indicate no concurrency pressure
 3. **Cost-effective:** Use existing resources vs creating new warehouse
 4. **Similar workload profiles:** Both handle mixed SELECT/CTAS operations
@@ -286,7 +285,7 @@ flowchart TB
 ```
 
 ### Expected Benefits:
-- **FRAUMD_001 (XL STD):** Increase utilization from 18% to ~60-70% (accepting from both SOW warehouses)
+- **FRAUMD_001 (XL STD):** Increase utilization significantly (accepting workloads from both SOW warehouses)
 - **LABMLFRD_003 (2XL SOW):** Right-size from 2X-Large to Large SOW
 - **LABMLFRD_002 (XL SOW):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
 - **Combined Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
