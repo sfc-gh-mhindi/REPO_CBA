@@ -129,10 +129,10 @@ flowchart TB
         subgraph "LABMLFRD_002 (X-Large High Memory)"
             L002_XS["🔴 XS: 77%<br/>CRITICAL"]
             L002_S["🟡 S: 16%<br/>High"]
-            L002_M["🟢 M: 1%<br/>Low"]
-            L002_L["🟢 L: 1%<br/>Low"]
-            L002_XL["🟢 XL: 1%<br/>Low"]
-            L002_2XL["🟢 2XL: 4%<br/>Low"]
+            L002_M["🟡 M: 1%<br/>UNDERUTILIZED"]
+            L002_L["🔴 L: 1%<br/>SEVERELY LOW"]
+            L002_XL["🔴 XL: 1%<br/>SEVERELY LOW"]
+            L002_2XL["🟡 2XL: 4%<br/>UNDERUTILIZED"]
         end
         
         subgraph "LABMLFRD_001 (X-Small Standard)"
@@ -147,19 +147,17 @@ flowchart TB
     
     classDef critical fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
     classDef warning fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
-    classDef good fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
-    classDef optimal fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    classDef good fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class L003_XS,L003_2XL,L002_XS critical
-    class L003_S,L003_XL,F001_XS,F001_2XL,L002_S warning
-    class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL,L002_M,L002_L,L002_XL,L002_2XL good
-    class L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL optimal
+    class L003_XS,L003_2XL,L002_XS,L002_L,L002_XL critical
+    class L003_S,L003_XL,F001_XS,F001_2XL,L002_S,L002_M,L002_2XL warning
+    class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL,L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL good
 ```
 
 **🚨 Heat Map Legend:**
-- 🔴 **CRITICAL/ALARMING** (60%+ small queries on X-Large+ warehouses, 10%+ 2XL queries)
-- 🟡 **WARNING/HIGH** (40-60% small queries on large warehouses, 5-10% 2XL queries)  
-- 🟢 **GOOD/OPTIMAL** (Appropriate distribution for warehouse size and type)
+- 🔴 **CRITICAL/ALARMING** (60%+ small queries on X-Large+ warehouses, OR <5% large queries on high-capacity warehouses)
+- 🟡 **WARNING/HIGH** (40-60% small queries on large warehouses, OR underutilized capacity for warehouse type)  
+- 🟢 **GOOD** (Acceptable distribution for warehouse size and type)
 
 **📊 Raw Distribution Table:**
 
@@ -167,12 +165,12 @@ flowchart TB
 |---------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
 | **LABMLFRD_003** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
 | **FRAUMD_001** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
-| **LABMLFRD_002** | 🔴 77% | 🟡 16% | 🟢 1% | 🟢 1% | 🟢 1% | 🟢 4% |
+| **LABMLFRD_002** | 🔴 77% | 🟡 16% | 🟡 1% | 🔴 1% | 🔴 1% | 🟡 4% |
 | **LABMLFRD_001** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
 
 ### Key Insights:
 - **LABMLFRD_003**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
-- **LABMLFRD_002**: **CRITICAL INEFFICIENCY** - 77% small queries on X-Large High Memory warehouse (93% total small+medium queries)
+- **LABMLFRD_002**: **CRITICAL INEFFICIENCY** - 77% small queries + severe underutilization (only 6% L/XL/2XL queries justify high memory)
 - **FRAUMD_001**: Moderate inefficiency with 62% small queries, but better balanced than other large warehouses
 - **LABMLFRD_001**: Perfect sizing with 91% small queries on X-Small - **OPTIMAL CONFIGURATION**
 
