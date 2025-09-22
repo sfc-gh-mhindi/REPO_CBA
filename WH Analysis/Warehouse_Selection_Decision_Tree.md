@@ -101,10 +101,10 @@ flowchart TD
 ### FRAUMD Specific Recommendations
 ```mermaid
 flowchart TD
-    FRAUMD[FRAUMD Warehouses<br/>Current Analysis] --> WH1[LABMLFRD_003<br/>2X-Large SOW]
-    FRAUMD --> WH2[FRAUMD_001<br/>X-Large Standard]
-    FRAUMD --> WH3[LABMLFRD_002<br/>X-Large SOW]
-    FRAUMD --> WH4[LABMLFRD_001<br/>X-Small Standard]
+    FRAUMD[FRAUMD Warehouses<br/>Current Analysis] --> WH1[LABMLFRD_003<br/>2XL SOW]
+    FRAUMD --> WH2[FRAUMD_001<br/>XL STD]
+    FRAUMD --> WH3[LABMLFRD_002<br/>XL SOW]
+    FRAUMD --> WH4[LABMLFRD_001<br/>XS STD]
     
     WH1 --> Critical[🔴 CRITICAL ISSUE<br/>99% inappropriate workload]
     WH2 --> Optimize[✅ OPTIMIZE<br/>82% spare capacity]
