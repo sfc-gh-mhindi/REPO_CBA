@@ -5,11 +5,10 @@
 - [📚 Definitions](#definitions)
   - [Warehouse Type Definitions](#warehouse-type-definitions)
   - [Query Sizing Band Definitions](#query-sizing-band-definitions)
-- [🏗️ Current Warehouse Setup](#current-warehouse-setup)
-- [📊 Current Usage Patterns](#current-usage-patterns)
-- [🚨 Critical Issues](#critical-issues)
-- [🎯 Optimization Plan](#optimization-plan)
-- [🌳 Best Practices Guide](#best-practices)
+- [🏗️ Current State Setup](#current-state-setup)
+- [📊 Findings](#findings)
+- [🎯 Recommendations](#recommendations)
+- [🌳 Warehouse Selection Guidelines](#warehouse-selection-guidelines)
 - [📋 Appendix](#appendix)
 
 ---
@@ -26,9 +25,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 
 **Analysis Scope:**
 - **Analysis Period:** Last 2 months  
-- **Warehouses Analyzed:** 4 FRAUMD warehouses  
-- **Key Finding:** LABMLFRD_003 warehouse misconfiguration identified  
-- **Primary Recommendation:** Workload redistribution and right-sizing  
+- **Warehouses Analyzed:** 4 FRAUMD warehouses
 
 ---
 
@@ -66,49 +63,49 @@ This comprehensive analysis examines the usage patterns, performance characteris
 
 ---
 
-## 🏗️ Current Warehouse Setup
+## 🏗️ Current State Setup
 
 *Source: `Fraud-Warehouse Setup Info.csv`*
 
-| **Warehouse** | **Size** | **Type** | **Max Clusters** | **Auto-Suspend** | **Server Count** | **Created** |
-|---------------|----------|----------|------------------|-------------------|------------------|-------------|
-| **LABMLFRD_003** | 2X-Large | **SOW_MEMORY_16X** | 1 | 600s | 32 | 2025-01-31 |
-| **FRAUMD_001** | X-Large | Standard | 2 | 300s | 16 | 2023-11-08 |
-| **LABMLFRD_002** | X-Large | High Memory | 2 | 30s | 16 | 2024-07-22 |
-| **LABMLFRD_001** | X-Small | Standard | 2 | 30s | 1 | 2024-05-27 |
+| **Warehouse** | **Size** | **Type** | **Max Clusters** | **Auto-Suspend** | **Created** |
+|---------------|----------|----------|------------------|-------------------|-------------|
+| **LABMLFRD_003 (SNOWPARK-OPTIMIZED)** | 2X-Large | **SOW_MEMORY_16X** | 1 | 600s | 2025-01-31 |
+| **FRAUMD_001 (STANDARD)** | X-Large | Standard | 2 | 300s | 2023-11-08 |
+| **LABMLFRD_002 (SNOWPARK-OPTIMIZED)** | X-Large | **SOW_MEMORY_16X** | 2 | 30s | 2024-07-22 |
+| **LABMLFRD_001 (STANDARD)** | X-Small | Standard | 2 | 30s | 2024-05-27 |
 
 ### Current Concurrency Patterns
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
 | **Warehouse** | **Avg Running** | **Queue %** | **>=75% Cost Jobs** | **Peak Concurrency** |
 |---------------|-----------------|-------------|--------------------|--------------------|
-| **LABMLFRD_003** | 1.00 | 8.22% | 97.39% | Always Active |
-| **FRAUMD_001** | 0.18 | 0.98% | 87.45% | Low Concurrency |
-| **LABMLFRD_002** | 0.25 | 12.69% | 97.52% | Low-Medium |
-| **LABMLFRD_001** | 0.11 | 0.15% | 99.79% | Very Low |
+| **LABMLFRD_003 (SNOWPARK-OPTIMIZED)** | 1.00 | 8.22% | 97.39% | Always Active |
+| **FRAUMD_001 (STANDARD)** | 0.18 | 0.98% | 87.45% | Low Concurrency |
+| **LABMLFRD_002 (SNOWPARK-OPTIMIZED)** | 0.25 | 12.69% | 97.52% | Low-Medium |
+| **LABMLFRD_001 (STANDARD)** | 0.11 | 0.15% | 99.79% | Very Low |
 
-
-
-## 📊 Current Usage Patterns
-
-### Warehouse Utilization Overview
+### Current Usage Patterns
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
 | **Warehouse** | **Size** | **Query Count** | **Credits Used** | **Large Queries %** | **Small Queries %** |
 |---------------|----------|-----------------|------------------|--------------------|--------------------|
-| **LABMLFRD_003** | 2X-Large | 2,998 | 9,274 | 40% | 60% |
-| **FRAUMD_001** | X-Large | 5,057 | 2,855 | 38% | 62% |
-| **LABMLFRD_002** | X-Large | 2,219 | 1,158 | 23% | 77% |
-| **LABMLFRD_001** | X-Small | 624 | 20 | 9% | 91% |
+| **LABMLFRD_003 (SNOWPARK-OPTIMIZED)** | 2X-Large | 2,998 | 9,274 | 40% | 60% |
+| **FRAUMD_001 (STANDARD)** | X-Large | 5,057 | 2,855 | 38% | 62% |
+| **LABMLFRD_002 (SNOWPARK-OPTIMIZED)** | X-Large | 2,219 | 1,158 | 23% | 77% |
+| **LABMLFRD_001 (STANDARD)** | X-Small | 624 | 20 | 9% | 91% |
 
-### Detailed Sizing Distribution
+---
+
+## 📊 Findings
+
+### Detailed Sizing Distribution Heat Map
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
 flowchart TB
     subgraph "🔥 Query Size Distribution Heat Map"
-        subgraph "LABMLFRD_003 (2X-Large SOW)"
+        subgraph "LABMLFRD_003 (2X-Large SNOWPARK-OPTIMIZED)"
             L003_XS["🔴 XS: 60%<br/>ALARMING"]
             L003_S["🟡 S: 19%<br/>High"]
             L003_M["🟢 M: 4%<br/>Normal"]
@@ -117,7 +114,7 @@ flowchart TB
             L003_2XL["🔴 2XL: 11%<br/>CRITICAL"]
         end
         
-        subgraph "FRAUMD_001 (X-Large Standard)"
+        subgraph "FRAUMD_001 (X-Large STANDARD)"
             F001_XS["🟡 XS: 62%<br/>High"]
             F001_S["🟢 S: 25%<br/>Good"]
             F001_M["🟢 M: 4%<br/>Normal"]
@@ -126,7 +123,7 @@ flowchart TB
             F001_2XL["🟡 2XL: 6%<br/>Medium"]
         end
         
-        subgraph "LABMLFRD_002 (X-Large High Memory)"
+        subgraph "LABMLFRD_002 (X-Large SNOWPARK-OPTIMIZED)"
             L002_XS["🔴 XS: 77%<br/>CRITICAL"]
             L002_S["🟡 S: 16%<br/>High"]
             L002_M["🟡 M: 1%<br/>UNDERUTILIZED"]
@@ -135,7 +132,7 @@ flowchart TB
             L002_2XL["🟡 2XL: 4%<br/>UNDERUTILIZED"]
         end
         
-        subgraph "LABMLFRD_001 (X-Small Standard)"
+        subgraph "LABMLFRD_001 (X-Small STANDARD)"
             L001_XS["🟢 XS: 91%<br/>Perfect"]
             L001_S["🟢 S: 8%<br/>Good"]
             L001_M["🟢 M: 0%<br/>None"]
@@ -163,22 +160,14 @@ flowchart TB
 
 | **Warehouse** | **XS (<1GB)** | **S (1-20GB)** | **M (20-50GB)** | **L (50-100GB)** | **XL (100-250GB)** | **2XL (>250GB)** |
 |---------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
-| **LABMLFRD_003** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
-| **FRAUMD_001** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
-| **LABMLFRD_002** | 🔴 77% | 🟡 16% | 🟡 1% | 🔴 1% | 🔴 1% | 🟡 4% |
-| **LABMLFRD_001** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
+| **LABMLFRD_003 (SNOWPARK-OPTIMIZED)** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
+| **FRAUMD_001 (STANDARD)** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
+| **LABMLFRD_002 (SNOWPARK-OPTIMIZED)** | 🔴 77% | 🟡 16% | 🟡 1% | 🔴 1% | 🔴 1% | 🟡 4% |
+| **LABMLFRD_001 (STANDARD)** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
 
-### Key Insights:
-- **LABMLFRD_003**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
-- **LABMLFRD_002**: **CRITICAL INEFFICIENCY** - 77% small queries + severe underutilization (only 6% L/XL/2XL queries justify high memory)
-- **FRAUMD_001**: Moderate inefficiency with 62% small queries, but better balanced than other large warehouses
-- **LABMLFRD_001**: Perfect sizing with 91% small queries on X-Small - **OPTIMAL CONFIGURATION**
+### 🚨 Critical Issues Identified
 
----
-
-## 🚨 Critical Issues
-
-### 🔴 Critical Issue #1: LABMLFRD_003 Misalignment
+#### 🔴 Critical Issue #1: LABMLFRD_003 (SNOWPARK-OPTIMIZED) Misalignment
 
 **The Problem:**
 - **Configuration:** 2X-Large SOW_MEMORY_16X (Snowpark Optimized)
@@ -197,24 +186,24 @@ flowchart TB
 - 19% scan 1-20GB (appropriate for Large warehouse)
 - Only 11% scan >250GB (justifying 2X-Large)
 
-### 🔴 Critical Issue #2: LABMLFRD_002 High Memory Waste
+#### 🔴 Critical Issue #2: LABMLFRD_002 (SNOWPARK-OPTIMIZED) Misalignment
 
 **The Problem:**
-- **Configuration:** X-Large High Memory (25% premium over standard)
-- **Reality:** 77% small queries (<1GB), 93% queries don't need high memory
+- **Configuration:** X-Large SOW_MEMORY_16X (Snowpark Optimized for ML/Python workloads)
+- **Reality:** 77% small queries (<1GB), 94% standard SQL operations
 
 **Usage Pattern Analysis:**
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 - 77% of queries scan <1GB (should use Small warehouse)
 - 16% scan 1-20GB (appropriate for Medium warehouse)
-- Only 7% scan >20GB (potentially justifying high memory)
+- Only 7% scan >20GB (potentially justifying X-Large sizing)
 
-**Memory Utilization Mismatch:**
-- **High Memory Purpose:** Complex joins, large aggregations requiring 2x memory
-- **Actual Usage:** Predominantly simple queries that don't benefit from extra memory
-- **Efficiency Loss:** ~70% of compute capacity wasted on inappropriate workloads
+**Snowpark Utilization Mismatch:**
+- **SOW Purpose:** Python/Java/Scala UDFs, ML algorithms, data science workloads
+- **Actual Usage:** Predominantly standard SQL queries that don't require Snowpark capabilities
+- **Efficiency Loss:** ~70% of specialized compute capacity wasted on inappropriate workloads
 
-### ⚠️ Secondary Issues
+#### ⚠️ Secondary Issues
 
 **Issue #3: Universal Cache Miss**
 *Source: `Fraud-Cache Efficiency Analysis.csv`*
@@ -223,51 +212,87 @@ flowchart TB
 
 **Issue #4: Spillage Patterns**
 *Source: `Fraud-Spillage analysis.csv`*
-- LABMLFRD_003: 2,860 local spills + 10 remote spills
-- FRAUMD_001: 5,292 local spills + 22 remote spills
+- LABMLFRD_003 (SNOWPARK-OPTIMIZED): 2,860 local spills + 10 remote spills
+- FRAUMD_001 (STANDARD): 5,292 local spills + 22 remote spills
+
+### Key Insights Summary:
+- **LABMLFRD_003 (SNOWPARK-OPTIMIZED)**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
+- **LABMLFRD_002 (SNOWPARK-OPTIMIZED)**: **CRITICAL MISALIGNMENT** - 77% small queries on Snowpark warehouse + severe underutilization (only 6% L/XL/2XL queries justify SOW)
+- **FRAUMD_001 (STANDARD)**: Moderate inefficiency with 62% small queries, but better balanced than other large warehouses
+- **LABMLFRD_001 (STANDARD)**: Perfect sizing with 91% small queries on X-Small - **OPTIMAL CONFIGURATION**
 
 ---
 
-## 🎯 Optimization Plan
+## 🎯 Recommendations
 
-### Priority 1: LABMLFRD_003 Workload Redistribution
+### Priority 1: LABMLFRD_003 (SNOWPARK-OPTIMIZED) Workload Redistribution
 
-**Analysis: Should we create new warehouse or redistribute to FRAUMD_001?**
+**Analysis: Should we create new warehouse or redistribute to FRAUMD_001 (STANDARD)?**
 
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
-**FRAUMD_001 Capacity Analysis:**
+**FRAUMD_001 (STANDARD) Capacity Analysis:**
 - **Current Avg Running:** 0.18 (only 18% utilized)
 - **Queue Time:** 0.98% (very low)
 - **Capacity Available:** ~82% unused capacity
 
-**Recommendation: Redistribute to FRAUMD_001**
+**Recommendation: Redistribute to FRAUMD_001 (STANDARD)**
 
 **Rationale:**
-1. **FRAUMD_001 has significant spare capacity** (82% unused)
+1. **FRAUMD_001 (STANDARD) has significant spare capacity** (82% unused)
 2. **Low queue times** (0.98%) indicate no concurrency pressure
 3. **Cost-effective:** Use existing resources vs creating new warehouse
 4. **Similar workload profiles:** Both handle mixed SELECT/CTAS operations
+5. **Partition Pruning Benefits:** Moving queries to appropriately-sized warehouse will improve partition pruning efficiency, as smaller warehouses are better optimized for targeted data access patterns
 
 **Implementation Plan:**
 
 ```sql
--- Phase 1: Migrate SELECT queries to FRAUMD_001
--- Target: 100,065 SELECT queries from LABMLFRD_003
+-- Phase 1: Migrate SELECT queries to FRAUMD_001 (STANDARD)
+-- Target: 100,065 SELECT queries from LABMLFRD_003 (SNOWPARK-OPTIMIZED)
+-- Benefit: Improved partition pruning on right-sized warehouse
 
--- Phase 2: Keep only Snowpark workloads on LABMLFRD_003
+-- Phase 2: Keep only Snowpark workloads on LABMLFRD_003 (SNOWPARK-OPTIMIZED)
 -- Downsize to Large SOW_MEMORY_16X for 139 CALL operations
 
 -- Phase 3: Monitor and adjust
--- Track FRAUMD_001 utilization and enable multi-cluster if needed
+-- Track FRAUMD_001 (STANDARD) utilization and enable multi-cluster if needed
+```
+
+### Priority 2: LABMLFRD_002 (SNOWPARK-OPTIMIZED) Workload Redistribution
+
+**Analysis: Similar Snowpark Misalignment Issue**
+
+**LABMLFRD_002 (SNOWPARK-OPTIMIZED) Current State:**
+- **Configuration:** X-Large SOW_MEMORY_16X 
+- **Usage:** 77% small queries (<1GB), 94% standard SQL operations
+- **Credits Used:** 1,158 (lower than LABMLFRD_003 but still significant waste)
+
+**Recommendation: Parallel Redistribution Strategy**
+
+**Implementation Plan for LABMLFRD_002 (SNOWPARK-OPTIMIZED):**
+
+```sql
+-- Phase 1: Migrate small queries from LABMLFRD_002 (SNOWPARK-OPTIMIZED) to FRAUMD_001 (STANDARD)
+-- Target: 77% of queries (predominantly SELECT operations)
+-- Benefit: Enhanced partition pruning efficiency on appropriately-sized standard warehouse
+
+-- Phase 2: Evaluate remaining workloads
+-- Determine if legitimate Snowpark workloads justify SOW configuration
+
+-- Phase 3: Consider downsizing or converting to Standard
+-- If minimal Snowpark usage, convert to X-Large Standard
+-- Optimize partition pruning by matching warehouse size to typical query patterns
 ```
 
 ### Expected Benefits:
-- **FRAUMD_001:** Increase utilization from 18% to ~45-50%
-- **LABMLFRD_003:** Right-size from 2X-Large to Large SOW
-- **Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage
+- **FRAUMD_001 (STANDARD):** Increase utilization from 18% to ~60-70% (accepting from both SOW warehouses)
+- **LABMLFRD_003 (SNOWPARK-OPTIMIZED):** Right-size from 2X-Large to Large SOW
+- **LABMLFRD_002 (SNOWPARK-OPTIMIZED):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
+- **Combined Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
+- **Partition Pruning Optimization:** Better query performance through warehouse-to-workload matching
 
-### Alternative: Multi-Cluster FRAUMD_001
+### Alternative: Multi-Cluster FRAUMD_001 (STANDARD)
 *If redistribution causes concurrency issues:*
 
 ```sql
@@ -277,34 +302,49 @@ SET AUTO_SCALE_MODE = 'STANDARD'
     MAX_CLUSTER_COUNT = 3;
 ```
 
+### Partition Pruning Optimization Strategy
+
+**Key Principle:** Match warehouse size to typical data scan patterns for optimal partition pruning
+
+**Current Issues:**
+- Large warehouses processing small queries bypass partition pruning benefits
+- Small data scans on oversized warehouses create resource waste
+- Partition pruning works best when warehouse size matches expected data volume
+
+**Optimization Approach:**
+1. **Route small queries (<1GB) to FRAUMD_001 (STANDARD)** - optimal partition pruning for targeted scans
+2. **Reserve SNOWPARK-OPTIMIZED warehouses for specialized workloads** - maintain partition efficiency for ML operations
+3. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
+
 ---
 
-## 📚 Best Practices Guide
+## 🌳 Warehouse Selection Guidelines
 
 ### Warehouse Selection Decision Matrix
 
 #### By Data Volume:
-| **Scan Size** | **Recommended Size** | **Rationale** |
-|---------------|---------------------|---------------|
-| < 1GB | X-Small/Small | Cost-effective for targeted queries |
-| 1-20GB | Medium/Large | Balanced performance and cost |
-| 50GB+ | Large/X-Large+ | Required for large data processing |
+| **Scan Size** | **Recommended Size** | **Warehouse Type** | **Rationale** |
+|---------------|---------------------|-------------------|---------------|
+| < 1GB | X-Small/Small | STANDARD | Cost-effective for targeted queries, optimal partition pruning |
+| 1-20GB | Medium/Large | STANDARD | Balanced performance and cost, efficient partition scanning |
+| 50GB+ | Large/X-Large+ | STANDARD/HIGH MEMORY | Required for large data processing, complex partition operations |
+| ML/Python Workloads | Medium+ | SNOWPARK-OPTIMIZED | Specialized compute for custom algorithms |
 
 #### By Query Type:
-| **Query Type** | **Warehouse Type** | **Size Guidance** |
-|----------------|-------------------|------------------|
-| Simple SELECT | Standard | Match data volume |
-| Complex JOINS | Standard/High Memory | Large+ recommended |
-| CTAS Operations | Standard | Large+ for performance |
-| **ML/Python/Java** | **Snowpark-Optimized** | Medium+ based on complexity |
-| Metadata (ALTER, DDL) | Any Standard | X-Small sufficient |
+| **Query Type** | **Warehouse Type** | **Size Guidance** | **Partition Considerations** |
+|----------------|-------------------|------------------|------------------------------|
+| Simple SELECT | STANDARD | Match data volume | Small warehouses optimize partition pruning |
+| Complex JOINS | STANDARD/High Memory | Large+ recommended | Balance partition pruning with join performance |
+| CTAS Operations | STANDARD | Large+ for performance | Consider target table partitioning strategy |
+| **ML/Python/Java** | **SNOWPARK-OPTIMIZED** | Medium+ based on complexity | Partition-aware ML algorithms benefit from right-sizing |
+| Metadata (ALTER, DDL) | STANDARD | X-Small sufficient | Minimal partition impact |
 
 #### By Concurrency:
-| **User Count** | **Configuration** | **Auto-Scaling** |
-|----------------|------------------|------------------|
-| 1-5 users | Single cluster | Not needed |
-| 5-15 users | Multi-cluster | 2-3 clusters |
-| 15+ users | Multi-cluster | 3-5 clusters |
+| **User Count** | **Configuration** | **Auto-Scaling** | **Partition Impact** |
+|----------------|------------------|------------------|----------------------|
+| 1-5 users | Single cluster | Not needed | Consistent partition pruning performance |
+| 5-15 users | Multi-cluster | 2-3 clusters | Balanced partition access across clusters |
+| 15+ users | Multi-cluster | 3-5 clusters | Distributed partition processing |
 
 ### 🌳 Warehouse Selection Decision Tree
 
@@ -325,22 +365,22 @@ flowchart TD
     MemNeeds -->|No| MediumSOW[🟡 Medium+ SOW<br/>Standard]
     
     %% Metadata Path
-    Metadata --> XSmallStd[🟢 X-Small<br/>Standard]
+    Metadata --> XSmallStd[🟢 X-Small<br/>STANDARD]
     
     %% Mixed and SQL Paths
     Mixed --> DataVol1{Data Volume<br/>Scanned?}
     SQL --> DataVol2{How much data<br/>scanned?}
     
     %% Data Volume Decision Tree
-    DataVol1 --> Vol1[🟢 < 1GB:<br/>X-Small]
-    DataVol1 --> Vol2[🟡 1-20GB:<br/>Small/Medium]
-    DataVol1 --> Vol3[🟠 20-100GB:<br/>Medium/Large]
-    DataVol1 --> Vol4[🔴 > 100GB:<br/>Large+]
+    DataVol1 --> Vol1[🟢 < 1GB:<br/>X-Small STANDARD]
+    DataVol1 --> Vol2[🟡 1-20GB:<br/>Small/Medium STANDARD]
+    DataVol1 --> Vol3[🟠 20-100GB:<br/>Medium/Large STANDARD]
+    DataVol1 --> Vol4[🔴 > 100GB:<br/>Large+ STANDARD]
     
-    DataVol2 --> Vol5[🟢 < 1GB:<br/>X-Small]
-    DataVol2 --> Vol6[🟡 1-20GB:<br/>Small/Medium]
-    DataVol2 --> Vol7[🟠 20-100GB:<br/>Medium/Large]
-    DataVol2 --> Vol8[🔴 > 100GB:<br/>Large+]
+    DataVol2 --> Vol5[🟢 < 1GB:<br/>X-Small STANDARD]
+    DataVol2 --> Vol6[🟡 1-20GB:<br/>Small/Medium STANDARD]
+    DataVol2 --> Vol7[🟠 20-100GB:<br/>Medium/Large STANDARD]
+    DataVol2 --> Vol8[🔴 > 100GB:<br/>Large+ STANDARD]
     
     %% Memory Decision for each volume
     Vol1 --> Mem1{Memory<br/>intensive?}
@@ -353,22 +393,22 @@ flowchart TD
     Vol8 --> Mem8{Memory<br/>intensive?}
     
     %% Final Recommendations
-    Mem1 -->|No| XSmallStd1[✅ X-Small<br/>Standard]
+    Mem1 -->|No| XSmallStd1[✅ X-Small<br/>STANDARD]
     Mem1 -->|Yes| XSmallHM1[🟡 X-Small<br/>High Memory]
-    Mem2 -->|No| SmallStd[✅ Small<br/>Standard]
+    Mem2 -->|No| SmallStd[✅ Small<br/>STANDARD]
     Mem2 -->|Yes| SmallHM[🟡 Small<br/>High Memory]
-    Mem3 -->|No| MediumStd[✅ Medium<br/>Standard]
+    Mem3 -->|No| MediumStd[✅ Medium<br/>STANDARD]
     Mem3 -->|Yes| MediumHM[🟡 Medium<br/>High Memory]
-    Mem4 -->|No| LargeStd[✅ Large+<br/>Standard]
+    Mem4 -->|No| LargeStd[✅ Large+<br/>STANDARD]
     Mem4 -->|Yes| LargeHM[🔴 Large+<br/>High Memory]
     
-    Mem5 -->|No| XSmallStd2[✅ X-Small<br/>Standard]
+    Mem5 -->|No| XSmallStd2[✅ X-Small<br/>STANDARD]
     Mem5 -->|Yes| XSmallHM2[🟡 X-Small<br/>High Memory]
-    Mem6 -->|No| SmallStd2[✅ Small<br/>Standard]
+    Mem6 -->|No| SmallStd2[✅ Small<br/>STANDARD]
     Mem6 -->|Yes| SmallHM2[🟡 Small<br/>High Memory]
-    Mem7 -->|No| MediumStd2[✅ Medium<br/>Standard]
+    Mem7 -->|No| MediumStd2[✅ Medium<br/>STANDARD]
     Mem7 -->|Yes| MediumHM2[🟡 Medium<br/>High Memory]
-    Mem8 -->|No| LargeStd2[✅ Large+<br/>Standard]
+    Mem8 -->|No| LargeStd2[✅ Large+<br/>STANDARD]
     Mem8 -->|Yes| LargeHM2[🔴 Large+<br/>High Memory]
     
     %% Styling
@@ -406,35 +446,6 @@ flowchart TD
     class VeryMany,MultiCluster5 highConcurrency
 ```
 
-### 🚨 FRAUMD Warehouse Specific Recommendations
-
-```mermaid
-flowchart TD
-    FRAUMD[🏢 FRAUMD Warehouses<br/>📊 Current Analysis<br/>⏱️ Last 2 Months] --> WH1[🔴 LABMLFRD_003<br/>2X-Large SOW<br/>💸 9,274 Credits]
-    FRAUMD --> WH2[🟡 FRAUMD_001<br/>X-Large Standard<br/>💰 2,855 Credits]
-    FRAUMD --> WH3[🟢 LABMLFRD_002<br/>X-Large High Memory<br/>💰 1,158 Credits]
-    FRAUMD --> WH4[✅ LABMLFRD_001<br/>X-Small Standard<br/>💚 20 Credits]
-    
-    WH1 --> Critical[🔴 CRITICAL ISSUE<br/>⚠️ 60% inappropriate workload<br/>📈 99% small queries on 2X-Large<br/>💸 300%+ cost inefficiency]
-    WH2 --> Optimize[🟡 OPTIMIZATION OPPORTUNITY<br/>📊 82% spare capacity<br/>⚡ Ready for more workload<br/>🎯 Perfect for redistribution]
-    WH3 --> Critical2[🔴 CRITICAL INEFFICIENCY<br/>⚠️ 77% small queries on X-Large HM<br/>💸 Significant over-provisioning<br/>📉 93% queries don't need high memory]
-    WH4 --> Perfect[✅ PERFECTLY SIZED<br/>🎯 91% small queries<br/>💚 Optimal cost efficiency<br/>🏆 Best practice example]
-    
-    Critical --> Action1[📋 IMMEDIATE ACTIONS<br/>🔄 Move 100K+ SELECT queries<br/>🎯 Redirect to FRAUMD_001<br/>🐍 Keep only Snowpark ops<br/>📉 Downsize to Large SOW]
-    Optimize --> Action2[📋 ENHANCEMENT PLAN<br/>⬆️ Accept workload from 003<br/>⚡ Enable multi-cluster scaling<br/>📊 Monitor utilization closely<br/>🎯 Become primary standard WH]
-    Critical2 --> Action3[📋 IMMEDIATE ACTIONS<br/>📉 Downsize to Medium Standard<br/>🔄 Migrate 77% small queries to FRAUMD_001<br/>🎯 Reserve for memory-intensive workloads only<br/>💰 Reduce high memory premium costs]
-    Perfect --> Action4[📋 MAINTENANCE MODE<br/>✅ No changes needed<br/>📊 Continue monitoring<br/>🏆 Use as best practice model]
-    
-    classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
-    classDef optimizeNode fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
-    classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
-    classDef perfectNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
-    
-    class WH1,Critical,Action1,WH3,Critical2,Action3 criticalNode
-    class WH2,Optimize,Action2 optimizeNode
-    class WH4,Perfect,Action4 perfectNode
-```
-
 ### Performance Monitoring KPIs
 
 **Key Metrics to Track:**
@@ -443,12 +454,13 @@ flowchart TD
 3. **Spillage Rate:** Maintain <1% of queries
 4. **Cache Hit Rate:** Achieve 40-60%
 5. **Credits per Query:** Monitor efficiency trends
+6. **Partition Pruning Efficiency:** Track scan reduction ratios
 
 ---
 
 ## 📋 Appendix
 
-### Appendix A: Small Queries on LABMLFRD_003 Warehouse
+### Appendix A: Small Queries on LABMLFRD_003 (SNOWPARK-OPTIMIZED) Warehouse
 
 *Source: `CBA CDL PROD - SMALL QUERIES ON WH_USR_PRD_P01_FRAUMD_LABMLFRD_003.csv`*
 
@@ -456,9 +468,9 @@ flowchart TD
 
 | **Query Type** | **Example** | **Data Scanned** | **Execution Time** | **Recommendation** |
 |----------------|-------------|------------------|-------------------|-------------------|
-| Simple SELECT | `SELECT * FROM LABMLFRD.CARD_TRAN_GROS_FRAU LIMIT 1` | 2.1MB | 1.3s | Move to X-Small |
-| Table Browse | `SELECT * FROM LABMLFRD.FDP_UV_DATA_DICT` | 88KB | 6.9mins* | Move to Small |
-| Aggregation | `SELECT TTS_TRAN_DATE_ALT, count(1) FROM ...` | 60MB | 2.9s | Move to Medium |
+| Simple SELECT | `SELECT * FROM LABMLFRD.CARD_TRAN_GROS_FRAU LIMIT 1` | 2.1MB | 1.3s | Move to X-Small STANDARD |
+| Table Browse | `SELECT * FROM LABMLFRD.FDP_UV_DATA_DICT` | 88KB | 6.9mins* | Move to Small STANDARD |
+| Aggregation | `SELECT TTS_TRAN_DATE_ALT, count(1) FROM ...` | 60MB | 2.9s | Move to Medium STANDARD |
 
 *Note: Long execution times often indicate resource contention on oversized warehouse*
 
@@ -468,9 +480,27 @@ flowchart TD
 - **Table browsing:** Metadata exploration on specialized ML warehouse
 
 **Cost Impact:**
-- These small queries represent 60% of LABMLFRD_003 workload
+- These small queries represent 60% of LABMLFRD_003 (SNOWPARK-OPTIMIZED) workload
 - Running on 4x more expensive warehouse than needed
 - Estimated efficiency gain: 70%+ by moving to appropriate warehouses
+
+### Appendix A2: Small Queries on LABMLFRD_002 (SNOWPARK-OPTIMIZED) Warehouse
+
+**Similar Pattern Analysis:**
+- **Configuration:** X-Large SOW_MEMORY_16X (Snowpark Optimized)
+- **Reality:** 77% small queries (<1GB) running on specialized warehouse
+- **Usage:** Predominantly standard SQL operations on Snowpark-optimized infrastructure
+
+**Key Findings:**
+- **Simple SELECT queries:** Using X-Large Snowpark for routine data retrieval
+- **Standard aggregations:** Basic SQL operations on premium Snowpark warehouse
+- **Metadata operations:** Non-ML workloads consuming Snowpark resources
+
+**Cost Impact:**
+- These small queries represent 77% of LABMLFRD_002 (SNOWPARK-OPTIMIZED) workload
+- Running on specialized Snowpark warehouse designed for ML/Python workloads
+- Estimated efficiency gain: 70%+ by moving standard SQL to appropriate warehouses
+- **Priority:** Second-highest optimization opportunity after LABMLFRD_003 (SNOWPARK-OPTIMIZED)
 
 ### Appendix B: Warehouse Configuration Scripts
 
@@ -484,17 +514,27 @@ WHERE name LIKE '%FRAUMD%';
 
 **Recommended Implementation:**
 ```sql
--- Phase 1: Enable multi-cluster on FRAUMD_001 (if needed)
+-- Phase 1: Enable multi-cluster on FRAUMD_001 (STANDARD) (if needed)
 ALTER WAREHOUSE WH_USR_PRD_P01_FRAUMD_001 
 SET AUTO_SCALE_MODE = 'STANDARD'
     MIN_CLUSTER_COUNT = 1
     MAX_CLUSTER_COUNT = 2;
 
--- Phase 2: Downsize LABMLFRD_003 for Snowpark-only
+-- Phase 2: Downsize LABMLFRD_003 (SNOWPARK-OPTIMIZED) for Snowpark-only
 ALTER WAREHOUSE WH_USR_PRD_P01_FRAUMD_LABMLFRD_003
 SET WAREHOUSE_SIZE = 'LARGE';
 
--- Phase 3: Optimize auto-suspend
+-- Phase 3: Evaluate LABMLFRD_002 (SNOWPARK-OPTIMIZED) Snowpark usage and downsize/convert
+-- Option A: If legitimate Snowpark workloads exist, downsize to Medium SOW
+ALTER WAREHOUSE WH_USR_PRD_P01_FRAUMD_LABMLFRD_002
+SET WAREHOUSE_SIZE = 'MEDIUM';
+
+-- Option B: If minimal Snowpark usage, convert to Standard X-Large
+-- ALTER WAREHOUSE WH_USR_PRD_P01_FRAUMD_LABMLFRD_002
+-- SET WAREHOUSE_TYPE = 'STANDARD'
+--     WAREHOUSE_SIZE = 'X-LARGE';
+
+-- Phase 4: Optimize auto-suspend for remaining warehouses
 ALTER WAREHOUSE WH_USR_PRD_P01_FRAUMD_LABMLFRD_002
 SET AUTO_SUSPEND = 120;
 ```
@@ -503,7 +543,7 @@ SET AUTO_SUSPEND = 120;
 
 **Weekly Utilization Check:**
 ```sql
-SELECT 
+SELECT  
     warehouse_name,
     COUNT(*) as query_count,
     AVG(execution_time) as avg_execution_ms,

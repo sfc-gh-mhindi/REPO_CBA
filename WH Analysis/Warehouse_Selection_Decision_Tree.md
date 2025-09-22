@@ -103,7 +103,7 @@ flowchart TD
 flowchart TD
     FRAUMD[FRAUMD Warehouses<br/>Current Analysis] --> WH1[LABMLFRD_003<br/>2X-Large SOW]
     FRAUMD --> WH2[FRAUMD_001<br/>X-Large Standard]
-    FRAUMD --> WH3[LABMLFRD_002<br/>X-Large High Memory]
+    FRAUMD --> WH3[LABMLFRD_002<br/>X-Large SOW]
     FRAUMD --> WH4[LABMLFRD_001<br/>X-Small Standard]
     
     WH1 --> Critical[🔴 CRITICAL ISSUE<br/>99% inappropriate workload]
