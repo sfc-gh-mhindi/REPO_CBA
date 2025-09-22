@@ -183,7 +183,6 @@ flowchart TB
 **The Problem:**
 - **Configuration:** 2X-Large SOW_MEMORY_16X (Snowpark Optimized)
 - **Reality:** 99.86% standard SQL operations
-- **Cost Impact:** Premium Snowpark pricing for inappropriate workload
 
 **Actual Usage Pattern:**
 *Source: `Fraud-Query complexity analysis.csv`*
@@ -203,7 +202,6 @@ flowchart TB
 **The Problem:**
 - **Configuration:** X-Large High Memory (25% premium over standard)
 - **Reality:** 77% small queries (<1GB), 93% queries don't need high memory
-- **Cost Impact:** Paying high memory premium for standard workloads
 
 **Usage Pattern Analysis:**
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
