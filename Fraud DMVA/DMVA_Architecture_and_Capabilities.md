@@ -8,70 +8,7 @@
 
 ## Architecture Flow Diagram
 
-### Mermaid Architecture Diagram
-
-```mermaid
-flowchart TD
-    %% Styling
-    classDef ec2Class fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#fff
-    classDef teradataClass fill:#00a651,stroke:#2d5016,stroke-width:2px,color:#fff
-    classDef s3Class fill:#569a31,stroke:#2d5016,stroke-width:2px,color:#fff
-    classDef snowflakeClass fill:#29b5e8,stroke:#1a73e8,stroke-width:2px,color:#fff
-    classDef glueClass fill:#fd79a8,stroke:#e84393,stroke-width:2px,color:#fff
-
-    %% Teradata Source (Standalone Left)
-    subgraph Teradata["🏢 Teradata<br/>Source data warehouse"]
-        TDTables["📊 Teradata Tables<br/>Enterprise production data"]
-        NOSProcess["📤 NOS Process<br/>Native object store export"]
-    end
-
-    %% EC2 DMVA Core
-    subgraph EC2["🔧 EC2 DMVA<br/>Orchestration platform"]
-        Dispatcher["📊 DMVA Dispatcher<br/>Task coordination"]
-        Workers["👷 Worker Pools<br/>Parallel processing"]
-    end
-
-    %% Snowflake Target Platform
-    subgraph SF["❄️ Snowflake<br/>Target data platform"]
-        DMVAMeta["🗂️ DMVA Metadata Tables<br/>System configuration"]
-        DMVARuntime["⚙️ DMVA Runtime Tables<br/>Operational workflows"]
-        IcebergCatalog["🧊 Iceberg Catalog Database<br/>External catalog integration"]
-    end
-
-    %% S3 Storage
-    subgraph S3["☁️ AWS S3<br/>Object storage"]
-        ParquetFiles["📦 Parquet Files<br/>Columnar data format"]
-    end
-
-    %% AWS Glue
-    GlueCatalog["🗄️ AWS Glue Catalog<br/>Metadata management"]
-
-    %% Data Flow
-    TDTables --> NOSProcess
-    NOSProcess --> ParquetFiles
-    
-    %% DMVA Control
-    Dispatcher --> TDTables
-    Dispatcher --> DMVAMeta
-    Workers --> NOSProcess
-    
-    %% Iceberg Integration
-    IcebergCatalog --> GlueCatalog
-    IcebergCatalog --> ParquetFiles
-    
-    %% Metadata Flow
-    DMVAMeta --> IcebergCatalog
-    DMVARuntime --> Workers
-
-    %% Apply Styles
-    class Teradata,TDTables,NOSProcess teradataClass
-    class EC2,Dispatcher,Workers ec2Class
-    class SF,DMVAMeta,DMVARuntime,IcebergCatalog snowflakeClass
-    class S3,ParquetFiles s3Class
-    class GlueCatalog glueClass
-```
-
----
+![CSEL Execution Flow](images/DMVA CBA.png)
 
 ## Prerequisites
 
