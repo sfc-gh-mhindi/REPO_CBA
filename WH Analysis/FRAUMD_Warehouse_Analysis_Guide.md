@@ -29,7 +29,6 @@ This comprehensive analysis examines the usage patterns, performance characteris
 - **Warehouses Analyzed:** 4 FRAUMD warehouses  
 - **Key Finding:** LABMLFRD_003 warehouse misconfiguration identified  
 - **Primary Recommendation:** Workload redistribution and right-sizing  
-[//]: # - **Expected Impact:** 60-70% efficiency improvement  
 
 ---
 
@@ -102,9 +101,6 @@ This comprehensive analysis examines the usage patterns, performance characteris
 | **LABMLFRD_002** | X-Large | 2,219 | 1,158 | 23% | 77% |
 | **LABMLFRD_001** | X-Small | 624 | 20 | 9% | 91% |
 
-### Query Sizing Band Analysis
-*Based on data volume scanned per query, categorized into standardized sizing bands (see [Definitions](#definitions) section for complete sizing band definitions).*
-
 ### Detailed Sizing Distribution
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
@@ -131,8 +127,8 @@ flowchart TB
         end
         
         subgraph "LABMLFRD_002 (X-Large High Memory)"
-            L002_XS["🟢 XS: 77%<br/>Optimal"]
-            L002_S["🟢 S: 16%<br/>Good"]
+            L002_XS["🔴 XS: 77%<br/>CRITICAL"]
+            L002_S["🟡 S: 16%<br/>High"]
             L002_M["🟢 M: 1%<br/>Low"]
             L002_L["🟢 L: 1%<br/>Low"]
             L002_XL["🟢 XL: 1%<br/>Low"]
@@ -154,16 +150,16 @@ flowchart TB
     classDef good fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
     classDef optimal fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class L003_XS,L003_2XL critical
-    class L003_S,L003_XL,F001_XS,F001_2XL warning
-    class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL good
-    class L002_XS,L002_S,L002_M,L002_L,L002_XL,L002_2XL,L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL optimal
+    class L003_XS,L003_2XL,L002_XS critical
+    class L003_S,L003_XL,F001_XS,F001_2XL,L002_S warning
+    class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL,L002_M,L002_L,L002_XL,L002_2XL good
+    class L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL optimal
 ```
 
 **🚨 Heat Map Legend:**
-- 🔴 **CRITICAL/ALARMING** (60%+ small queries on large warehouses, 10%+ 2XL queries)
-- 🟡 **WARNING/HIGH** (40-60% small queries, 5-10% 2XL queries)  
-- 🟢 **GOOD/OPTIMAL** (Appropriate distribution for warehouse size)
+- 🔴 **CRITICAL/ALARMING** (60%+ small queries on X-Large+ warehouses, 10%+ 2XL queries)
+- 🟡 **WARNING/HIGH** (40-60% small queries on large warehouses, 5-10% 2XL queries)  
+- 🟢 **GOOD/OPTIMAL** (Appropriate distribution for warehouse size and type)
 
 **📊 Raw Distribution Table:**
 
@@ -171,14 +167,14 @@ flowchart TB
 |---------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
 | **LABMLFRD_003** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
 | **FRAUMD_001** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
-| **LABMLFRD_002** | 🟢 77% | 🟢 16% | 🟢 1% | 🟢 1% | 🟢 1% | 🟢 4% |
+| **LABMLFRD_002** | 🔴 77% | 🟡 16% | 🟢 1% | 🟢 1% | 🟢 1% | 🟢 4% |
 | **LABMLFRD_001** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
 
 ### Key Insights:
-- **LABMLFRD_003**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB)
-- **FRAUMD_001**: Well-balanced distribution, good candidate for mixed workloads
-- **LABMLFRD_002**: Highly efficient with 77% small queries on X-Large
-- **LABMLFRD_001**: Perfect sizing with 91% small queries on X-Small
+- **LABMLFRD_003**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
+- **LABMLFRD_002**: **CRITICAL INEFFICIENCY** - 77% small queries on X-Large High Memory warehouse (93% total small+medium queries)
+- **FRAUMD_001**: Moderate inefficiency with 62% small queries, but better balanced than other large warehouses
+- **LABMLFRD_001**: Perfect sizing with 91% small queries on X-Small - **OPTIMAL CONFIGURATION**
 
 ---
 
@@ -204,14 +200,32 @@ flowchart TB
 - 19% scan 1-20GB (appropriate for Large warehouse)
 - Only 11% scan >250GB (justifying 2X-Large)
 
+### 🔴 Critical Issue #2: LABMLFRD_002 High Memory Waste
+
+**The Problem:**
+- **Configuration:** X-Large High Memory (25% premium over standard)
+- **Reality:** 77% small queries (<1GB), 93% queries don't need high memory
+- **Cost Impact:** Paying high memory premium for standard workloads
+
+**Usage Pattern Analysis:**
+*Source: `CBA CDL PROD - warehouse_utilisation.csv`*
+- 77% of queries scan <1GB (should use Small warehouse)
+- 16% scan 1-20GB (appropriate for Medium warehouse)
+- Only 7% scan >20GB (potentially justifying high memory)
+
+**Memory Utilization Mismatch:**
+- **High Memory Purpose:** Complex joins, large aggregations requiring 2x memory
+- **Actual Usage:** Predominantly simple queries that don't benefit from extra memory
+- **Efficiency Loss:** ~70% of compute capacity wasted on inappropriate workloads
+
 ### ⚠️ Secondary Issues
 
-**Issue #2: Universal Cache Miss**
+**Issue #3: Universal Cache Miss**
 *Source: `Fraud-Cache Efficiency Analysis.csv`*
 - 0% cache hit rate across all warehouses
 - Missed performance optimization opportunities
 
-**Issue #3: Spillage Patterns**
+**Issue #4: Spillage Patterns**
 *Source: `Fraud-Spillage analysis.csv`*
 - LABMLFRD_003: 2,860 local spills + 10 remote spills
 - FRAUMD_001: 5,292 local spills + 22 remote spills
@@ -407,12 +421,12 @@ flowchart TD
     
     WH1 --> Critical[🔴 CRITICAL ISSUE<br/>⚠️ 60% inappropriate workload<br/>📈 99% small queries on 2X-Large<br/>💸 300%+ cost inefficiency]
     WH2 --> Optimize[🟡 OPTIMIZATION OPPORTUNITY<br/>📊 82% spare capacity<br/>⚡ Ready for more workload<br/>🎯 Perfect for redistribution]
-    WH3 --> Good[🟢 WELL CONFIGURED<br/>✅ 77% small queries (appropriate)<br/>⚡ Good utilization pattern<br/>🔧 Minor tuning needed]
+    WH3 --> Critical2[🔴 CRITICAL INEFFICIENCY<br/>⚠️ 77% small queries on X-Large HM<br/>💸 Significant over-provisioning<br/>📉 93% queries don't need high memory]
     WH4 --> Perfect[✅ PERFECTLY SIZED<br/>🎯 91% small queries<br/>💚 Optimal cost efficiency<br/>🏆 Best practice example]
     
     Critical --> Action1[📋 IMMEDIATE ACTIONS<br/>🔄 Move 100K+ SELECT queries<br/>🎯 Redirect to FRAUMD_001<br/>🐍 Keep only Snowpark ops<br/>📉 Downsize to Large SOW]
     Optimize --> Action2[📋 ENHANCEMENT PLAN<br/>⬆️ Accept workload from 003<br/>⚡ Enable multi-cluster scaling<br/>📊 Monitor utilization closely<br/>🎯 Become primary standard WH]
-    Good --> Action3[📋 MINOR OPTIMIZATIONS<br/>⏰ Extend auto-suspend → 120s<br/>📊 Monitor spillage patterns<br/>✅ Continue current usage]
+    Critical2 --> Action3[📋 IMMEDIATE ACTIONS<br/>📉 Downsize to Medium Standard<br/>🔄 Migrate 77% small queries to FRAUMD_001<br/>🎯 Reserve for memory-intensive workloads only<br/>💰 Reduce high memory premium costs]
     Perfect --> Action4[📋 MAINTENANCE MODE<br/>✅ No changes needed<br/>📊 Continue monitoring<br/>🏆 Use as best practice model]
     
     classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
@@ -420,9 +434,8 @@ flowchart TD
     classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
     classDef perfectNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class WH1,Critical,Action1 criticalNode
+    class WH1,Critical,Action1,WH3,Critical2,Action3 criticalNode
     class WH2,Optimize,Action2 optimizeNode
-    class WH3,Good,Action3 goodNode
     class WH4,Perfect,Action4 perfectNode
 ```
 
