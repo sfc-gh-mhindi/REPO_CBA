@@ -36,7 +36,6 @@ This comprehensive analysis examines the usage patterns, performance characteris
 | **Warehouse Type** | **Purpose** | **Compute Characteristics** | **Best For** | **Memory Options** |
 |-------------------|-------------|------------------------------|--------------|-------------------|
 | **Standard** | General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS) | Balanced CPU and memory allocation | Traditional data analytics, ETL operations, reporting | Standard allocation |
-| **High Memory** | Memory-intensive operations requiring large working sets | Enhanced memory allocation (2x standard memory) | Complex joins, large aggregations, analytical functions | 2x standard memory |
 | **Snowpark-Optimized (SOW)** | Custom code execution (Python, Java, Scala) | Specialized for User-Defined Functions (UDFs) and stored procedures | Machine learning, data science, custom algorithms | SOW_MEMORY_16X (16x allocation) or Standard SOW |
 
 ### Query Sizing Band Definitions
@@ -326,14 +325,14 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 |---------------|---------------------|-------------------|---------------|
 | < 1GB | X-Small/Small | STANDARD | Cost-effective for targeted queries, optimal partition pruning |
 | 1-20GB | Medium/Large | STANDARD | Balanced performance and cost, efficient partition scanning |
-| 50GB+ | Large/X-Large+ | STANDARD/HIGH MEMORY | Required for large data processing, complex partition operations |
+| 50GB+ | Large/X-Large+ | STANDARD | Required for large data processing, complex partition operations |
 | ML/Python Workloads | Medium+ | SNOWPARK-OPTIMIZED | Specialized compute for custom algorithms |
 
 #### By Query Type:
 | **Query Type** | **Warehouse Type** | **Size Guidance** | **Partition Considerations** |
 |----------------|-------------------|------------------|------------------------------|
 | Simple SELECT | STANDARD | Match data volume | Small warehouses optimize partition pruning |
-| Complex JOINS | STANDARD/High Memory | Large+ recommended | Balance partition pruning with join performance |
+| Complex JOINS | STANDARD | Large+ recommended | Balance partition pruning with join performance |
 | CTAS Operations | STANDARD | Large+ for performance | Consider target table partitioning strategy |
 | **ML/Python/Java** | **SNOWPARK-OPTIMIZED** | Medium+ based on complexity | Partition-aware ML algorithms benefit from right-sizing |
 | Metadata (ALTER, DDL) | STANDARD | X-Small sufficient | Minimal partition impact |
@@ -381,34 +380,16 @@ flowchart TD
     DataVol2 --> Vol7[🟠 20-100GB:<br/>Medium/Large STANDARD]
     DataVol2 --> Vol8[🔴 > 100GB:<br/>Large+ STANDARD]
     
-    %% Memory Decision for each volume
-    Vol1 --> Mem1{Memory<br/>intensive?}
-    Vol2 --> Mem2{Memory<br/>intensive?}
-    Vol3 --> Mem3{Memory<br/>intensive?}
-    Vol4 --> Mem4{Memory<br/>intensive?}
-    Vol5 --> Mem5{Memory<br/>intensive?}
-    Vol6 --> Mem6{Memory<br/>intensive?}
-    Vol7 --> Mem7{Memory<br/>intensive?}
-    Vol8 --> Mem8{Memory<br/>intensive?}
+    %% Direct Recommendations (No High Memory Option)
+    Vol1 --> XSmallStd1[✅ X-Small<br/>STANDARD]
+    Vol2 --> SmallStd[✅ Small<br/>STANDARD]
+    Vol3 --> MediumStd[✅ Medium<br/>STANDARD]
+    Vol4 --> LargeStd[✅ Large+<br/>STANDARD]
     
-    %% Final Recommendations
-    Mem1 -->|No| XSmallStd1[✅ X-Small<br/>STANDARD]
-    Mem1 -->|Yes| XSmallHM1[🟡 X-Small<br/>High Memory]
-    Mem2 -->|No| SmallStd[✅ Small<br/>STANDARD]
-    Mem2 -->|Yes| SmallHM[🟡 Small<br/>High Memory]
-    Mem3 -->|No| MediumStd[✅ Medium<br/>STANDARD]
-    Mem3 -->|Yes| MediumHM[🟡 Medium<br/>High Memory]
-    Mem4 -->|No| LargeStd[✅ Large+<br/>STANDARD]
-    Mem4 -->|Yes| LargeHM[🔴 Large+<br/>High Memory]
-    
-    Mem5 -->|No| XSmallStd2[✅ X-Small<br/>STANDARD]
-    Mem5 -->|Yes| XSmallHM2[🟡 X-Small<br/>High Memory]
-    Mem6 -->|No| SmallStd2[✅ Small<br/>STANDARD]
-    Mem6 -->|Yes| SmallHM2[🟡 Small<br/>High Memory]
-    Mem7 -->|No| MediumStd2[✅ Medium<br/>STANDARD]
-    Mem7 -->|Yes| MediumHM2[🟡 Medium<br/>High Memory]
-    Mem8 -->|No| LargeStd2[✅ Large+<br/>STANDARD]
-    Mem8 -->|Yes| LargeHM2[🔴 Large+<br/>High Memory]
+    Vol5 --> XSmallStd2[✅ X-Small<br/>STANDARD]
+    Vol6 --> SmallStd2[✅ Small<br/>STANDARD]
+    Vol7 --> MediumStd2[✅ Medium<br/>STANDARD]
+    Vol8 --> LargeStd2[✅ Large+<br/>STANDARD]
     
     %% Styling
     classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
@@ -416,8 +397,8 @@ flowchart TD
     classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
     classDef optimalNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class LargeSOW,LargeHM,LargeHM2 criticalNode
-    class MediumSOW,XSmallHM1,SmallHM,MediumHM,XSmallHM2,SmallHM2,MediumHM2 warningNode
+    class LargeSOW criticalNode
+    class MediumSOW warningNode
     class SmallStd,MediumStd,LargeStd,SmallStd2,MediumStd2,LargeStd2 goodNode
     class XSmallStd,XSmallStd1,XSmallStd2 optimalNode
 ```
