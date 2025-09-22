@@ -8,7 +8,13 @@
 
 ## Architecture Flow Diagram
 
-![CSEL Execution Flow](images/DMVA CBA.png)
+### DMVA Architecture Diagram
+
+![DMVA Architecture](images/DMVA%20CBA.png)
+
+*Figure: DMVA (Data Migration Validation & Automation) Architecture showing the complete data flow from Teradata source systems through AWS S3 storage to Snowflake target platform, with AWS Glue catalog integration for Iceberg table management.*
+
+---
 
 ## Prerequisites
 
