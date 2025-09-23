@@ -80,7 +80,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#000000', 'primaryBorderColor': '#1e3a8a', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#f8fafc', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#1e40af,#7c3aed,#dc2626,#059669,#ea580c'}}}}%%
 xychart-beta
     title "Warehouse Queue Time Percentage"
-    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
     y-axis "Queue Time %" 0 --> 15
     bar "Queue %" [0.98, 0.15, 12.69, 8.22]
 ```
@@ -101,7 +101,7 @@ xychart-beta
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#000000', 'primaryBorderColor': '#1e3a8a', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#f8fafc', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#1e40af,#7c3aed,#dc2626,#059669,#ea580c,#0891b2'}}}}%%
 xychart-beta
     title "Query Size Band Distribution by Warehouse (%)"
-    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
     y-axis "Percentage" 0 --> 100
     bar "XS (<1GB)" [62, 91, 77, 60]
     bar "S (1-20GB)" [25, 8, 16, 19]
@@ -111,13 +111,21 @@ xychart-beta
     bar "2XL (>250GB)" [6, 0, 4, 11]
 ```
 
+**Legend:**
+- 🔵 **XS (<1GB)** - Extra Small queries, ideal for small warehouses
+- 🟣 **S (1-20GB)** - Small queries, suitable for small to medium warehouses  
+- 🔴 **M (20-50GB)** - Medium queries, appropriate for medium warehouses
+- 🟢 **L (50-100GB)** - Large queries, require large warehouses
+- 🟠 **XL (100-250GB)** - Extra Large queries, need extra large warehouses
+- 🔵 **2XL (>250GB)** - Double Extra Large queries, require 2X-Large warehouses
+
 #### Credits Usage by Warehouse
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#b91c1c', 'primaryTextColor': '#000000', 'primaryBorderColor': '#991b1b', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#fef2f2', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#b91c1c,#7c3aed,#1e40af,#059669'}}}}%%
 xychart-beta
     title "Credits Used by Warehouse"
-    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
     y-axis "Credits Used" 0 --> 10000
     bar "Credits" [2855, 20, 1158, 9274]
 ```
@@ -306,21 +314,17 @@ pie title Data Volume Distribution - LABMLFRD_002
 
 ## 🎯 Recommendations
 
-### Priority 1: LABMLFRD_003 (2XL SOW) Workload Redistribution
+### LABMLFRD_003 (2XL SOW) Workload Redistribution
 
 **Analysis: Should we create new warehouse or redistribute to FRAUMD_001 (XL STD)?**
 
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
-**FRAUMD_001 (XL STD) Capacity Analysis:**
-- **Queue Time:** 0.98% (very low)
-- **Capacity Available:** Significant unused capacity based on low queue times
-
 **Recommendation: Redistribute to FRAUMD_001 (XL STD)**
 
 **Rationale:**
-1. **FRAUMD_001 (XL STD) has significant spare capacity** based on low queue times
-2. **Low queue times** (0.98%) indicate no concurrency pressure
+1. **FRAUMD_001 (XL STD) has significant spare capacity** - Queue time of only 0.98% (very low) indicates significant unused capacity
+2. **Low concurrency pressure** - Minimal queue times indicate no resource contention
 3. **Cost-effective:** Use existing resources vs creating new warehouse
 4. **Similar workload profiles:** Both handle mixed SELECT/CTAS operations
 5. **Partition Pruning Benefits:** Moving queries to appropriately-sized warehouse will improve partition pruning efficiency, as smaller warehouses are better optimized for targeted data access patterns
@@ -339,16 +343,15 @@ pie title Data Volume Distribution - LABMLFRD_002
 -- Track FRAUMD_001 (XL STD) utilization and enable multi-cluster if needed
 ```
 
-### Priority 2: LABMLFRD_002 (XL SOW) Workload Redistribution
+### LABMLFRD_002 (XL SOW) Workload Redistribution
 
 **Analysis: Similar Snowpark Misalignment Issue**
 
-**LABMLFRD_002 (XL SOW) Current State:**
-- **Configuration:** X-Large SOW_MEMORY_16X 
-- **Usage:** 77% small queries (<1GB), 94% standard SQL operations
-- **Credits Used:** 1,158 (lower than LABMLFRD_003 but still significant waste)
-
 **Recommendation: Parallel Redistribution Strategy**
+
+**Rationale:**
+1. **Significant workload misalignment** - X-Large SOW_MEMORY_16X configuration with 77% small queries (<1GB) and 94% standard SQL operations
+2. **Substantial cost inefficiency** - 1,158 credits used (lower than LABMLFRD_003 but still significant waste for inappropriate workloads)
 
 **Implementation Plan for LABMLFRD_002 (XL SOW):**
 
@@ -365,14 +368,35 @@ pie title Data Volume Distribution - LABMLFRD_002
 -- Optimize partition pruning by matching warehouse size to typical query patterns
 ```
 
-### Expected Benefits:
-- **FRAUMD_001 (XL STD):** Increase utilization significantly (accepting workloads from both SOW warehouses)
-- **LABMLFRD_003 (2XL SOW):** Right-size from 2X-Large to Large SOW
-- **LABMLFRD_002 (XL SOW):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
-- **Combined Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
-- **Partition Pruning Optimization:** Better query performance through warehouse-to-workload matching
+### Gen 2 Standard Warehouse Strategy
 
-### Alternative: Multi-Cluster FRAUMD_001 (XL STD)
+**Recommendation: Implement Gen 2 Standard Warehouses for Performance-Critical Workloads**
+
+**Benefits:**
+- **Enhanced Performance:** Gen 2 warehouses provide up to 2x faster query execution for small to medium workloads
+- **Better Resource Utilization:** Improved compute efficiency reduces the need for oversized warehouses
+- **Cost-Effective Alternative:** Replace expensive SOW warehouses with appropriately-sized Gen 2 Standard warehouses for non-ML workloads
+- **Improved User Experience:** Faster response times for interactive dashboards and ad-hoc queries
+
+**Implementation Strategy:**
+```sql
+-- Create Gen 2 warehouses for performance-critical small workloads
+CREATE WAREHOUSE WH_FRAUMD_XS_GEN2 WITH 
+    WAREHOUSE_SIZE = 'X-SMALL' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 30;
+
+CREATE WAREHOUSE WH_FRAUMD_S_GEN2 WITH 
+    WAREHOUSE_SIZE = 'SMALL' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 60;
+```
+
+**Target Migration:**
+- **From LABMLFRD_003 (2XL SOW):** Migrate 60% XS queries to XS Gen 2, 19% S queries to S Gen 2
+- **From LABMLFRD_002 (XL SOW):** Migrate 77% XS queries to XS Gen 2, 16% S queries to S Gen 2
+
+**Note: Multi-Cluster FRAUMD_001 (XL STD)**
 *If redistribution causes concurrency issues:*
 
 ```sql
@@ -381,6 +405,25 @@ SET AUTO_SCALE_MODE = 'STANDARD'
     MIN_CLUSTER_COUNT = 1
     MAX_CLUSTER_COUNT = 3;
 ```
+
+### Expected Benefits
+
+**Standard Warehouse Optimization:**
+- **FRAUMD_001 (XL STD):** Increase utilization significantly (accepting workloads from both SOW warehouses)
+- **LABMLFRD_003 (2XL SOW):** Right-size from 2X-Large to Large SOW
+- **LABMLFRD_002 (XL SOW):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
+
+**Gen 2 Warehouse Benefits:**
+- **Performance Improvement:** 2x faster execution for small to medium queries
+- **Cost Optimization:** Replace oversized SOW warehouses with appropriately-sized Gen 2 Standard warehouses
+- **Enhanced User Experience:** Faster response times for interactive workloads
+- **Resource Efficiency:** Better compute utilization without over-provisioning
+
+**Combined Impact:**
+- **Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
+- **Partition Pruning Optimization:** Better query performance through warehouse-to-workload matching
+- **Operational Excellence:** Clear workload routing with performance and cost benefits
+- **Scalability:** Portfolio approach supports future growth and diverse workload patterns
 
 ### Partition Pruning Optimization Strategy
 
@@ -394,8 +437,7 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 **Optimization Approach:**
 1. **Route small queries (<1GB) to FRAUMD_001 (XL STD)** - optimal partition pruning for targeted scans
 2. **Reserve SNOWPARK-OPTIMIZED warehouses for specialized workloads** - maintain partition efficiency for ML operations
-3. **Consider Gen 2 Standard warehouses for performance-critical small workloads** - leverage enhanced performance capabilities to replace oversized SOW warehouses
-4. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
+3. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
 
 ---
 
