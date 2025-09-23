@@ -236,7 +236,7 @@ flowchart LR
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'pie1': '#3b82f6', 'pie2': '#10b981', 'pie3': '#f59e0b', 'pie4': '#ef4444', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
-pie title Query Type Distribution - LABMLFRD_003
+pie title Query Types - LABMLFRD_003
     "SELECT Queries" : 100065
     "ALTER Operations" : 3436
     "UNLOAD Operations" : 148
@@ -253,7 +253,7 @@ pie title Query Type Distribution - LABMLFRD_003
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'pie1': '#ef4444', 'pie2': '#f97316', 'pie3': '#10b981', 'pie4': '#3b82f6', 'pie5': '#8b5cf6', 'pie6': '#ec4899', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
-pie title Data Volume Distribution - LABMLFRD_003
+pie title Data Volume - LABMLFRD_003
     "XS (<1GB)" : 60
     "S (1-20GB)" : 19
     "M (20-50GB)" : 4
@@ -278,7 +278,7 @@ pie title Data Volume Distribution - LABMLFRD_003
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'pie1': '#ef4444', 'pie2': '#f97316', 'pie3': '#10b981', 'pie4': '#3b82f6', 'pie5': '#8b5cf6', 'pie6': '#ec4899', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
-pie title Data Volume Distribution - LABMLFRD_002
+pie title Data Volume - LABMLFRD_002
     "XS (<1GB)" : 77
     "S (1-20GB)" : 16
     "M (20-50GB)" : 1
