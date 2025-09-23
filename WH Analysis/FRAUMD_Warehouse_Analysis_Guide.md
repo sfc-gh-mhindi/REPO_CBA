@@ -67,12 +67,12 @@ This comprehensive analysis examines the usage patterns, performance characteris
 ### Current Concurrency Patterns
 *Source: `PS ACCOUNT REVIEW - AVG RUNNING 4 WHS.csv`*
 
-| **Warehouse** | **Queue %** | **>=75% Cost Jobs** | **Peak Concurrency** |
-|---------------|-------------|--------------------|--------------------|
-| **LABMLFRD_003 (2XL SOW)** | 8.22% | 97.39% | Always Active |
-| **FRAUMD_001 (XL STD)** | 0.98% | 87.45% | Low Concurrency |
-| **LABMLFRD_002 (XL SOW)** | 12.69% | 97.52% | Low-Medium |
-| **LABMLFRD_001 (XS STD)** | 0.15% | 99.79% | Very Low |
+| **Warehouse** | **Queue %** | **Peak Concurrency** |
+|---------------|-------------|--------------------|
+| **LABMLFRD_003 (2XL SOW)** | 8.22% | Always Active |
+| **FRAUMD_001 (XL STD)** | 0.98% | Low Concurrency |
+| **LABMLFRD_002 (XL SOW)** | 12.69% | Low-Medium |
+| **LABMLFRD_001 (XS STD)** | 0.15% | Very Low |
 
 #### Queue Time Distribution
 
