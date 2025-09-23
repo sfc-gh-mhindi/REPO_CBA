@@ -406,25 +406,6 @@ SET AUTO_SCALE_MODE = 'STANDARD'
     MAX_CLUSTER_COUNT = 3;
 ```
 
-### Expected Benefits
-
-**Standard Warehouse Optimization:**
-- **FRAUMD_001 (XL STD):** Increase utilization significantly (accepting workloads from both SOW warehouses)
-- **LABMLFRD_003 (2XL SOW):** Right-size from 2X-Large to Large SOW
-- **LABMLFRD_002 (XL SOW):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
-
-**Gen 2 Warehouse Benefits:**
-- **Performance Improvement:** 2x faster execution for small to medium queries
-- **Cost Optimization:** Replace oversized SOW warehouses with appropriately-sized Gen 2 Standard warehouses
-- **Enhanced User Experience:** Faster response times for interactive workloads
-- **Resource Efficiency:** Better compute utilization without over-provisioning
-
-**Combined Impact:**
-- **Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
-- **Partition Pruning Optimization:** Better query performance through warehouse-to-workload matching
-- **Operational Excellence:** Clear workload routing with performance and cost benefits
-- **Scalability:** Portfolio approach supports future growth and diverse workload patterns
-
 ### Partition Pruning Optimization Strategy
 
 **Key Principle:** Match warehouse size to typical data scan patterns for optimal partition pruning
@@ -438,6 +419,32 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 1. **Route small queries (<1GB) to FRAUMD_001 (XL STD)** - optimal partition pruning for targeted scans
 2. **Reserve SNOWPARK-OPTIMIZED warehouses for specialized workloads** - maintain partition efficiency for ML operations
 3. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
+
+### Expected Benefits
+
+**Standard Warehouse Optimization:**
+- **FRAUMD_001 (XL STD):** Increase utilization significantly (accepting workloads from both SOW warehouses)
+- **LABMLFRD_003 (2XL SOW):** Right-size from 2X-Large to Large SOW
+- **LABMLFRD_002 (XL SOW):** Right-size from X-Large SOW to Medium/Large Standard (if no legitimate Snowpark workloads)
+
+**Gen 2 Warehouse Benefits:**
+- **Performance Improvement:** 2x faster execution for small to medium queries
+- **Cost Optimization:** Replace oversized SOW warehouses with appropriately-sized Gen 2 Standard warehouses
+- **Enhanced User Experience:** Faster response times for interactive workloads
+- **Resource Efficiency:** Better compute utilization without over-provisioning
+
+**Partition Pruning Optimization Benefits:**
+- **Query Performance Enhancement:** Improved execution times through better warehouse-to-workload matching
+- **Resource Utilization:** Small warehouses excel at partition pruning for targeted data access
+- **Scan Efficiency:** Reduced data scanning through appropriate warehouse sizing
+- **Cost-Performance Balance:** Optimal resource allocation based on actual data volume requirements
+
+**Combined Impact:**
+- **Cost Efficiency:** Eliminate 70%+ of inappropriate Snowpark usage across both warehouses
+- **Performance Optimization:** Enhanced query execution through partition pruning and right-sizing
+- **Operational Excellence:** Clear workload routing with performance and cost benefits
+- **Scalability:** Portfolio approach supports future growth and diverse workload patterns
+- **Data Access Efficiency:** Better partition pruning and join filtering optimization
 
 ---
 
