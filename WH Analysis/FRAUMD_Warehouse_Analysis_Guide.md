@@ -38,16 +38,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 | **Standard** | General-purpose SQL operations (SELECT, INSERT, UPDATE, CTAS) | Balanced CPU and memory allocation | Traditional data analytics, ETL operations, reporting | Standard allocation |
 | **Snowpark-Optimized (SOW)** | Custom code execution (Python, Java, Scala) | Specialized for User-Defined Functions (UDFs) and stored procedures | Machine learning, data science, custom algorithms | SOW_MEMORY_16X (16x allocation) or Standard SOW |
 
-### Query Sizing Band Definitions
-
-**Query Size Classification:**
-
-| **Classification** | **Data Volume Scanned** | **Description** |
-|-------------------|-------------------------|-----------------|
-| **Small Queries** | < 1GB | Lightweight operations, ideal for small warehouses |
-| **Large Queries** | ≥ 1GB | Data-intensive operations, require appropriately sized warehouses |
-
-**Detailed Sizing Bands:**
+### Query Size Classification
 
 | **Size Band** | **Full Name** | **Data Volume Range** | **Typical Use Cases** |
 |---------------|---------------|----------------------|----------------------|
@@ -86,12 +77,12 @@ This comprehensive analysis examines the usage patterns, performance characteris
 ### Current Usage Patterns
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
-| **Warehouse** | **Size** | **Query Count** | **Credits Used** | **Large Queries %** | **Small Queries %** |
-|---------------|----------|-----------------|------------------|--------------------|--------------------|
-| **LABMLFRD_003 (2XL SOW)** | 2X-Large | 2,998 | 9,274 | 40% | 60% |
-| **FRAUMD_001 (XL STD)** | X-Large | 5,057 | 2,855 | 38% | 62% |
-| **LABMLFRD_002 (XL SOW)** | X-Large | 2,219 | 1,158 | 23% | 77% |
-| **LABMLFRD_001 (XS STD)** | X-Small | 624 | 20 | 9% | 91% |
+| **Warehouse** | **Size** | **Query Count** | **Credits Used** | **XS (<1GB)** | **S (1-20GB)** | **M (20-50GB)** | **L (50-100GB)** | **XL (100-250GB)** | **2XL (>250GB)** |
+|---------------|----------|-----------------|------------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
+| **FRAUMD_001 (XL STD)** | X-Large | 5,057 | 2,855 | 62% | 25% | 4% | 2% | 2% | 6% |
+| **LABMLFRD_001 (XS STD)** | X-Small | 624 | 20 | 91% | 8% | 0% | 0% | 0% | 0% |
+| **LABMLFRD_002 (XL SOW)** | X-Large | 2,219 | 1,158 | 77% | 16% | 1% | 1% | 1% | 4% |
+| **LABMLFRD_003 (2XL SOW)** | 2X-Large | 2,998 | 9,274 | 60% | 19% | 4% | 2% | 3% | 11% |
 
 ---
 
@@ -104,40 +95,44 @@ This comprehensive analysis examines the usage patterns, performance characteris
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
 flowchart TB
     subgraph "🔥 Query Size Distribution Heat Map"
-        subgraph "LABMLFRD_003 (2XL SOW)"
-            L003_XS["🔴 XS: 60%<br/>ALARMING"]
-            L003_S["🟡 S: 19%<br/>High"]
-            L003_M["🟢 M: 4%<br/>Normal"]
-            L003_L["🟢 L: 2%<br/>Normal"]
-            L003_XL["🟡 XL: 3%<br/>Medium"]
-            L003_2XL["🔴 2XL: 11%<br/>CRITICAL"]
+        subgraph "STANDARD WAREHOUSES"
+            subgraph "FRAUMD_001 (XL STD)"
+                F001_XS["🟡 XS: 62%<br/>High"]
+                F001_S["🟢 S: 25%<br/>Good"]
+                F001_M["🟢 M: 4%<br/>Normal"]
+                F001_L["🟢 L: 2%<br/>Normal"]
+                F001_XL["🟢 XL: 2%<br/>Low"]
+                F001_2XL["🟡 2XL: 6%<br/>Medium"]
+            end
+            
+            subgraph "LABMLFRD_001 (XS STD)"
+                L001_XS["🟢 XS: 91%<br/>Perfect"]
+                L001_S["🟢 S: 8%<br/>Good"]
+                L001_M["🟢 M: 0%<br/>None"]
+                L001_L["🟢 L: 0%<br/>None"]
+                L001_XL["🟢 XL: 0%<br/>None"]
+                L001_2XL["🟢 2XL: 0%<br/>None"]
+            end
         end
         
-        subgraph "FRAUMD_001 (XL STD)"
-            F001_XS["🟡 XS: 62%<br/>High"]
-            F001_S["🟢 S: 25%<br/>Good"]
-            F001_M["🟢 M: 4%<br/>Normal"]
-            F001_L["🟢 L: 2%<br/>Normal"]
-            F001_XL["🟢 XL: 2%<br/>Low"]
-            F001_2XL["🟡 2XL: 6%<br/>Medium"]
-        end
-        
-        subgraph "LABMLFRD_002 (XL SOW)"
-            L002_XS["🔴 XS: 77%<br/>CRITICAL"]
-            L002_S["🟡 S: 16%<br/>High"]
-            L002_M["🟡 M: 1%<br/>UNDERUTILIZED"]
-            L002_L["🔴 L: 1%<br/>SEVERELY LOW"]
-            L002_XL["🔴 XL: 1%<br/>SEVERELY LOW"]
-            L002_2XL["🟡 2XL: 4%<br/>UNDERUTILIZED"]
-        end
-        
-        subgraph "LABMLFRD_001 (XS STD)"
-            L001_XS["🟢 XS: 91%<br/>Perfect"]
-            L001_S["🟢 S: 8%<br/>Good"]
-            L001_M["🟢 M: 0%<br/>None"]
-            L001_L["🟢 L: 0%<br/>None"]
-            L001_XL["🟢 XL: 0%<br/>None"]
-            L001_2XL["🟢 2XL: 0%<br/>None"]
+        subgraph "SNOWPARK-OPTIMIZED WAREHOUSES"
+            subgraph "LABMLFRD_002 (XL SOW)"
+                L002_XS["🔴 XS: 77%<br/>CRITICAL"]
+                L002_S["🟡 S: 16%<br/>High"]
+                L002_M["🟡 M: 1%<br/>UNDERUTILIZED"]
+                L002_L["🔴 L: 1%<br/>SEVERELY LOW"]
+                L002_XL["🔴 XL: 1%<br/>SEVERELY LOW"]
+                L002_2XL["🟡 2XL: 4%<br/>UNDERUTILIZED"]
+            end
+            
+            subgraph "LABMLFRD_003 (2XL SOW)"
+                L003_XS["🔴 XS: 60%<br/>ALARMING"]
+                L003_S["🟡 S: 19%<br/>High"]
+                L003_M["🟢 M: 4%<br/>Normal"]
+                L003_L["🟢 L: 2%<br/>Normal"]
+                L003_XL["🟡 XL: 3%<br/>Medium"]
+                L003_2XL["🔴 2XL: 11%<br/>CRITICAL"]
+            end
         end
     end
     
@@ -159,18 +154,18 @@ flowchart TB
 
 | **Warehouse** | **XS (<1GB)** | **S (1-20GB)** | **M (20-50GB)** | **L (50-100GB)** | **XL (100-250GB)** | **2XL (>250GB)** |
 |---------------|---------------|----------------|-----------------|------------------|-------------------|------------------|
-| **LABMLFRD_003 (2XL SOW)** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
 | **FRAUMD_001 (XL STD)** | 🟡 62% | 🟢 25% | 🟢 4% | 🟢 2% | 🟢 2% | 🟡 6% |
-| **LABMLFRD_002 (XL SOW)** | 🔴 77% | 🟡 16% | 🟡 1% | 🔴 1% | 🔴 1% | 🟡 4% |
 | **LABMLFRD_001 (XS STD)** | 🟢 91% | 🟢 8% | 🟢 0% | 🟢 0% | 🟢 0% | 🟢 0% |
+| **LABMLFRD_002 (XL SOW)** | 🔴 77% | 🟡 16% | 🟡 1% | 🔴 1% | 🔴 1% | 🟡 4% |
+| **LABMLFRD_003 (2XL SOW)** | 🔴 60% | 🟡 19% | 🟢 4% | 🟢 2% | 🟡 3% | 🔴 11% |
 
-### 🚨 Critical Issues Identified
+### 🚨 Issues Identified
 
-#### 🔴 Critical Issue #1: LABMLFRD_003 (2XL SOW) Misalignment
+#### 🔴 Issue #1: LABMLFRD_003 (2XL SOW)
 
-**The Problem:**
-- **Configuration:** 2X-Large SOW_MEMORY_16X (Snowpark Optimized)
-- **Reality:** 99.86% standard SQL operations
+**Workload Analysis:**
+- **Warehouse Specification:** 2X-Large SOW_MEMORY_16X (Snowpark Optimized)
+- **Current Usage Pattern:** 99.86% standard SQL operations
 
 **Actual Usage Pattern:**
 *Source: `Fraud-Query complexity analysis.csv`*
@@ -179,23 +174,23 @@ flowchart TB
 - 148 UNLOAD operations (standard)
 - **Only 139 CALL operations** (legitimate Snowpark usage)
 
-**Sizing Mismatch:**
+**Data Volume Distribution:**
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
-- 60% of queries scan <1GB (should use Small/Medium warehouse)
-- 19% scan 1-20GB (appropriate for Large warehouse)
-- Only 11% scan >250GB (justifying 2X-Large)
+- 60% of queries scan <1GB (optimal for Small/Medium warehouse)
+- 19% scan 1-20GB (well-suited for Large warehouse)
+- Only 11% scan >250GB (requiring 2X-Large capacity)
 
-#### 🔴 Critical Issue #2: LABMLFRD_002 (XL SOW) Misalignment
+#### 🔴 Issue #2: LABMLFRD_002 (XL SOW)
 
-**The Problem:**
-- **Configuration:** X-Large SOW_MEMORY_16X (Snowpark Optimized for ML/Python workloads)
-- **Reality:** 77% small queries (<1GB), 94% standard SQL operations
+**Workload Analysis:**
+- **Warehouse Specification:** X-Large SOW_MEMORY_16X (Snowpark Optimized for ML/Python workloads)
+- **Current Usage Pattern:** 77% small queries (<1GB), 94% standard SQL operations
 
-**Usage Pattern Analysis:**
+**Data Volume Distribution:**
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
-- 77% of queries scan <1GB (should use Small warehouse)
-- 16% scan 1-20GB (appropriate for Medium warehouse)
-- Only 7% scan >20GB (potentially justifying X-Large sizing)
+- 77% of queries scan <1GB (optimal for Small warehouse)
+- 16% scan 1-20GB (well-suited for Medium warehouse)
+- Only 7% scan >20GB (requiring larger warehouse capacity)
 
 **Snowpark Utilization Mismatch:**
 - **SOW Purpose:** Python/Java/Scala UDFs, ML algorithms, data science workloads
@@ -215,10 +210,10 @@ flowchart TB
 - FRAUMD_001 (XL STD): 5,292 local spills + 22 remote spills
 
 ### Key Insights Summary:
-- **LABMLFRD_003 (2XL SOW)**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
-- **LABMLFRD_002 (XL SOW)**: **CRITICAL MISALIGNMENT** - 77% small queries on Snowpark warehouse + severe underutilization (only 6% L/XL/2XL queries justify SOW)
 - **FRAUMD_001 (XL STD)**: Moderate inefficiency with 62% small queries, but better balanced than other large warehouses
 - **LABMLFRD_001 (XS STD)**: Perfect sizing with 91% small queries on X-Small - **OPTIMAL CONFIGURATION**
+- **LABMLFRD_002 (XL SOW)**: **CRITICAL MISALIGNMENT** - 77% small queries on Snowpark warehouse + severe underutilization (only 6% L/XL/2XL queries justify SOW)
+- **LABMLFRD_003 (2XL SOW)**: Despite being 2X-Large Snowpark, 60% of queries are small (<1GB) - **CRITICAL MISALIGNMENT**
 
 ---
 
@@ -312,7 +307,86 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 **Optimization Approach:**
 1. **Route small queries (<1GB) to FRAUMD_001 (XL STD)** - optimal partition pruning for targeted scans
 2. **Reserve SNOWPARK-OPTIMIZED warehouses for specialized workloads** - maintain partition efficiency for ML operations
-3. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
+3. **Consider Gen 2 Standard warehouses for performance-critical small workloads** - leverage enhanced performance capabilities to replace oversized SOW warehouses
+4. **Monitor partition scan efficiency** - track improvements in query performance post-redistribution
+
+---
+
+## 📚 Query Optimization Fundamentals
+
+### Partition Pruning and Join Filtering
+
+Understanding these core concepts is essential for writing effective queries and selecting appropriate warehouses:
+
+#### 🎯 Static Partition Pruning
+
+**Definition:** Snowflake automatically eliminates irrelevant micro-partitions during query planning based on filter conditions.
+
+**How it works:**
+- Snowflake maintains metadata about min/max values for each micro-partition
+- When queries include WHERE clauses on clustered columns, irrelevant partitions are skipped
+- This happens at query compile time, before any data is scanned
+
+**Practical Example:**
+```sql
+-- Efficient: Static pruning eliminates partitions outside date range
+SELECT customer_id, amount 
+FROM transactions 
+WHERE transaction_date BETWEEN '2024-01-01' AND '2024-01-31';
+
+-- Less efficient: Function prevents static pruning
+SELECT customer_id, amount 
+FROM transactions 
+WHERE YEAR(transaction_date) = 2024;
+```
+
+**Best Practices:**
+- Use direct column comparisons in WHERE clauses
+- Avoid functions on filtered columns when possible
+- Consider clustering keys for frequently filtered columns
+- Smaller warehouses benefit more from effective pruning
+
+#### 🔗 Join Filtering (Bloom Filters)
+
+**Definition:** Snowflake uses bloom filters to eliminate rows early in join operations, reducing data movement between compute nodes.
+
+**How it works:**
+- During join processing, Snowflake creates bloom filters from the smaller table
+- These filters eliminate non-matching rows from the larger table before the actual join
+- Reduces network traffic and memory usage significantly
+
+**Practical Example:**
+```sql
+-- Efficient: Small dimension table creates effective bloom filter
+SELECT c.customer_name, SUM(o.amount)
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.region = 'APAC'
+GROUP BY c.customer_name;
+
+-- Consider: Large-to-large joins may benefit from different warehouse sizing
+SELECT a.*, b.*
+FROM large_table_a a
+JOIN large_table_b b ON a.key = b.key;
+```
+
+**Optimization Tips:**
+- Ensure smaller tables are on the "build" side of joins
+- Use appropriate data types for join keys
+- Consider warehouse sizing based on join complexity
+- Monitor query profiles for join spilling
+
+#### 💡 Warehouse Sizing Impact
+
+**Small Warehouses (XS, S):**
+- Excel with effective partition pruning
+- Optimal for targeted queries with good filtering
+- Limited memory may cause issues with large joins
+
+**Large Warehouses (L, XL, 2XL):**
+- Handle complex joins with bloom filtering efficiently
+- More memory available for join processing
+- May be oversized for well-pruned queries
 
 ---
 
@@ -333,7 +407,7 @@ SET AUTO_SCALE_MODE = 'STANDARD'
 |----------------|-------------------|------------------|------------------------------|
 | Simple SELECT | STANDARD | Match data volume | Small warehouses optimize partition pruning |
 | Complex JOINS | STANDARD | Large+ recommended | Balance partition pruning with join performance |
-| CTAS Operations | STANDARD | Large+ for performance | Consider target table partitioning strategy |
+| CTAS Operations | STANDARD | Match source data volume | Consider target table partitioning strategy and source data size |
 | **ML/Python/Java** | **SNOWPARK-OPTIMIZED** | Medium+ based on complexity | Partition-aware ML algorithms benefit from right-sizing |
 | Metadata (ALTER, DDL) | STANDARD | X-Small sufficient | Minimal partition impact |
 
@@ -435,6 +509,112 @@ flowchart TD
 4. **Cache Hit Rate:** Achieve 40-60%
 5. **Credits per Query:** Monitor efficiency trends
 6. **Partition Pruning Efficiency:** Track scan reduction ratios
+
+---
+
+## 🏗️ Warehouse Portfolio Strategy
+
+### Recommended Portfolio Architecture
+
+To optimize workload routing and performance, we recommend establishing a comprehensive warehouse portfolio:
+
+#### Standard Warehouse Portfolio
+
+| **Size** | **Purpose** | **Target Workloads** | **Concurrency** |
+|----------|-------------|----------------------|-----------------|
+| **XS Standard** | Metadata & Small Queries | DDL, simple lookups, <1GB scans | 1-3 users |
+| **S Standard** | Light Analytics | Basic reporting, 1-20GB scans | 3-8 users |
+| **M Standard** | Medium Analytics | Complex queries, 20-50GB scans | 5-12 users |
+| **L Standard** | Heavy Analytics | Large joins, 50-100GB scans | 8-15 users |
+
+#### Gen 2 Standard Warehouse Portfolio
+
+| **Size** | **Purpose** | **Target Workloads** | **Performance Benefit** |
+|----------|-------------|----------------------|------------------------|
+| **XS Gen 2** | Performance-Critical Small Queries | Time-sensitive lookups, real-time dashboards | 2x faster than standard XS |
+| **S Gen 2** | Interactive Analytics | User-facing reports, ad-hoc queries | Enhanced response times |
+| **M Gen 2** | Business Intelligence | Executive dashboards, complex analytics | Improved concurrency handling |
+| **L Gen 2** | Data Science Workloads | Feature engineering, model training prep | Faster iteration cycles |
+
+### Implementation Strategy
+
+#### Phase 1: Core Portfolio Setup
+```sql
+-- Create Standard Warehouse Portfolio
+CREATE WAREHOUSE WH_FRAUMD_XS_STD WITH 
+    WAREHOUSE_SIZE = 'X-SMALL' 
+    AUTO_SUSPEND = 60 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_S_STD WITH 
+    WAREHOUSE_SIZE = 'SMALL' 
+    AUTO_SUSPEND = 120 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_M_STD WITH 
+    WAREHOUSE_SIZE = 'MEDIUM' 
+    AUTO_SUSPEND = 300 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_L_STD WITH 
+    WAREHOUSE_SIZE = 'LARGE' 
+    AUTO_SUSPEND = 300 
+    AUTO_RESUME = TRUE;
+```
+
+#### Phase 2: Gen 2 Enhancement Portfolio
+```sql
+-- Create Gen 2 Standard Warehouses for Performance-Critical Workloads
+CREATE WAREHOUSE WH_FRAUMD_XS_GEN2 WITH 
+    WAREHOUSE_SIZE = 'X-SMALL' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 30 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_S_GEN2 WITH 
+    WAREHOUSE_SIZE = 'SMALL' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 60 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_M_GEN2 WITH 
+    WAREHOUSE_SIZE = 'MEDIUM' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 120 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_L_GEN2 WITH 
+    WAREHOUSE_SIZE = 'LARGE' 
+    WAREHOUSE_TYPE = 'STANDARD'  -- Gen 2 when available
+    AUTO_SUSPEND = 180 
+    AUTO_RESUME = TRUE;
+```
+
+### Workload Routing Strategy
+
+#### Routing Decision Matrix
+
+| **Query Characteristics** | **Recommended Warehouse** | **Rationale** |
+|---------------------------|---------------------------|---------------|
+| Metadata queries, DDL operations | XS Standard | Cost-effective, sufficient capacity |
+| Simple SELECT, <1GB scans | XS Gen 2 | Enhanced performance for frequent operations |
+| Basic reporting, 1-20GB scans | S Standard/Gen 2 | Balanced cost and performance |
+| Complex analytics, 20-50GB scans | M Standard/Gen 2 | Optimal for medium complexity |
+| Large joins, 50-100GB scans | L Standard/Gen 2 | Required memory and compute |
+| ML/Data Science (Python/Java) | Snowpark-Optimized | Specialized compute requirements |
+
+#### Migration Benefits
+
+**From Current State:**
+- **LABMLFRD_003 (2XL SOW):** Migrate 79% of workload to S/M Standard warehouses
+- **LABMLFRD_002 (XL SOW):** Migrate 93% of workload to XS/S Standard warehouses
+- **FRAUMD_001 (XL STD):** Redistribute 62% small queries to XS/S warehouses
+
+**Expected Outcomes:**
+- **Cost Optimization:** 40-60% reduction in compute costs
+- **Performance Improvement:** Better resource utilization and response times
+- **Operational Efficiency:** Clear workload routing guidelines
+- **Scalability:** Portfolio supports growth and diverse workload patterns
 
 ---
 
