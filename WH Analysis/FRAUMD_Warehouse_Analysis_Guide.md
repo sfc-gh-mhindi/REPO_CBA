@@ -77,7 +77,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 #### Queue Time Distribution
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1f2937', 'primaryBorderColor': '#1e40af', 'lineColor': '#374151', 'secondaryColor': '#10b981', 'tertiaryColor': '#f3f4f6', 'background': '#ffffff', 'fontFamily': 'Arial'}}}%%
 xychart-beta
     title "Warehouse Queue Time Percentage"
     x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
@@ -98,7 +98,7 @@ xychart-beta
 #### Query Size Distribution by Warehouse
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#1f2937', 'primaryBorderColor': '#1d4ed8', 'lineColor': '#374151', 'secondaryColor': '#10b981', 'tertiaryColor': '#f8fafc', 'background': '#ffffff', 'fontFamily': 'Arial'}}}%%
 xychart-beta
     title "Query Size Band Distribution by Warehouse (%)"
     x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
@@ -114,7 +114,7 @@ xychart-beta
 #### Credits Usage by Warehouse
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#dc2626', 'primaryTextColor': '#1f2937', 'primaryBorderColor': '#b91c1c', 'lineColor': '#374151', 'secondaryColor': '#16a34a', 'tertiaryColor': '#fef2f2', 'background': '#ffffff', 'fontFamily': 'Arial'}}}%%
 xychart-beta
     title "Credits Used by Warehouse"
     x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
@@ -130,7 +130,7 @@ xychart-beta
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1f2937', 'primaryTextColor': '#1f2937', 'primaryBorderColor': '#374151', 'lineColor': '#6b7280', 'secondaryColor': '#10b981', 'tertiaryColor': '#f9fafb', 'background': '#ffffff', 'clusterBkg': '#f3f4f6', 'clusterBorder': '#d1d5db'}}}%%
 flowchart LR
     subgraph "🔥 Query Size Distribution Heat Map"
         subgraph "STANDARD WAREHOUSES"
@@ -227,7 +227,7 @@ flowchart LR
 #### Query Type Distribution
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'pie1': '#3b82f6', 'pie2': '#10b981', 'pie3': '#f59e0b', 'pie4': '#ef4444', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
 pie title Query Type Distribution - LABMLFRD_003
     "SELECT Queries" : 100065
     "ALTER Operations" : 3436
@@ -244,7 +244,7 @@ pie title Query Type Distribution - LABMLFRD_003
 #### Data Volume Scanned Distribution
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'pie1': '#ef4444', 'pie2': '#f97316', 'pie3': '#10b981', 'pie4': '#3b82f6', 'pie5': '#8b5cf6', 'pie6': '#ec4899', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
 pie title Data Volume Distribution - LABMLFRD_003
     "XS (<1GB)" : 60
     "S (1-20GB)" : 19
@@ -269,7 +269,7 @@ pie title Data Volume Distribution - LABMLFRD_003
 #### Data Volume Scanned Distribution
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'pie1': '#ef4444', 'pie2': '#f97316', 'pie3': '#10b981', 'pie4': '#3b82f6', 'pie5': '#8b5cf6', 'pie6': '#ec4899', 'pieTitleTextColor': '#1f2937', 'pieSectionTextColor': '#1f2937', 'pieOuterStrokeColor': '#374151', 'background': '#ffffff'}}}%%
 pie title Data Volume Distribution - LABMLFRD_002
     "XS (<1GB)" : 77
     "S (1-20GB)" : 16
