@@ -74,6 +74,17 @@ This comprehensive analysis examines the usage patterns, performance characteris
 | **LABMLFRD_002 (XL SOW)** | 12.69% | 97.52% | Low-Medium |
 | **LABMLFRD_001 (XS STD)** | 0.15% | 99.79% | Very Low |
 
+#### Queue Time Distribution
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+xychart-beta
+    title "Warehouse Queue Time Percentage"
+    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    y-axis "Queue Time %" 0 --> 15
+    bar [0.98, 0.15, 12.69, 8.22]
+```
+
 ### Current Usage Patterns
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 
@@ -83,6 +94,33 @@ This comprehensive analysis examines the usage patterns, performance characteris
 | **LABMLFRD_001 (XS STD)** | X-Small | 624 | 20 | 91% | 8% | 0% | 0% | 0% | 0% |
 | **LABMLFRD_002 (XL SOW)** | X-Large | 2,219 | 1,158 | 77% | 16% | 1% | 1% | 1% | 4% |
 | **LABMLFRD_003 (2XL SOW)** | 2X-Large | 2,998 | 9,274 | 60% | 19% | 4% | 2% | 3% | 11% |
+
+#### Query Size Distribution by Warehouse
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+xychart-beta
+    title "Query Size Band Distribution by Warehouse (%)"
+    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    y-axis "Percentage" 0 --> 100
+    bar "XS (<1GB)" [62, 91, 77, 60]
+    bar "S (1-20GB)" [25, 8, 16, 19]
+    bar "M (20-50GB)" [4, 0, 1, 4]
+    bar "L (50-100GB)" [2, 0, 1, 2]
+    bar "XL (100-250GB)" [2, 0, 1, 3]
+    bar "2XL (>250GB)" [6, 0, 4, 11]
+```
+
+#### Credits Usage by Warehouse
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+xychart-beta
+    title "Credits Used by Warehouse"
+    x-axis [FRAUMD_001, LABMLFRD_001, LABMLFRD_002, LABMLFRD_003]
+    y-axis "Credits Used" 0 --> 10000
+    bar [2855, 20, 1158, 9274]
+```
 
 ---
 
@@ -186,11 +224,35 @@ flowchart LR
 - 148 UNLOAD operations (standard)
 - **Only 139 CALL operations** (legitimate Snowpark usage)
 
+#### Query Type Distribution
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+pie title Query Type Distribution - LABMLFRD_003
+    "SELECT Queries" : 100065
+    "ALTER Operations" : 3436
+    "UNLOAD Operations" : 148
+    "CALL Operations (Snowpark)" : 139
+```
+
 **Data Volume Distribution:**
 *Source: `CBA CDL PROD - warehouse_utilisation.csv`*
 - 60% of queries scan <1GB (optimal for Small/Medium warehouse)
 - 19% scan 1-20GB (well-suited for Large warehouse)
 - Only 11% scan >250GB (requiring 2X-Large capacity)
+
+#### Data Volume Scanned Distribution
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+pie title Data Volume Distribution - LABMLFRD_003
+    "XS (<1GB)" : 60
+    "S (1-20GB)" : 19
+    "M (20-50GB)" : 4
+    "L (50-100GB)" : 2
+    "XL (100-250GB)" : 3
+    "2XL (>250GB)" : 11
+```
 
 #### 🔴 Issue #2: LABMLFRD_002 (XL SOW)
 
@@ -203,6 +265,19 @@ flowchart LR
 - 77% of queries scan <1GB (optimal for Small warehouse)
 - 16% scan 1-20GB (well-suited for Medium warehouse)
 - Only 7% scan >20GB (requiring larger warehouse capacity)
+
+#### Data Volume Scanned Distribution
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
+pie title Data Volume Distribution - LABMLFRD_002
+    "XS (<1GB)" : 77
+    "S (1-20GB)" : 16
+    "M (20-50GB)" : 1
+    "L (50-100GB)" : 1
+    "XL (100-250GB)" : 1
+    "2XL (>250GB)" : 4
+```
 
 **Snowpark Utilization Mismatch:**
 - **SOW Purpose:** Python/Java/Scala UDFs, ML algorithms, data science workloads
