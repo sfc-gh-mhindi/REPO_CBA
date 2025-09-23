@@ -93,10 +93,14 @@ This comprehensive analysis examines the usage patterns, performance characteris
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff6b6b', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#fff'}}}%%
-flowchart TB
+flowchart LR
     subgraph "🔥 Query Size Distribution Heat Map"
         subgraph "STANDARD WAREHOUSES"
+            direction TB
+            STD_TITLE["📊 STANDARD WAREHOUSES"]
+            
             subgraph "FRAUMD_001 (XL STD)"
+                direction LR
                 F001_XS["🟡 XS: 62%<br/>High"]
                 F001_S["🟢 S: 25%<br/>Good"]
                 F001_M["🟢 M: 4%<br/>Normal"]
@@ -106,6 +110,7 @@ flowchart TB
             end
             
             subgraph "LABMLFRD_001 (XS STD)"
+                direction LR
                 L001_XS["🟢 XS: 91%<br/>Perfect"]
                 L001_S["🟢 S: 8%<br/>Good"]
                 L001_M["🟢 M: 0%<br/>None"]
@@ -116,7 +121,11 @@ flowchart TB
         end
         
         subgraph "SNOWPARK-OPTIMIZED WAREHOUSES"
+            direction TB
+            SOW_TITLE["🐍 SNOWPARK-OPTIMIZED WAREHOUSES"]
+            
             subgraph "LABMLFRD_002 (XL SOW)"
+                direction LR
                 L002_XS["🔴 XS: 77%<br/>CRITICAL"]
                 L002_S["🟡 S: 16%<br/>High"]
                 L002_M["🟡 M: 1%<br/>UNDERUTILIZED"]
@@ -126,6 +135,7 @@ flowchart TB
             end
             
             subgraph "LABMLFRD_003 (2XL SOW)"
+                direction LR
                 L003_XS["🔴 XS: 60%<br/>ALARMING"]
                 L003_S["🟡 S: 19%<br/>High"]
                 L003_M["🟢 M: 4%<br/>Normal"]
@@ -139,10 +149,12 @@ flowchart TB
     classDef critical fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
     classDef warning fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
     classDef good fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    classDef titleStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
     
     class L003_XS,L003_2XL,L002_XS,L002_L,L002_XL critical
     class L003_S,L003_XL,F001_XS,F001_2XL,L002_S,L002_M,L002_2XL warning
     class L003_M,L003_L,F001_S,F001_M,F001_L,F001_XL,L001_XS,L001_S,L001_M,L001_L,L001_XL,L001_2XL good
+    class STD_TITLE,SOW_TITLE titleStyle
 ```
 
 **🚨 Heat Map Legend:**
