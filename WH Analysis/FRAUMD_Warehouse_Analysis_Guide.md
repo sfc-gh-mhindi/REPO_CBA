@@ -80,7 +80,7 @@ This comprehensive analysis examines the usage patterns, performance characteris
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#000000', 'primaryBorderColor': '#1e3a8a', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#f8fafc', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#1e40af,#7c3aed,#dc2626,#059669,#ea580c'}}}}%%
 xychart-beta
     title "Warehouse Queue Time Percentage"
-    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
+    x-axis ["FRAUMD_001", "LABMLFRD_001", "LABMLFRD_002", "LABMLFRD_003"]
     y-axis "Queue Time %" 0 --> 15
     bar "Queue %" [0.98, 0.15, 12.69, 8.22]
 ```
@@ -101,7 +101,7 @@ xychart-beta
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#000000', 'primaryBorderColor': '#1e3a8a', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#f8fafc', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#1e40af,#7c3aed,#dc2626,#059669,#ea580c,#0891b2'}}}}%%
 xychart-beta
     title "Query Size Band Distribution by Warehouse (%)"
-    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
+    x-axis ["FRAUMD_001", "LABMLFRD_001", "LABMLFRD_002", "LABMLFRD_003"]
     y-axis "Percentage" 0 --> 100
     bar "XS (<1GB)" [62, 91, 77, 60]
     bar "S (1-20GB)" [25, 8, 16, 19]
@@ -125,7 +125,7 @@ xychart-beta
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#b91c1c', 'primaryTextColor': '#000000', 'primaryBorderColor': '#991b1b', 'lineColor': '#000000', 'secondaryColor': '#059669', 'tertiaryColor': '#fef2f2', 'background': '#ffffff', 'fontFamily': 'Arial', 'xyChart': {'backgroundColor': '#ffffff', 'titleColor': '#000000', 'xAxisTitleColor': '#000000', 'xAxisLabelColor': '#000000', 'yAxisTitleColor': '#000000', 'yAxisLabelColor': '#000000', 'plotColorPalette': '#b91c1c,#7c3aed,#1e40af,#059669'}}}}%%
 xychart-beta
     title "Credits Used by Warehouse"
-    x-axis ["FRAUMD_001 (XL STD)", "LABMLFRD_001 (XS STD)", "LABMLFRD_002 (XL SOW)", "LABMLFRD_003 (2XL SOW)"]
+    x-axis ["FRAUMD_001", "LABMLFRD_001", "LABMLFRD_002", "LABMLFRD_003"]
     y-axis "Credits Used" 0 --> 10000
     bar "Credits" [2855, 20, 1158, 9274]
 ```
