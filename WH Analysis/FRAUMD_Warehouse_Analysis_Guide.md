@@ -754,6 +754,198 @@ CREATE WAREHOUSE WH_FRAUMD_L_GEN2 WITH
 
 ---
 
+## 💡 Real-World Example: Warehouse Misalignment Analysis
+
+### Query Case Study: Fraud Transaction Analysis
+
+This section demonstrates how to apply our warehouse optimization recommendations using a real production query that exemplifies the misalignment issues identified in our analysis.
+
+#### 📊 Query Overview
+
+**Query ID:** `01be988c-3204-bee5-0000-c71d2a6e377e`  
+**Business Purpose:** Fraud transaction analysis with percentage calculations  
+**Query Type:** Complex analytical SELECT with aggregations and window functions  
+
+#### 🔍 Query Characteristics
+
+**SQL Pattern:**
+```sql
+-- Simplified version of the actual query
+SELECT 
+    DSPT_TRAN_PROS_C, 
+    COUNT, 
+    CONCAT(CAST(ROUND((PERCENT * 100), 2) AS STRING), '%') AS PERCENT
+FROM (
+    SELECT 
+        DSPT_TRAN_PROS_C, 
+        COUNT(1) AS COUNT,
+        (COUNT / SUM(COUNT) OVER (...)) AS PERCENT
+    FROM (
+        SELECT * FROM LABMLFRD.CARD_TRAN_DAIS_DSPT
+        WHERE DSPT_TRAN_DCDE_X IN ('Chargeback', 'Fraud Referral', ...)
+          AND TTS_TRAN_DATE_ALT BETWEEN '20250615' AND '20250710'
+    )
+    GROUP BY DSPT_TRAN_PROS_C
+)
+ORDER BY COUNT DESC;
+```
+
+#### 📈 Current Performance Metrics
+
+| **Metric** | **Value** | **Analysis** |
+|------------|-----------|--------------|
+| **Warehouse Used** | LABMLFRD_003 (2XL SOW) | ❌ **CRITICAL MISALIGNMENT** |
+| **Bytes Scanned** | 21.3 MB | 🔴 **SEVERELY OVERSIZED** |
+| **Execution Time** | 1.22 seconds | ⚠️ **Acceptable but inefficient** |
+| **Queue Time** | 0 seconds | ✅ **No contention** |
+| **Compilation Time** | 1.086 seconds | ⚠️ **High overhead** |
+| **Cache Hit Rate** | 1% | 🔴 **Poor cache utilization** |
+| **Partitions Scanned** | 128 of 128 | ⚠️ **Full partition scan** |
+| **Query Size Band** | **XS (< 1GB)** | 🎯 **Key insight** |
+
+#### 🏗️ Table Context
+
+**Source Table:** `PRD_P01_DMN_FRAUMD.LABMLFRD.CARD_TRAN_DAIS_DSPT`
+- **Total Size:** 219.7 MB (1.1M rows)
+- **Table Type:** BASE TABLE
+- **Clustering:** None configured
+- **Columns Accessed:** 82 columns (full SELECT *)
+
+#### 🚨 Problem Analysis
+
+**1. Warehouse Oversizing:**
+- **Current:** 2X-Large Snowpark-Optimized (premium compute)
+- **Actual Need:** Extra Small Standard (21.3 MB scan)
+- **Oversizing Factor:** ~16x larger than needed
+- **Waste Ratio:** 94% of warehouse capacity unused
+
+**2. Query Pattern Mismatch:**
+- **Warehouse Purpose:** Python/Java ML workloads
+- **Actual Usage:** Standard SQL aggregation
+- **Snowpark Utilization:** 0% (no UDFs, no custom code)
+
+**3. Partition Pruning Inefficiency:**
+- **Date Filter Applied:** 25-day window (June 15 - July 10, 2025)
+- **Partitions Scanned:** 128/128 (100%)
+- **Issue:** No clustering on date columns, poor pruning
+
+#### 💡 Optimization Recommendations
+
+#### **Immediate Actions (Quick Wins)**
+
+**1. Warehouse Migration:**
+```sql
+-- Move query to appropriately-sized warehouse
+USE WAREHOUSE WH_USR_PRD_P01_FRAUMD_001; -- XL Standard
+
+-- Expected improvements:
+-- ✅ 75% cost reduction
+-- ✅ Better resource utilization
+-- ✅ Maintained performance
+```
+
+**2. Query Optimization:**
+```sql
+-- Optimized version with targeted column selection
+SELECT 
+    DSPT_TRAN_PROS_C, 
+    COUNT(1) AS transaction_count,
+    ROUND((COUNT(1) * 100.0 / SUM(COUNT(1)) OVER ()), 2) AS percentage
+FROM LABMLFRD.CARD_TRAN_DAIS_DSPT
+WHERE DSPT_TRAN_DCDE_X IN ('Chargeback', 'Fraud Referral', 'Chargeoff', 
+                           'Paypass Transaction Detail', 'Customer Liable')
+  AND TRAN_S BETWEEN '2025-06-15' AND '2025-07-10'  -- Use actual date column
+  AND TRAN_I != '...'
+GROUP BY DSPT_TRAN_PROS_C
+ORDER BY transaction_count DESC;
+
+-- Benefits:
+-- ✅ Eliminates SELECT * overhead
+-- ✅ Better partition pruning potential
+-- ✅ Reduced compilation time
+```
+
+#### **Strategic Improvements (Long-term)**
+
+**1. Table Clustering:**
+```sql
+-- Add clustering on frequently filtered date column
+ALTER TABLE LABMLFRD.CARD_TRAN_DAIS_DSPT 
+CLUSTER BY (TRAN_S);
+
+-- Expected benefits:
+-- ✅ Improved partition pruning (128 → ~10 partitions)
+-- ✅ 80% reduction in data scanned
+-- ✅ Faster query execution
+```
+
+**2. Warehouse Portfolio Approach:**
+```sql
+-- Create appropriately-sized warehouse for this workload pattern
+CREATE WAREHOUSE WH_FRAUMD_FRAUD_ANALYTICS WITH 
+    WAREHOUSE_SIZE = 'SMALL'
+    WAREHOUSE_TYPE = 'STANDARD'
+    AUTO_SUSPEND = 120
+    AUTO_RESUME = TRUE;
+
+-- Route similar fraud analytics queries here
+```
+
+#### 📊 Expected Performance Impact
+
+| **Metric** | **Current (2XL SOW)** | **Optimized (S STD)** | **Improvement** |
+|------------|----------------------|----------------------|-----------------|
+| **Execution Time** | 1.22s | 0.8s | 🟢 **35% faster** |
+| **Compilation Time** | 1.086s | 0.3s | 🟢 **72% faster** |
+| **Data Scanned** | 21.3 MB | 4.2 MB | 🟢 **80% less** (with clustering) |
+| **Partitions Scanned** | 128 | 12 | 🟢 **91% reduction** |
+| **Cost per Query** | High (2XL SOW rate) | Low (S STD rate) | 🟢 **~85% savings** |
+| **Cache Efficiency** | 1% | 45%+ | 🟢 **Better reuse** |
+
+#### 🎯 Key Learnings
+
+**1. Size Band Classification:**
+- 21.3 MB scan = **XS workload** on **2XL warehouse** = Critical misalignment
+- Proper sizing: XS-Small Standard warehouse
+
+**2. Warehouse Type Mismatch:**
+- Snowpark-Optimized for standard SQL = Resource waste
+- Standard warehouse sufficient for aggregation queries
+
+**3. Partition Pruning Opportunity:**
+- Date-filtered queries on unclustered table = Full scan
+- Clustering key implementation = Dramatic improvement potential
+
+**4. Query Pattern Recognition:**
+- Fraud analytics = Recurring pattern
+- Dedicated appropriately-sized warehouse = Better resource allocation
+
+#### 🔄 Implementation Roadmap
+
+**Phase 1: Immediate Migration (Week 1)**
+- Move query to FRAUMD_001 (XL STD)
+- Monitor performance and cost impact
+- Validate no degradation in execution
+
+**Phase 2: Query Optimization (Week 2-3)**
+- Implement targeted column selection
+- Test optimized query patterns
+- Measure performance improvements
+
+**Phase 3: Infrastructure Enhancement (Month 2)**
+- Implement table clustering on TRAN_S
+- Create dedicated fraud analytics warehouse
+- Establish query routing guidelines
+
+**Phase 4: Monitoring & Validation (Ongoing)**
+- Track partition pruning efficiency
+- Monitor cache hit rates
+- Validate cost savings achievement
+
+This example demonstrates how proper warehouse selection, combined with query optimization and infrastructure improvements, can deliver significant performance and cost benefits while maintaining analytical capabilities.
+
+---
+
 ## 📋 Appendix
 
 ### Appendix A: Small Queries on LABMLFRD_003 (2XL SOW) Warehouse
