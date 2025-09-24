@@ -569,71 +569,83 @@ flowchart TD
     
     %% Snowpark Path
     Snowpark --> MemNeeds{Memory intensive?}
-    MemNeeds -->|Yes| LargeSOW[🔴 Large+ SOW<br/>Memory 16X]
-    MemNeeds -->|No| MediumSOW[🟡 Medium+ SOW<br/>Standard]
+    MemNeeds -->|Yes| LargeSOW[Large+ SOW<br/>Memory 16X]
+    MemNeeds -->|No| MediumSOW[Medium+ SOW<br/>Standard]
     
     %% Metadata Path
-    Metadata --> XSmallStd[🟢 X-Small<br/>STANDARD]
+    Metadata --> XSmallStd[X-Small<br/>STANDARD]
     
     %% Mixed and SQL Paths
     Mixed --> DataVol1{Data Volume<br/>Scanned?}
     SQL --> DataVol2{How much data<br/>scanned?}
     
     %% Data Volume Decision Tree
-    DataVol1 --> Vol1[🟢 < 1GB:<br/>X-Small STANDARD]
-    DataVol1 --> Vol2[🟡 1-20GB:<br/>Small/Medium STANDARD]
-    DataVol1 --> Vol3[🟠 20-100GB:<br/>Medium/Large STANDARD]
-    DataVol1 --> Vol4[🔴 > 100GB:<br/>Large+ STANDARD]
+    DataVol1 --> Vol1[< 1GB]
+    DataVol1 --> Vol2[1-20GB]
+    DataVol1 --> Vol3[20-100GB]
+    DataVol1 --> Vol4[> 100GB]
     
-    DataVol2 --> Vol5[🟢 < 1GB:<br/>X-Small STANDARD]
-    DataVol2 --> Vol6[🟡 1-20GB:<br/>Small/Medium STANDARD]
-    DataVol2 --> Vol7[🟠 20-100GB:<br/>Medium/Large STANDARD]
-    DataVol2 --> Vol8[🔴 > 100GB:<br/>Large+ STANDARD]
+    DataVol2 --> Vol5[< 1GB]
+    DataVol2 --> Vol6[1-20GB]
+    DataVol2 --> Vol7[20-100GB]
+    DataVol2 --> Vol8[> 100GB]
     
-    %% Direct Recommendations (No High Memory Option)
-    Vol1 --> XSmallStd1[✅ X-Small<br/>STANDARD]
-    Vol2 --> SmallStd[✅ Small<br/>STANDARD]
-    Vol3 --> MediumStd[✅ Medium<br/>STANDARD]
-    Vol4 --> LargeStd[✅ Large+<br/>STANDARD]
+    %% Memory Decision for each volume
+    Vol1 --> Mem1{Memory intensive?}
+    Vol2 --> Mem2{Memory intensive?}
+    Vol3 --> Mem3{Memory intensive?}
+    Vol4 --> Mem4{Memory intensive?}
+    Vol5 --> Mem5{Memory intensive?}
+    Vol6 --> Mem6{Memory intensive?}
+    Vol7 --> Mem7{Memory intensive?}
+    Vol8 --> Mem8{Memory intensive?}
     
-    Vol5 --> XSmallStd2[✅ X-Small<br/>STANDARD]
-    Vol6 --> SmallStd2[✅ Small<br/>STANDARD]
-    Vol7 --> MediumStd2[✅ Medium<br/>STANDARD]
-    Vol8 --> LargeStd2[✅ Large+<br/>STANDARD]
+    %% Final Recommendations
+    Mem1 -->|No| XSmallStd1[X-Small<br/>STANDARD]
+    Mem1 -->|Yes| XSmallGen2_1[X-Small<br/>GEN 2 STANDARD]
+    Mem2 -->|No| SmallStd[Small<br/>STANDARD]
+    Mem2 -->|Yes| SmallGen2[Small<br/>GEN 2 STANDARD]
+    Mem3 -->|No| MediumStd[Medium<br/>STANDARD]
+    Mem3 -->|Yes| MediumGen2[Medium<br/>GEN 2 STANDARD]
+    Mem4 -->|No| LargeStd[Large+<br/>STANDARD]
+    Mem4 -->|Yes| LargeGen2[Large+<br/>GEN 2 STANDARD]
+    
+    Mem5 -->|No| XSmallStd2[X-Small<br/>STANDARD]
+    Mem5 -->|Yes| XSmallGen2_2[X-Small<br/>GEN 2 STANDARD]
+    Mem6 -->|No| SmallStd2[Small<br/>STANDARD]
+    Mem6 -->|Yes| SmallGen2_2[Small<br/>GEN 2 STANDARD]
+    Mem7 -->|No| MediumStd2[Medium<br/>STANDARD]
+    Mem7 -->|Yes| MediumGen2_2[Medium<br/>GEN 2 STANDARD]
+    Mem8 -->|No| LargeStd2[Large+<br/>STANDARD]
+    Mem8 -->|Yes| LargeGen2_2[Large+<br/>GEN 2 STANDARD]
     
     %% Styling
-    classDef criticalNode fill:#ff6b6b,stroke:#d63031,stroke-width:3px,color:#fff
-    classDef warningNode fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
-    classDef goodNode fill:#55a3ff,stroke:#0984e3,stroke-width:2px,color:#fff
-    classDef optimalNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
+    classDef decisionNode fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef leafNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class LargeSOW criticalNode
-    class MediumSOW warningNode
-    class SmallStd,MediumStd,LargeStd,SmallStd2,MediumStd2,LargeStd2 goodNode
-    class XSmallStd,XSmallStd1,XSmallStd2 optimalNode
+    class Start,Workload,MemNeeds,DataVol1,DataVol2,Mem1,Mem2,Mem3,Mem4,Mem5,Mem6,Mem7,Mem8 decisionNode
+    class LargeSOW,MediumSOW,XSmallStd,XSmallStd1,XSmallGen2_1,SmallStd,SmallGen2,MediumStd,MediumGen2,LargeStd,LargeGen2,XSmallStd2,XSmallGen2_2,SmallStd2,SmallGen2_2,MediumStd2,MediumGen2_2,LargeStd2,LargeGen2_2 leafNode
 ```
 
 ### 🎯 Concurrency Decision Branch
 
 ```mermaid
 flowchart TD
-    Users{👥 How many<br/>concurrent users?} --> Few[🟢 1-5 Users]
-    Users --> Medium[🟡 5-15 Users]
-    Users --> Many[🟠 15-25 Users]
-    Users --> VeryMany[🔴 25+ Users]
+    Users{👥 How many<br/>concurrent users?} --> Few[1-5 Users]
+    Users --> Medium[5-15 Users]
+    Users --> Many[15-25 Users]
+    Users --> VeryMany[25+ Users]
     
-    Few --> SingleCluster[✅ Single Cluster<br/>🔄 No Auto-Scaling<br/>💰 Cost Efficient]
-    Medium --> MultiCluster2[⚡ Multi-Cluster<br/>📊 2-3 Max Clusters<br/>🔄 Auto-Scale: On]
-    Many --> MultiCluster3[⚡ Multi-Cluster<br/>📊 3-5 Max Clusters<br/>🔄 Auto-Scale: Aggressive]
-    VeryMany --> MultiCluster5[⚡ Multi-Cluster<br/>📊 5+ Max Clusters<br/>💸 High Concurrency Mode]
+    Few --> SingleCluster[Single Cluster<br/>No Auto-Scaling<br/>Cost Efficient]
+    Medium --> MultiCluster2[Multi-Cluster<br/>2-3 Max Clusters<br/>Auto-Scale: On]
+    Many --> MultiCluster3[Multi-Cluster<br/>3-5 Max Clusters<br/>Auto-Scale: Aggressive]
+    VeryMany --> MultiCluster5[Multi-Cluster<br/>5+ Max Clusters<br/>High Concurrency Mode]
     
-    classDef lowConcurrency fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
-    classDef medConcurrency fill:#ffeaa7,stroke:#fdcb6e,stroke-width:2px,color:#000
-    classDef highConcurrency fill:#ff6b6b,stroke:#d63031,stroke-width:2px,color:#fff
+    classDef decisionNode fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef leafNode fill:#00b894,stroke:#00a085,stroke-width:2px,color:#fff
     
-    class Few,SingleCluster lowConcurrency
-    class Medium,Many,MultiCluster2,MultiCluster3 medConcurrency
-    class VeryMany,MultiCluster5 highConcurrency
+    class Users decisionNode
+    class Few,Medium,Many,VeryMany,SingleCluster,MultiCluster2,MultiCluster3,MultiCluster5 leafNode
 ```
 
 ### Performance Monitoring KPIs
