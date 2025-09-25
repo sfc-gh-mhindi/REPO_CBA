@@ -664,7 +664,7 @@ flowchart TD
 
 ### Recommended Portfolio Architecture
 
-To optimize workload routing and performance, we recommend establishing a comprehensive warehouse portfolio:
+To optimize workload routing and performance, we recommend establishing a comprehensive warehouse portfolio that includes Standard, Gen 2 Standard, and Snowpark-Optimized warehouses for complete workload coverage:
 
 #### Standard Warehouse Portfolio
 
@@ -683,6 +683,16 @@ To optimize workload routing and performance, we recommend establishing a compre
 | **S Gen 2** | Interactive Analytics | User-facing reports, ad-hoc queries | Enhanced response times |
 | **M Gen 2** | Business Intelligence | Executive dashboards, complex analytics | Improved concurrency handling |
 | **L Gen 2** | Data Science Workloads | Feature engineering, model training prep | Faster iteration cycles |
+
+#### Snowpark-Optimized Warehouse Portfolio
+
+| **Size** | **Memory Type** | **Target Workloads** | **Use Cases** |
+|----------|-----------------|----------------------|---------------|
+| **M SOW** | Standard | Light ML/Python Workloads | Simple UDFs, basic data science, model inference |
+| **L SOW** | Standard | Standard ML Operations | Model training, feature engineering, Python analytics |
+| **L SOW** | Memory 16X | Memory-Intensive ML | Large dataset ML, complex algorithms, deep learning |
+| **XL SOW** | Memory 16X | Enterprise ML Workloads | Production ML pipelines, large-scale data science |
+| **2XL SOW** | Memory 16X | Heavy ML Processing | Massive datasets, complex model training, research workloads |
 
 ### Implementation Strategy
 
@@ -738,6 +748,36 @@ CREATE WAREHOUSE WH_FRAUMD_L_GEN2 WITH
     AUTO_RESUME = TRUE;
 ```
 
+#### Phase 3: Snowpark-Optimized Portfolio
+```sql
+-- Create Snowpark warehouses for legitimate ML/Python workloads
+CREATE WAREHOUSE WH_FRAUMD_ML_MEDIUM WITH 
+    WAREHOUSE_SIZE = 'MEDIUM' 
+    WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED'
+    AUTO_SUSPEND = 300 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_ML_LARGE WITH 
+    WAREHOUSE_SIZE = 'LARGE' 
+    WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED'
+    AUTO_SUSPEND = 300 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_ML_LARGE_16X WITH 
+    WAREHOUSE_SIZE = 'LARGE' 
+    WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED'
+    RESOURCE_MONITOR = 'SOW_MEMORY_16X'
+    AUTO_SUSPEND = 600 
+    AUTO_RESUME = TRUE;
+
+CREATE WAREHOUSE WH_FRAUMD_ML_XL_16X WITH 
+    WAREHOUSE_SIZE = 'X-LARGE' 
+    WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED'
+    RESOURCE_MONITOR = 'SOW_MEMORY_16X'
+    AUTO_SUSPEND = 600 
+    AUTO_RESUME = TRUE;
+```
+
 ### Workload Routing Strategy
 
 #### Routing Decision Matrix
@@ -749,20 +789,29 @@ CREATE WAREHOUSE WH_FRAUMD_L_GEN2 WITH
 | Basic reporting, 1-20GB scans | S Standard/Gen 2 | Balanced cost and performance |
 | Complex analytics, 20-50GB scans | M Standard/Gen 2 | Optimal for medium complexity |
 | Large joins, 50-100GB scans | L Standard/Gen 2 | Required memory and compute |
-| ML/Data Science (Python/Java) | Snowpark-Optimized | Specialized compute requirements |
+| **Light ML/Python (UDFs, simple models)** | **M SOW Standard** | **Basic Snowpark capabilities without memory overhead** |
+| **Standard ML Operations** | **L SOW Standard** | **Balanced ML compute for typical data science workloads** |
+| **Memory-Intensive ML (large datasets)** | **L SOW Memory 16X** | **High memory allocation for complex algorithms** |
+| **Enterprise ML Pipelines** | **XL SOW Memory 16X** | **Production-scale ML with maximum memory** |
 
 #### Migration Benefits
 
 **From Current State:**
-- **LABMLFRD_003 (2XL SOW):** Migrate 79% of workload to S/M Standard warehouses
-- **LABMLFRD_002 (XL SOW):** Migrate 93% of workload to XS/S Standard warehouses
+- **LABMLFRD_003 (2XL SOW):** Migrate 79% of SQL workload to S/M Standard warehouses, retain 21% legitimate Snowpark on L SOW
+- **LABMLFRD_002 (XL SOW):** Migrate 93% of SQL workload to XS/S Standard warehouses, evaluate remaining 7% for SOW needs
 - **FRAUMD_001 (XL STD):** Redistribute 62% small queries to XS/S warehouses
 
+**Snowpark Workload Optimization:**
+- **Right-size Current SOW Usage:** Move from 2XL SOW to L SOW for legitimate Python/ML workloads
+- **Eliminate SOW Misuse:** Migrate standard SQL operations to appropriate Standard warehouses
+- **Create Dedicated SOW Portfolio:** Establish M/L/XL SOW warehouses for different ML complexity levels
+
 **Expected Outcomes:**
-- **Cost Optimization:** 40-60% reduction in compute costs
-- **Performance Improvement:** Better resource utilization and response times
-- **Operational Efficiency:** Clear workload routing guidelines
-- **Scalability:** Portfolio supports growth and diverse workload patterns
+- **Cost Optimization:** 40-60% reduction in compute costs through proper warehouse-to-workload alignment
+- **Performance Improvement:** Better resource utilization and response times across all workload types
+- **ML Workload Efficiency:** Dedicated Snowpark resources for legitimate ML operations
+- **Operational Efficiency:** Clear workload routing guidelines for SQL vs Snowpark operations
+- **Scalability:** Complete portfolio supports growth in both traditional analytics and ML workloads
 
 ---
 
