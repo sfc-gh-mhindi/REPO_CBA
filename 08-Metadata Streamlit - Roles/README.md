@@ -162,6 +162,9 @@ GRANT USAGE ON STREAMLIT <database_name>.<schema_name>.<app_name>
 TO ROLE <role_name>;
 ```
 
+> **Important Note on MANAGED ACCESS Schemas:**
+> In most cases, when the app owner shares a Streamlit app with another role, the USAGE privilege is automatically granted to the new role. However, if a Streamlit app is created in a schema with MANAGED ACCESS, the USAGE privilege must be manually granted to the new role.
+
 #### Database and Schema Access
 ```sql
 -- Database access
