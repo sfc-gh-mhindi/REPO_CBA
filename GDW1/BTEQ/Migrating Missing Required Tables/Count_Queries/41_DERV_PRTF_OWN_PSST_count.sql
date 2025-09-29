@@ -1,6 +1,0 @@
--- Count query for PVTECH.DERV_PRTF_OWN_PSST
--- Snowflake table: PS_CLD_RW.STARCADPRODDATA.DERV_PRTF_OWN_PSST
--- Teradata counterpart: PVTECH.DERV_PRTF_OWN_PSST
-
-SELECT count(1) AS record_count
-FROM PVTECH.DERV_PRTF_OWN_PSST; 

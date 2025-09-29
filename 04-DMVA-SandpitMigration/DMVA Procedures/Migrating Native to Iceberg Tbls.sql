@@ -1,0 +1,37 @@
+
+UPDATE NPD_D12_DMN_GDWMIG.ICEBERG_MIGRATOR.iceberg_tool_config
+SET CONFIG_VALUE = 'SNOW'
+WHERE CONFIG_TYPE = 'core'
+and config_parameter = 'catalog_type';
+
+UPDATE NPD_D12_DMN_GDWMIG.ICEBERG_MIGRATOR.iceberg_tool_config
+SET CONFIG_VALUE = 'EXTV_S3_CDAO_GDWMIG_TDSF_DEV_RW'
+WHERE CONFIG_TYPE = 'snow'
+and config_parameter = 'external_volume';
+
+
+CALL NPD_D12_DMN_GDWMIG.ICEBERG_MIGRATOR.MIGRATE_TABLE_TO_ICEBERG_MH(
+    1,  --TABLE_INSTANCE_ID
+    1, --RUN_ID
+    'NPD_D12_DMN_GDWMIG',  --TABLE_CATALOG
+    'TMP',  --TABLE_SCHEMA
+    'SANDPIT_DEMO_TBL001', --TABLE_NAME
+    
+    'NPD_D12_DMN_GDWMIG_IBRG_V', --TARGET_TABLE_CATALOG
+    'P_V_STG_001_STD_0', ---TARGET_TABLE_SCHEMA
+    parse_json('null') --TABLE_CONFIGURATION
+);
+
+
+UPDATE NPD_D12_DMN_GDWMIG.ICEBERG_MIGRATOR.iceberg_tool_config
+SET CONFIG_VALUE = 'DATABASE'
+WHERE CONFIG_TYPE = 'core'
+and config_parameter = 'catalog_type';
+
+UPDATE NPD_D12_DMN_GDWMIG.ICEBERG_MIGRATOR.iceberg_tool_config
+SET CONFIG_VALUE = 'iceberg_external_volume'
+WHERE CONFIG_TYPE = 'snow'
+and config_parameter = 'external_volume';
+
+
+select * from "NPD_D12_DMN_GDWMIG_IBRG_V"."P_V_STG_001_STD_0"."SANDPIT_DEMO_TBL002";

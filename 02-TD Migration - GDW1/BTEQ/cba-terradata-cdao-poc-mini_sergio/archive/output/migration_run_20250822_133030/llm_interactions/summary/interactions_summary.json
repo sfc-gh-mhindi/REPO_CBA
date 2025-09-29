@@ -1,0 +1,27 @@
+{
+  "total_interactions": 3,
+  "by_conversion_type": {},
+  "by_model": {},
+  "success_rate": 0.0,
+  "average_processing_time": 0.0,
+  "files": {
+    "requests": [
+      "bteq2dbt_acct_baln_bkdt_adj_rule_claude4_request.txt",
+      "bteq2sp_acct_baln_bkdt_adj_rule_claude4_request.txt",
+      "bteq2sp_acct_baln_bkdt_adj_rule_llama33_request.txt"
+    ],
+    "responses": [
+      "bteq2dbt_acct_baln_bkdt_adj_rule_claude4_response.txt",
+      "bteq2sp_acct_baln_bkdt_adj_rule_claude4_response.txt",
+      "bteq2sp_acct_baln_bkdt_adj_rule_llama33_response.txt"
+    ],
+    "metadata": [
+      "bteq2dbt_acct_baln_bkdt_adj_rule_claude4_request_metadata.json",
+      "bteq2sp_acct_baln_bkdt_adj_rule_claude4_response_metadata.json",
+      "bteq2sp_acct_baln_bkdt_adj_rule_llama33_request_metadata.json",
+      "bteq2sp_acct_baln_bkdt_adj_rule_claude4_request_metadata.json",
+      "bteq2dbt_acct_baln_bkdt_adj_rule_claude4_response_metadata.json",
+      "bteq2sp_acct_baln_bkdt_adj_rule_llama33_response_metadata.json"
+    ]
+  }
+}

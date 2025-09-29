@@ -1,0 +1,11 @@
+{
+  "interaction_id": "857d6769",
+  "conversion_type": "bteq2sp",
+  "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+  "model": "snowflake-llama-3.3-70b",
+  "prompt_length": 29686,
+  "context_data": {
+    "enhancement_type": "stored_procedure"
+  },
+  "timestamp": "2025-08-22T13:32:42.520667"
+}

@@ -1,0 +1,67 @@
+# LLM Response
+Interaction ID: 20250821_154502_ded7d7f1
+Success: True
+Processing Time: 7238ms
+Quality Score: None
+
+# Response
+```sql
+{%- set process_name = 'ACCT_BALN_BKDT_DELT' -%}
+{%- set stream_name = 'ACCT_BALN_BKDT' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('CAD_PROD_DATA'),
+    schema=var('target_schema'),
+    tags=['ACCT_BALN_BKDT', 'delete'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT delete process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT delete process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model Documentation
+    Purpose: Delete Accts from ACCT BALN so that the modified data can be inserted in next step
+    Business Logic: Delete records from ACCT_BALN_BKDT table where matching records exist in ACCT_BALN_BKDT_STG1
+    Dependencies: ACCT_BALN_BKDT, ACCT_BALN_BKDT_STG1
+*/
+
+WITH delete_candidates AS (
+    SELECT 
+        BAL.ACCT_I,
+        BAL.BALN_TYPE_C,
+        BAL.CALC_FUNC_C,
+        BAL.TIME_PERD_C,
+        BAL.BKDT_EFFT_D,
+        BAL.BKDT_EXPY_D,
+        BAL.BALN_A,
+        BAL.CALC_F,
+        BAL.PROS_KEY_EFFT_I,
+        BAL.PROS_KEY_EXPY_I
+    FROM 
+        {{ source('CAD_PROD_DATA', 'ACCT_BALN_BKDT') }} BAL
+    INNER JOIN 
+        {{ source('DDSTG', 'ACCT_BALN_BKDT_STG1') }} STG1
+    ON 
+        STG1.ACCT_I = BAL.ACCT_I
+        AND STG1.BALN_TYPE_C = BAL.BALN_TYPE_C
+        AND STG1.CALC_FUNC_C = BAL.CALC_FUNC_C
+        AND STG1.TIME_PERD_C = BAL.TIME_PERD_C
+        AND STG1.BKDT_EFFT_D = BAL.BKDT_EFFT_D
+        AND STG1.BKDT_EXPY_D = BAL.BKDT_EXPY_D
+        AND STG1.BALN_A = BAL.BALN_A
+        AND STG1.CALC_F = BAL.CALC_F
+        AND COALESCE(STG1.PROS_KEY_EFFT_I, 0) = COALESCE(BAL.PROS_KEY_EFFT_I, 0)
+        AND COALESCE(STG1.PROS_KEY_EXPY_I, 0) = COALESCE(BAL.PROS_KEY_EXPY_I, 0)
+)
+
+SELECT 
+    *
+FROM 
+    delete_candidates
+```

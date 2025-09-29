@@ -1,0 +1,28 @@
+{
+  "procedure_name": "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY",
+  "parameters": [
+    "INPUT_PATH STRING DEFAULT '/tmp/input'",
+    "OUTPUT_PATH STRING DEFAULT '/tmp/output'",
+    "ERROR_TABLE STRING DEFAULT 'PROCESS_ERROR_LOG'",
+    "PROCESS_KEY STRING DEFAULT 'UNKNOWN_PROCESS'"
+  ],
+  "warnings": [
+    "Line 27: IMPORT converted to INPUT_PATH parameter",
+    "Line 47: EXPORT converted to OUTPUT_PATH parameter",
+    "Line 27: File I/O requires manual conversion to Snowflake stages",
+    "Line 47: File I/O requires manual conversion to Snowflake stages"
+  ],
+  "llm_enhancements": [],
+  "quality_score": 0.0,
+  "migration_notes": [],
+  "generation_timestamp": "2025-08-22T16:15:53.141240",
+  "versions_generated": [
+    "prescriptive"
+  ],
+  "preferred_version": "prescriptive",
+  "preferred_file": "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY_prescriptive.sql",
+  "available_files": {
+    "prescriptive": "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY_prescriptive.sql",
+    "preferred": "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY.sql"
+  }
+}

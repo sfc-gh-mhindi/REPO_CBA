@@ -1,0 +1,1463 @@
+QUERY_ID,QUERY_START_TIME,USER_NAME,DIRECT_OBJECTS_ACCESSED,BASE_OBJECTS_ACCESSED,OBJECTS_MODIFIED,OBJECT_MODIFIED_BY_DDL,POLICIES_REFERENCED,PARENT_QUERY_ID,ROOT_QUERY_ID
+01be988c-3204-bee5-0000-c71d2a6e377e,2025-08-25 01:48:07.929 Z,CLEMINRD,"[
+  {
+    ""columns"": [
+      {
+        ""columnId"": 15791820,
+        ""columnName"": ""TRAN_RCRR_F""
+      },
+      {
+        ""columnId"": 15791766,
+        ""columnName"": ""DSPT_DPAN_I""
+      },
+      {
+        ""columnId"": 15791763,
+        ""columnName"": ""DSPT_TRAN_RTRV_RQST_NUMB_C""
+      },
+      {
+        ""columnId"": 15791800,
+        ""columnName"": ""TRAN_MDIA_C""
+      },
+      {
+        ""columnId"": 15791793,
+        ""columnName"": ""DSPT_TRAN_PROS_C""
+      },
+      {
+        ""columnId"": 15791819,
+        ""columnName"": ""TRAN_PAIN_CUST_MERC_F""
+      },
+      {
+        ""columnId"": 15791773,
+        ""columnName"": ""DSPT_TRAN_ORIG_A""
+      },
+      {
+        ""columnId"": 15791777,
+        ""columnName"": ""DSPT_TRAN_ACTL_A""
+      },
+      {
+        ""columnId"": 15791824,
+        ""columnName"": ""FDP_RULE_PUSH_TYPE_F""
+      },
+      {
+        ""columnId"": 15791762,
+        ""columnName"": ""DSPT_TRAN_SYST_TRAC_AUDT_NUMB_I""
+      },
+      {
+        ""columnId"": 15791803,
+        ""columnName"": ""TRAN_A""
+      },
+      {
+        ""columnId"": 15791814,
+        ""columnName"": ""TRAN_FINL_DCDE_C""
+      },
+      {
+        ""columnId"": 15791822,
+        ""columnName"": ""FDP_CARD_PRFL_X""
+      },
+      {
+        ""columnId"": 15791776,
+        ""columnName"": ""DSPT_TRAN_DEST_CNCY_C""
+      },
+      {
+        ""columnId"": 15791788,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_X""
+      },
+      {
+        ""columnId"": 15791825,
+        ""columnName"": ""FDP_PUSH_EXIT_C""
+      },
+      {
+        ""columnId"": 15791792,
+        ""columnName"": ""DSPT_TRAN_FALL_BACK_C""
+      },
+      {
+        ""columnId"": 15791758,
+        ""columnName"": ""DSPT_CASE_STUS_X""
+      },
+      {
+        ""columnId"": 15791810,
+        ""columnName"": ""TRAN_POS_MODE_C""
+      },
+      {
+        ""columnId"": 15791817,
+        ""columnName"": ""TRAN_PIN_VERF_F""
+      },
+      {
+        ""columnId"": 15791771,
+        ""columnName"": ""DSPT_TRAN_POST_S""
+      },
+      {
+        ""columnId"": 15791755,
+        ""columnName"": ""DSPT_CHNL_M""
+      },
+      {
+        ""columnId"": 15791751,
+        ""columnName"": ""DSPT_CASE_I""
+      },
+      {
+        ""columnId"": 15791809,
+        ""columnName"": ""TRAN_CNTY_C""
+      },
+      {
+        ""columnId"": 15791832,
+        ""columnName"": ""SNAP_D""
+      },
+      {
+        ""columnId"": 15791781,
+        ""columnName"": ""DSPT_VISA_MAIL_TELE_ORDR_C""
+      },
+      {
+        ""columnId"": 15791778,
+        ""columnName"": ""DSPT_TRAN_MERC_DETL_X""
+      },
+      {
+        ""columnId"": 15791760,
+        ""columnName"": ""DSPT_TRAN_I""
+      },
+      {
+        ""columnId"": 15791756,
+        ""columnName"": ""DSPT_TYPE_X""
+      },
+      {
+        ""columnId"": 15791780,
+        ""columnName"": ""DSPT_TRAN_C""
+      },
+      {
+        ""columnId"": 15791752,
+        ""columnName"": ""DSPT_CASE_CRAT_I""
+      },
+      {
+        ""columnId"": 15791764,
+        ""columnName"": ""DSPT_ACCT_N""
+      },
+      {
+        ""columnId"": 15791794,
+        ""columnName"": ""DSPT_TRAN_CRAT_S""
+      },
+      {
+        ""columnId"": 15791786,
+        ""columnName"": ""DSPT_MCRD_AUTN_C""
+      },
+      {
+        ""columnId"": 15791798,
+        ""columnName"": ""CARD_I""
+      },
+      {
+        ""columnId"": 15791765,
+        ""columnName"": ""DSPT_CPNN_ACCT_N""
+      },
+      {
+        ""columnId"": 15791790,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACTV_TRML_C""
+      },
+      {
+        ""columnId"": 15791770,
+        ""columnName"": ""DSPT_TRAN_S""
+      },
+      {
+        ""columnId"": 15791754,
+        ""columnName"": ""DSPT_CASE_CLSE_S""
+      },
+      {
+        ""columnId"": 15791821,
+        ""columnName"": ""TRAN_MCRD_SCOR_N""
+      },
+      {
+        ""columnId"": 15791795,
+        ""columnName"": ""DSPT_LOAD_TS""
+      },
+      {
+        ""columnId"": 15791769,
+        ""columnName"": ""DSPT_TRAN_D""
+      },
+      {
+        ""columnId"": 15791829,
+        ""columnName"": ""ROW_SECU_ACCS_C""
+      },
+      {
+        ""columnId"": 15791785,
+        ""columnName"": ""DSPT_TRAN_DCDE_X""
+      },
+      {
+        ""columnId"": 15791830,
+        ""columnName"": ""ETL_TS""
+      },
+      {
+        ""columnId"": 15791831,
+        ""columnName"": ""ETL_ID""
+      },
+      {
+        ""columnId"": 15791783,
+        ""columnName"": ""DSPT_TRAN_POS_MODE_C""
+      },
+      {
+        ""columnId"": 15791768,
+        ""columnName"": ""DSPT_TRAN_TOKN_TYPE_X""
+      },
+      {
+        ""columnId"": 15791807,
+        ""columnName"": ""MERC_TRML_I""
+      },
+      {
+        ""columnId"": 15791811,
+        ""columnName"": ""TRAN_AUTT_NUMB_X""
+      },
+      {
+        ""columnId"": 15791772,
+        ""columnName"": ""DSPT_TRAN_HOST_SWIT_S""
+      },
+      {
+        ""columnId"": 15791812,
+        ""columnName"": ""TRAN_UPST_DCDE_C""
+      },
+      {
+        ""columnId"": 15791806,
+        ""columnName"": ""MERC_I""
+      },
+      {
+        ""columnId"": 15791816,
+        ""columnName"": ""TRAN_SECU_LEVL_INDA_C""
+      },
+      {
+        ""columnId"": 15791791,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACPT_IDNN_I""
+      },
+      {
+        ""columnId"": 15791813,
+        ""columnName"": ""TRAN_UPST_REAS_C""
+      },
+      {
+        ""columnId"": 15791761,
+        ""columnName"": ""DSPT_TRAN_REFN_I""
+      },
+      {
+        ""columnId"": 15791775,
+        ""columnName"": ""DSPT_TRAN_DEST_A""
+      },
+      {
+        ""columnId"": 15791801,
+        ""columnName"": ""TRAN_S""
+      },
+      {
+        ""columnId"": 15791808,
+        ""columnName"": ""TRAN_ACQR_I""
+      },
+      {
+        ""columnId"": 15791802,
+        ""columnName"": ""TRAN_D""
+      },
+      {
+        ""columnId"": 15791796,
+        ""columnName"": ""TRAN_I""
+      },
+      {
+        ""columnId"": 15791782,
+        ""columnName"": ""DSPT_MCRD_INPT_MODE_C""
+      },
+      {
+        ""columnId"": 15791797,
+        ""columnName"": ""CUST_I""
+      },
+      {
+        ""columnId"": 15791827,
+        ""columnName"": ""SRCE_SYST_C""
+      },
+      {
+        ""columnId"": 15791784,
+        ""columnName"": ""DSPT_TRAN_AUTT_NUMB_X""
+      },
+      {
+        ""columnId"": 15791789,
+        ""columnName"": ""DSPT_MCRD_UVRS_CAHD_AUTT_FIED_C""
+      },
+      {
+        ""columnId"": 15791757,
+        ""columnName"": ""DSPT_CASE_USER_STUS_X""
+      },
+      {
+        ""columnId"": 15791805,
+        ""columnName"": ""TRAN_MERC_CATG_C""
+      },
+      {
+        ""columnId"": 15791818,
+        ""columnName"": ""TRAN_REVS_F""
+      },
+      {
+        ""columnId"": 15791804,
+        ""columnName"": ""MERC_M""
+      },
+      {
+        ""columnId"": 15791828,
+        ""columnName"": ""LOAD_TS""
+      },
+      {
+        ""columnId"": 15791774,
+        ""columnName"": ""DSPT_TRAN_ORIG_CNCY_C""
+      },
+      {
+        ""columnId"": 15791779,
+        ""columnName"": ""DSPT_TRAN_MERC_CATG_C""
+      },
+      {
+        ""columnId"": 15791787,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_C""
+      },
+      {
+        ""columnId"": 15791799,
+        ""columnName"": ""DPAN_I""
+      },
+      {
+        ""columnId"": 15791753,
+        ""columnName"": ""DSPT_CASE_CRAT_S""
+      },
+      {
+        ""columnId"": 15791767,
+        ""columnName"": ""DSPT_DDA_N""
+      },
+      {
+        ""columnId"": 15791759,
+        ""columnName"": ""DSPT_SRCE_SYST_M""
+      },
+      {
+        ""columnId"": 15791826,
+        ""columnName"": ""POST_AUTN_MTCH_SCOR""
+      },
+      {
+        ""columnId"": 15791823,
+        ""columnName"": ""FDP_RULE_TRIG_X""
+      },
+      {
+        ""columnId"": 15791815,
+        ""columnName"": ""TRAN_ACCT_AUTT_V""
+      }
+    ],
+    ""objectDomain"": ""Table"",
+    ""objectId"": 1690060,
+    ""objectName"": ""PRD_P01_DMN_FRAUMD.LABMLFRD.CARD_TRAN_DAIS_DSPT""
+  }
+]","[
+  {
+    ""columns"": [
+      {
+        ""columnId"": 15791820,
+        ""columnName"": ""TRAN_RCRR_F""
+      },
+      {
+        ""columnId"": 15791766,
+        ""columnName"": ""DSPT_DPAN_I""
+      },
+      {
+        ""columnId"": 15791763,
+        ""columnName"": ""DSPT_TRAN_RTRV_RQST_NUMB_C""
+      },
+      {
+        ""columnId"": 15791800,
+        ""columnName"": ""TRAN_MDIA_C""
+      },
+      {
+        ""columnId"": 15791793,
+        ""columnName"": ""DSPT_TRAN_PROS_C""
+      },
+      {
+        ""columnId"": 15791819,
+        ""columnName"": ""TRAN_PAIN_CUST_MERC_F""
+      },
+      {
+        ""columnId"": 15791773,
+        ""columnName"": ""DSPT_TRAN_ORIG_A""
+      },
+      {
+        ""columnId"": 15791777,
+        ""columnName"": ""DSPT_TRAN_ACTL_A""
+      },
+      {
+        ""columnId"": 15791824,
+        ""columnName"": ""FDP_RULE_PUSH_TYPE_F""
+      },
+      {
+        ""columnId"": 15791762,
+        ""columnName"": ""DSPT_TRAN_SYST_TRAC_AUDT_NUMB_I""
+      },
+      {
+        ""columnId"": 15791803,
+        ""columnName"": ""TRAN_A""
+      },
+      {
+        ""columnId"": 15791814,
+        ""columnName"": ""TRAN_FINL_DCDE_C""
+      },
+      {
+        ""columnId"": 15791822,
+        ""columnName"": ""FDP_CARD_PRFL_X""
+      },
+      {
+        ""columnId"": 15791776,
+        ""columnName"": ""DSPT_TRAN_DEST_CNCY_C""
+      },
+      {
+        ""columnId"": 15791788,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_X""
+      },
+      {
+        ""columnId"": 15791825,
+        ""columnName"": ""FDP_PUSH_EXIT_C""
+      },
+      {
+        ""columnId"": 15791792,
+        ""columnName"": ""DSPT_TRAN_FALL_BACK_C""
+      },
+      {
+        ""columnId"": 15791758,
+        ""columnName"": ""DSPT_CASE_STUS_X""
+      },
+      {
+        ""columnId"": 15791810,
+        ""columnName"": ""TRAN_POS_MODE_C""
+      },
+      {
+        ""columnId"": 15791817,
+        ""columnName"": ""TRAN_PIN_VERF_F""
+      },
+      {
+        ""columnId"": 15791771,
+        ""columnName"": ""DSPT_TRAN_POST_S""
+      },
+      {
+        ""columnId"": 15791755,
+        ""columnName"": ""DSPT_CHNL_M""
+      },
+      {
+        ""columnId"": 15791751,
+        ""columnName"": ""DSPT_CASE_I""
+      },
+      {
+        ""columnId"": 15791809,
+        ""columnName"": ""TRAN_CNTY_C""
+      },
+      {
+        ""columnId"": 15791832,
+        ""columnName"": ""SNAP_D""
+      },
+      {
+        ""columnId"": 15791781,
+        ""columnName"": ""DSPT_VISA_MAIL_TELE_ORDR_C""
+      },
+      {
+        ""columnId"": 15791778,
+        ""columnName"": ""DSPT_TRAN_MERC_DETL_X""
+      },
+      {
+        ""columnId"": 15791760,
+        ""columnName"": ""DSPT_TRAN_I""
+      },
+      {
+        ""columnId"": 15791756,
+        ""columnName"": ""DSPT_TYPE_X""
+      },
+      {
+        ""columnId"": 15791780,
+        ""columnName"": ""DSPT_TRAN_C""
+      },
+      {
+        ""columnId"": 15791752,
+        ""columnName"": ""DSPT_CASE_CRAT_I""
+      },
+      {
+        ""columnId"": 15791764,
+        ""columnName"": ""DSPT_ACCT_N""
+      },
+      {
+        ""columnId"": 15791794,
+        ""columnName"": ""DSPT_TRAN_CRAT_S""
+      },
+      {
+        ""columnId"": 15791786,
+        ""columnName"": ""DSPT_MCRD_AUTN_C""
+      },
+      {
+        ""columnId"": 15791798,
+        ""columnName"": ""CARD_I""
+      },
+      {
+        ""columnId"": 15791765,
+        ""columnName"": ""DSPT_CPNN_ACCT_N""
+      },
+      {
+        ""columnId"": 15791790,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACTV_TRML_C""
+      },
+      {
+        ""columnId"": 15791770,
+        ""columnName"": ""DSPT_TRAN_S""
+      },
+      {
+        ""columnId"": 15791754,
+        ""columnName"": ""DSPT_CASE_CLSE_S""
+      },
+      {
+        ""columnId"": 15791821,
+        ""columnName"": ""TRAN_MCRD_SCOR_N""
+      },
+      {
+        ""columnId"": 15791795,
+        ""columnName"": ""DSPT_LOAD_TS""
+      },
+      {
+        ""columnId"": 15791769,
+        ""columnName"": ""DSPT_TRAN_D""
+      },
+      {
+        ""columnId"": 15791829,
+        ""columnName"": ""ROW_SECU_ACCS_C""
+      },
+      {
+        ""columnId"": 15791785,
+        ""columnName"": ""DSPT_TRAN_DCDE_X""
+      },
+      {
+        ""columnId"": 15791830,
+        ""columnName"": ""ETL_TS""
+      },
+      {
+        ""columnId"": 15791831,
+        ""columnName"": ""ETL_ID""
+      },
+      {
+        ""columnId"": 15791783,
+        ""columnName"": ""DSPT_TRAN_POS_MODE_C""
+      },
+      {
+        ""columnId"": 15791768,
+        ""columnName"": ""DSPT_TRAN_TOKN_TYPE_X""
+      },
+      {
+        ""columnId"": 15791807,
+        ""columnName"": ""MERC_TRML_I""
+      },
+      {
+        ""columnId"": 15791811,
+        ""columnName"": ""TRAN_AUTT_NUMB_X""
+      },
+      {
+        ""columnId"": 15791772,
+        ""columnName"": ""DSPT_TRAN_HOST_SWIT_S""
+      },
+      {
+        ""columnId"": 15791812,
+        ""columnName"": ""TRAN_UPST_DCDE_C""
+      },
+      {
+        ""columnId"": 15791806,
+        ""columnName"": ""MERC_I""
+      },
+      {
+        ""columnId"": 15791816,
+        ""columnName"": ""TRAN_SECU_LEVL_INDA_C""
+      },
+      {
+        ""columnId"": 15791791,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACPT_IDNN_I""
+      },
+      {
+        ""columnId"": 15791813,
+        ""columnName"": ""TRAN_UPST_REAS_C""
+      },
+      {
+        ""columnId"": 15791761,
+        ""columnName"": ""DSPT_TRAN_REFN_I""
+      },
+      {
+        ""columnId"": 15791775,
+        ""columnName"": ""DSPT_TRAN_DEST_A""
+      },
+      {
+        ""columnId"": 15791801,
+        ""columnName"": ""TRAN_S""
+      },
+      {
+        ""columnId"": 15791808,
+        ""columnName"": ""TRAN_ACQR_I""
+      },
+      {
+        ""columnId"": 15791802,
+        ""columnName"": ""TRAN_D""
+      },
+      {
+        ""columnId"": 15791796,
+        ""columnName"": ""TRAN_I""
+      },
+      {
+        ""columnId"": 15791782,
+        ""columnName"": ""DSPT_MCRD_INPT_MODE_C""
+      },
+      {
+        ""columnId"": 15791797,
+        ""columnName"": ""CUST_I""
+      },
+      {
+        ""columnId"": 15791827,
+        ""columnName"": ""SRCE_SYST_C""
+      },
+      {
+        ""columnId"": 15791784,
+        ""columnName"": ""DSPT_TRAN_AUTT_NUMB_X""
+      },
+      {
+        ""columnId"": 15791789,
+        ""columnName"": ""DSPT_MCRD_UVRS_CAHD_AUTT_FIED_C""
+      },
+      {
+        ""columnId"": 15791757,
+        ""columnName"": ""DSPT_CASE_USER_STUS_X""
+      },
+      {
+        ""columnId"": 15791805,
+        ""columnName"": ""TRAN_MERC_CATG_C""
+      },
+      {
+        ""columnId"": 15791818,
+        ""columnName"": ""TRAN_REVS_F""
+      },
+      {
+        ""columnId"": 15791804,
+        ""columnName"": ""MERC_M""
+      },
+      {
+        ""columnId"": 15791828,
+        ""columnName"": ""LOAD_TS""
+      },
+      {
+        ""columnId"": 15791774,
+        ""columnName"": ""DSPT_TRAN_ORIG_CNCY_C""
+      },
+      {
+        ""columnId"": 15791779,
+        ""columnName"": ""DSPT_TRAN_MERC_CATG_C""
+      },
+      {
+        ""columnId"": 15791787,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_C""
+      },
+      {
+        ""columnId"": 15791799,
+        ""columnName"": ""DPAN_I""
+      },
+      {
+        ""columnId"": 15791753,
+        ""columnName"": ""DSPT_CASE_CRAT_S""
+      },
+      {
+        ""columnId"": 15791767,
+        ""columnName"": ""DSPT_DDA_N""
+      },
+      {
+        ""columnId"": 15791759,
+        ""columnName"": ""DSPT_SRCE_SYST_M""
+      },
+      {
+        ""columnId"": 15791826,
+        ""columnName"": ""POST_AUTN_MTCH_SCOR""
+      },
+      {
+        ""columnId"": 15791823,
+        ""columnName"": ""FDP_RULE_TRIG_X""
+      },
+      {
+        ""columnId"": 15791815,
+        ""columnName"": ""TRAN_ACCT_AUTT_V""
+      }
+    ],
+    ""objectDomain"": ""Table"",
+    ""objectId"": 1690060,
+    ""objectName"": ""PRD_P01_DMN_FRAUMD.LABMLFRD.CARD_TRAN_DAIS_DSPT""
+  }
+]",[],,"[
+  {
+    ""columns"": [
+      {
+        ""columnId"": 15791768,
+        ""columnName"": ""DSPT_TRAN_TOKN_TYPE_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791829,
+        ""columnName"": ""ROW_SECU_ACCS_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791823,
+        ""columnName"": ""FDP_RULE_TRIG_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791759,
+        ""columnName"": ""DSPT_SRCE_SYST_M"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791806,
+        ""columnName"": ""MERC_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791802,
+        ""columnName"": ""TRAN_D"",
+        ""policies"": [
+          {
+            ""policyId"": 2049,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_DATE_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791815,
+        ""columnName"": ""TRAN_ACCT_AUTT_V"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791816,
+        ""columnName"": ""TRAN_SECU_LEVL_INDA_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791821,
+        ""columnName"": ""TRAN_MCRD_SCOR_N"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791785,
+        ""columnName"": ""DSPT_TRAN_DCDE_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791769,
+        ""columnName"": ""DSPT_TRAN_D"",
+        ""policies"": [
+          {
+            ""policyId"": 2049,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_DATE_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791808,
+        ""columnName"": ""TRAN_ACQR_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791807,
+        ""columnName"": ""MERC_TRML_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791796,
+        ""columnName"": ""TRAN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791790,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACTV_TRML_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791761,
+        ""columnName"": ""DSPT_TRAN_REFN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791786,
+        ""columnName"": ""DSPT_MCRD_AUTN_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791765,
+        ""columnName"": ""DSPT_CPNN_ACCT_N"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791787,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791783,
+        ""columnName"": ""DSPT_TRAN_POS_MODE_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791832,
+        ""columnName"": ""SNAP_D"",
+        ""policies"": [
+          {
+            ""policyId"": 2049,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_DATE_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791767,
+        ""columnName"": ""DSPT_DDA_N"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791818,
+        ""columnName"": ""TRAN_REVS_F"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791782,
+        ""columnName"": ""DSPT_MCRD_INPT_MODE_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791791,
+        ""columnName"": ""DSPT_TRAN_CAHD_ACPT_IDNN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791797,
+        ""columnName"": ""CUST_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791779,
+        ""columnName"": ""DSPT_TRAN_MERC_CATG_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791757,
+        ""columnName"": ""DSPT_CASE_USER_STUS_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791804,
+        ""columnName"": ""MERC_M"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791805,
+        ""columnName"": ""TRAN_MERC_CATG_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791827,
+        ""columnName"": ""SRCE_SYST_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791774,
+        ""columnName"": ""DSPT_TRAN_ORIG_CNCY_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791775,
+        ""columnName"": ""DSPT_TRAN_DEST_A"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791784,
+        ""columnName"": ""DSPT_TRAN_AUTT_NUMB_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791811,
+        ""columnName"": ""TRAN_AUTT_NUMB_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791799,
+        ""columnName"": ""DPAN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791793,
+        ""columnName"": ""DSPT_TRAN_PROS_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791825,
+        ""columnName"": ""FDP_PUSH_EXIT_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791788,
+        ""columnName"": ""DSPT_MCRD_SECU_LEVL_INDA_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791773,
+        ""columnName"": ""DSPT_TRAN_ORIG_A"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791762,
+        ""columnName"": ""DSPT_TRAN_SYST_TRAC_AUDT_NUMB_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791824,
+        ""columnName"": ""FDP_RULE_PUSH_TYPE_F"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791764,
+        ""columnName"": ""DSPT_ACCT_N"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791766,
+        ""columnName"": ""DSPT_DPAN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791763,
+        ""columnName"": ""DSPT_TRAN_RTRV_RQST_NUMB_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791826,
+        ""columnName"": ""POST_AUTN_MTCH_SCOR"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791800,
+        ""columnName"": ""TRAN_MDIA_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791777,
+        ""columnName"": ""DSPT_TRAN_ACTL_A"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791819,
+        ""columnName"": ""TRAN_PAIN_CUST_MERC_F"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791814,
+        ""columnName"": ""TRAN_FINL_DCDE_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791776,
+        ""columnName"": ""DSPT_TRAN_DEST_CNCY_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791810,
+        ""columnName"": ""TRAN_POS_MODE_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791789,
+        ""columnName"": ""DSPT_MCRD_UVRS_CAHD_AUTT_FIED_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791755,
+        ""columnName"": ""DSPT_CHNL_M"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791813,
+        ""columnName"": ""TRAN_UPST_REAS_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791760,
+        ""columnName"": ""DSPT_TRAN_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2050,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_NUMBER_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791822,
+        ""columnName"": ""FDP_CARD_PRFL_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791758,
+        ""columnName"": ""DSPT_CASE_STUS_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791809,
+        ""columnName"": ""TRAN_CNTY_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791756,
+        ""columnName"": ""DSPT_TYPE_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791817,
+        ""columnName"": ""TRAN_PIN_VERF_F"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791780,
+        ""columnName"": ""DSPT_TRAN_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791752,
+        ""columnName"": ""DSPT_CASE_CRAT_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791812,
+        ""columnName"": ""TRAN_UPST_DCDE_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791820,
+        ""columnName"": ""TRAN_RCRR_F"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791792,
+        ""columnName"": ""DSPT_TRAN_FALL_BACK_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791798,
+        ""columnName"": ""CARD_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791751,
+        ""columnName"": ""DSPT_CASE_I"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791781,
+        ""columnName"": ""DSPT_VISA_MAIL_TELE_ORDR_C"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791831,
+        ""columnName"": ""ETL_ID"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      },
+      {
+        ""columnId"": 15791778,
+        ""columnName"": ""DSPT_TRAN_MERC_DETL_X"",
+        ""policies"": [
+          {
+            ""policyId"": 2051,
+            ""policyKind"": ""MASKING_POLICY"",
+            ""policyName"": ""PRD_RBAC.POLICIES.MSK_CLS_VARCHAR_LAB""
+          }
+        ]
+      }
+    ],
+    ""objectDomain"": ""Table"",
+    ""objectId"": 1690060,
+    ""objectName"": ""PRD_P01_DMN_FRAUMD.LABMLFRD.CARD_TRAN_DAIS_DSPT""
+  }
+]",,

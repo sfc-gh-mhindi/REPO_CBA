@@ -1,0 +1,158 @@
+# LLM Response
+Interaction ID: 20250821_154936_a95e8428
+Success: True
+Processing Time: 23773ms
+Quality Score: None
+
+# Response
+```sql
+{%- set process_name = 'ACCT_BALN_BKDT_STG_ISRT' -%}
+{%- set stream_name = 'ACCOUNT_BALANCE_BACKDATE' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('ddstg_database'),
+    schema='ddstg_schema',
+    tags=['staging', 'account_balance', 'backdate'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_STG_ISRT Process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_STG_ISRT Process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model: ACCT_BALN_BKDT_STG2
+    Purpose: Loading ACCT_I that need to be adjusted into staging area
+    Business Logic: Calculate adjusted balance values by combining balance amounts with adjustment amounts
+    Dependencies: ACCT_BALN_BKDT, ACCT_BALN_BKDT_STG1, ACCT_BALN_BKDT_ADJ_RULE, UTIL_PROS_ISAC
+*/
+
+WITH acct_baln_candidates AS (
+    -- Identify suitable candidates for processing to avoid pulling entire history
+    SELECT	
+        ACCT_I, 
+        MIN(BKDT_ADJ_FROM_D) AS BKDT_ADJ_FROM_D
+    FROM	
+        {{ ref('acct_baln_bkdt_adj_rule') }}
+    GROUP BY 1
+),
+
+acct_baln_bkdt_stg1 AS (
+    -- Current balances that need to be adjusted
+    SELECT	
+        A.ACCT_I,
+        A.BALN_TYPE_C,
+        A.CALC_FUNC_C,                  
+        A.TIME_PERD_C,                  
+        A.BKDT_EFFT_D,
+        A.BKDT_EXPY_D,
+        A.BALN_A,
+        A.CALC_F,
+        A.PROS_KEY_EFFT_I,
+        A.PROS_KEY_EXPY_I,
+        A.BKDT_PROS_KEY_I,
+        A.ORIG_SRCE_SYST_C,
+        A.SRCE_SYST_C,
+        A.LOAD_D
+    FROM	
+        {{ source('vtech', 'ACCT_BALN_BKDT') }} A
+    INNER JOIN acct_baln_candidates B
+        ON A.ACCT_I = B.ACCT_I
+    WHERE	
+        A.BKDT_EXPY_D >= B.BKDT_ADJ_FROM_D
+),
+
+time_period_endpoints AS (
+    -- Identify END points OF ALL TIME periods OF interest FOR EACH ACCT_I
+    SELECT ACCT_I, BKDT_EXPY_D          
+    FROM acct_baln_bkdt_stg1
+    
+    UNION	 	            
+    SELECT ACCT_I, ADJ_TO_D            
+    FROM {{ ref('acct_baln_bkdt_adj_rule') }}
+    
+    UNION	                
+    SELECT ACCT_I, BKDT_EFFT_D - 1                
+    FROM acct_baln_bkdt_stg1
+    
+    UNION	                
+    SELECT ACCT_I, BKDT_ADJ_FROM_D - 1             
+    FROM {{ ref('acct_baln_bkdt_adj_rule') }}
+),
+
+time_periods AS (
+    -- Identify ALL TIME periods OF interest FOR EACH ACCT_I
+    SELECT	
+        DT0.ACCT_I,
+        -- Calculate start points of time periods of interest based on end point of previous time period
+        (MAX(DT0.BKDT_EXPY_D) OVER (
+            PARTITION BY DT0.ACCT_I 
+            ORDER BY DT0.BKDT_EXPY_D 
+            ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING
+        ) + 1) AS BKDT_EFFT_D,
+        DT0.BKDT_EXPY_D
+    FROM time_period_endpoints DT0
+    -- Ignore record where there is no start point
+    QUALIFY BKDT_EFFT_D IS NOT NULL
+),
+
+pros_key_lookup AS (
+    -- Update the latest PROS_KEY_I into subsequent inserts
+    SELECT MAX(PROS_KEY_I) AS BKDT_PROS_KEY_I
+    FROM {{ source('vtech', 'UTIL_PROS_ISAC') }}
+    WHERE CONV_M = 'CAD_X01_ACCT_BALN_BKDT'
+),
+
+final AS (
+    SELECT DISTINCT	
+        DT1.ACCT_I AS ACCT_I,
+        -- The BALN_TYPE_C in ACCT_BALN_BKDT table is hardcoded to 'BDCL'
+        COALESCE(B.BALN_TYPE_C, 'BDCL') AS BALN_TYPE_C,
+        COALESCE(B.CALC_FUNC_C, 'SPOT') AS CALC_FUNC_C,              
+        COALESCE(B.TIME_PERD_C, 'E') AS TIME_PERD_C,
+        DT1.BKDT_EFFT_D AS BKDT_EFFT_D,
+        DT1.BKDT_EXPY_D AS BKDT_EXPY_D,
+        -- Calculate the adjusted balance value as the sum of all relevant adjustments plus the relevant balance value
+        -- Note that MAX is used for BAL amount simply to identify the single balance valid during the time period
+        MAX(COALESCE(B.BALN_A, 0.0)) OVER (
+            PARTITION BY DT1.ACCT_I, DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D
+        ) + SUM(COALESCE(A.ADJ_A, 0.0)) OVER (
+            PARTITION BY DT1.ACCT_I, DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D
+        ) AS BALN_A,
+        COALESCE(B.CALC_F, 'N') AS CALC_F,
+        B.PROS_KEY_EFFT_I,
+        B.PROS_KEY_EXPY_I,
+        PKEY.BKDT_PROS_KEY_I AS BKDT_PROS_KEY_I,
+        A.PROS_KEY_EFFT_I AS ADJ_PROS_KEY_EFFT_I,
+        COALESCE(B.ORIG_SRCE_SYST_C, 'SAP') AS ORIG_SRCE_SYST_C,
+        COALESCE(B.SRCE_SYST_C, 'GDW') AS SRCE_SYST_C,
+        CURRENT_DATE AS LOAD_D
+    FROM time_periods DT1
+    -- Join to balance table based on ACCT_I and intersection with time periods of interest
+    -- Note that there may be no balance amount related to a time period
+    LEFT OUTER JOIN acct_baln_bkdt_stg1 B
+        ON DT1.ACCT_I = B.ACCT_I
+        AND (
+            (DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D) OVERLAPS (B.BKDT_EFFT_D, B.BKDT_EXPY_D)
+            -- as Overlaps does not include equality
+            OR DT1.BKDT_EFFT_D = B.BKDT_EFFT_D
+            OR DT1.BKDT_EXPY_D = B.BKDT_EXPY_D
+        )
+    -- Join to adjustment table based on ACCT_I and intersection with time periods of interest
+    -- Note that there may be multiple adjustments or no adjustments related to a time period
+    LEFT OUTER JOIN {{ ref('acct_baln_bkdt_adj_rule') }} A
+        ON DT1.ACCT_I = A.ACCT_I                   
+        AND (
+            (DT1.BKDT_EFFT_D, DT1.BKDT_EXPY_D) OVERLAPS (A.BKDT_ADJ_FROM_D, A.ADJ_TO_D)
+            OR DT1.BKDT_EFFT_D = A.BKDT_ADJ_FROM_D
+            OR DT1.BKDT_EXPY_D = A.ADJ_TO_D
+        )
+    CROSS JOIN pros_key_lookup PKEY
+)
+
+SELECT * FROM final
+```

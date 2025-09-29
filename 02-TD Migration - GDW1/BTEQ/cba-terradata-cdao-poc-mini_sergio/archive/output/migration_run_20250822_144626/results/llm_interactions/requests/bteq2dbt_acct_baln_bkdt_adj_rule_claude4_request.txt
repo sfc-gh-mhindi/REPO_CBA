@@ -1,0 +1,258 @@
+# LLM REQUEST
+Interaction ID: c2016650
+Conversion Type: bteq2dbt
+Procedure: ACCT_BALN_BKDT_ADJ_RULE_ISRT
+Model: claude-4-sonnet
+Prompt Length: 9927 characters
+Timestamp: 2025-08-22T14:46:36.697081
+
+================================================================================
+RAW PROMPT:
+================================================================================
+# BTEQ SQL to DBT Model Conversion
+
+You are a senior data engineer expert in converting legacy BTEQ SQL scripts to modern DBT models with Jinja templating.
+
+## CRITICAL INSTRUCTIONS - NO HALLUCINATION POLICY
+- ONLY transform the logic provided in the source BTEQ SQL
+- DO NOT add new business logic, columns, or transformations
+- DO NOT create new table references not in the original
+- PRESERVE all existing business logic exactly
+- If unclear about any logic, maintain the original approach
+
+## Source Context
+
+### 1. Original BTEQ SQL Script
+```sql
+.RUN FILE=%%BTEQ_LOGON_SCRIPT%%
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+.SET QUIET OFF
+.SET ECHOREQ ON
+.SET FORMAT OFF
+.SET WIDTH 120
+
+------------------------------------------------------------------------------
+--  SCRIPT NAME: 90_ISRT_ACCT_BALN_BKDT_ADJ_RULE
+--Description: Calculate the Backdated adjustment from ACCT BALN ADJ and apply 
+--it on ACCT BALN
+--
+--  Ver  Date       Modified By        		    Description
+--  ---- ---------- ---------------------------------------------------------
+--  1.0  22/07/2011 Suresh Vajapeyajula        	Initial Version
+
+-- $LastChangedBy: vajapes $
+-- $LastChangedDate: 2012-02-28 09:08:17 +1100 (Tue, 28 Feb 2012) $
+-- $LastChangedRevision: 9216 $
+
+------------------------------------------------------------------------------
+
+
+DELETE %%DDSTG%%.ACCT_BALN_BKDT_ADJ_RULE;
+
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+INSERT INTO %%DDSTG%%.ACCT_BALN_BKDT_ADJ_RULE
+(
+ACCT_I, 
+SRCE_SYST_C,
+BALN_TYPE_C,
+CALC_FUNC_C,
+TIME_PERD_C,
+ADJ_FROM_D,
+BKDT_ADJ_FROM_D,
+ADJ_TO_D,
+ADJ_A,
+EFFT_D,
+Gl_RECN_F,
+PROS_KEY_EFFT_I               
+)
+SELECT 
+DT1.ACCT_I,
+DT1.SRCE_SYST_C, 
+DT1.BALN_TYPE_C,
+DT1.CALC_FUNC_C,
+DT1.TIME_PERD_C,
+DT1.ADJ_FROM_D,
+CASE WHEN ((DT1.EFFT_D - DT1.ADJ_FROM_D) YEAR(4) TO MONTH) (INTERVAL MONTH(4))  = 0 
+THEN DT1.ADJ_FROM_D 
+/*Backdated logic calculation when diffrence of months is 1 
+and DT1.EFFT_D is between Business day 1 and Biz day 4*/
+WHEN ((DT1.EFFT_D - DT1.ADJ_FROM_D) YEAR(4) TO MONTH) (INTERVAL MONTH(4))  = 1 
+AND DT1.EFFT_D <= BSDY_4.CALR_CALR_D THEN DT1.ADJ_FROM_D
+
+/*Backdated logic calculation when diffrence of months is 1 
+and DT1.EFFT_D is NOT between Business day 1 and Biz day 4*/
+WHEN ((DT1.EFFT_D - DT1.ADJ_FROM_D) YEAR(4) TO MONTH) (INTERVAL MONTH(4)) = 1 
+AND DT1.EFFT_D > BSDY_4.CALR_CALR_D  THEN  DT1.EFFT_D - (EXTRACT (DAY FROM DT1.EFFT_D) - 1)  
+
+/*Backdated logic calculation when diffrence of months is greater than 1 
+and DT1.EFFT_D is between Business day 1 and Biz day 4*/
+WHEN ((DT1.EFFT_D - DT1.ADJ_FROM_D) YEAR(4) TO MONTH) (INTERVAL MONTH(4))> 1 
+AND DT1.EFFT_D <= BSDY_4.CALR_CALR_D 
+THEN DT1.EFFT_D - (EXTRACT (DAY FROM DT1.EFFT_D) - 1)-INTERVAL '1' MONTH
+
+/*Backdated logic calculation when diffrence of months is greater than 1 
+and DT1.EFFT_D is  NOT between Business day 1 and Biz day 4*/
+WHEN ((DT1.EFFT_D - DT1.ADJ_FROM_D) YEAR(4) TO MONTH) (INTERVAL MONTH(4))  > 1 
+AND DT1.EFFT_D > BSDY_4.CALR_CALR_D  THEN DT1.EFFT_D - (EXTRACT (DAY FROM DT1.EFFT_D) - 1) 
+END AS BKDT_ADJ_FROM_D,
+DT1.ADJ_TO_D,
+/*Similar adjustments for the same period are added */
+SUM(DT1.ADJ_A) AS ADJ_A,
+DT1.EFFT_D,
+DT1.Gl_RECN_F,
+DT1.PROS_KEY_EFFT_I
+FROM
+(
+SELECT	
+ADJ.ACCT_I AS ACCT_I,
+ADJ.SRCE_SYST_C AS SRCE_SYST_C, 
+ADJ.BALN_TYPE_C AS BALN_TYPE_C,
+ADJ.CALC_FUNC_C AS CALC_FUNC_C,
+ADJ.TIME_PERD_C AS TIME_PERD_C,
+ADJ.ADJ_FROM_D AS ADJ_FROM_D,
+ADJ.ADJ_TO_D,
+/*Adjustments impacting the current record need to be loaded on the next day to avoid changing the open balances
+*/
+(CASE WHEN ADJ.EFFT_D = ADJ.ADJ_TO_D THEN EFFT_D+1
+ELSE EFFT_D END) AS EFFT_D,
+ADJ.Gl_RECN_F,
+ADJ_A,
+PROS_KEY_EFFT_I
+FROM
+%%VTECH%%.ACCT_BALN_ADJ  ADJ
+WHERE	
+SRCE_SYST_C = 'SAP'
+AND BALN_TYPE_C='BALN'
+AND CALC_FUNC_C='SPOT' 
+AND TIME_PERD_C = 'E' 
+/*Excluding the adjustments  with $0 in value as this brings no change to the 
+$value in tha ACCT BALN and had a negative impact on the last records in 
+ACCT BALN, so considerably important to eliminate*/
+AND ADJ.ADJ_A <> 0 
+/* Capturing delta adjustments*/
+AND ADJ.EFFT_D >= 
+	(SELECT MAX(BTCH_RUN_D) 
+	FROM %%VTECH%%.UTIL_PROS_ISAC 
+	WHERE    TRGT_M='ACCT_BALN_BKDT' AND SRCE_SYST_M='GDW'
+	AND COMT_F = 'Y'  	AND SUCC_F='Y')
+)DT1
+INNER JOIN
+(
+/*Calulation of Business day 4 Logic*/
+SELECT	
+CALR_YEAR_N,
+CALR_MNTH_N,
+CALR_CALR_D
+FROM	
+%%VTECH%%.GRD_RPRT_CALR_CLYR
+WHERE	
+CALR_WEEK_DAY_N NOT IN (1,7) 
+AND CALR_NON_WORK_DAY_F = 'N'
+AND CALR_CALR_D BETWEEN  ADD_MONTHS(CURRENT_DATE,-13) AND ADD_MONTHS(CURRENT_DATE,+1)
+QUALIFY	ROW_NUMBER() OVER (PARTITION BY CALR_YEAR_N, CALR_MNTH_N 
+ORDER	BY CALR_CALR_D) = 4
+)BSDY_4
+ON EXTRACT (YEAR 
+FROM DT1.EFFT_D)=EXTRACT (YEAR FROM BSDY_4.CALR_CALR_D)
+AND EXTRACT (MONTH FROM DT1.EFFT_D)=EXTRACT (MONTH FROM BSDY_4.CALR_CALR_D)
+
+WHERE
+/*Including the adjustments that are excluded  in the previous run  for open record*/
+DT1.EFFT_D <= (SELECT MAX(BTCH_RUN_D) AS BTCH_RUN_D
+FROM %%VTECH%%.UTIL_PROS_ISAC
+WHERE    TRGT_M='ACCT_BALN_ADJ' AND SRCE_SYST_M='SAP'
+AND COMT_F = 'Y'  AND SUCC_F='Y')
+
+/*To avoid any records that are processed in the previous runs */
+AND  DT1.EFFT_D > (SELECT MAX(BTCH_RUN_D) AS BTCH_RUN_D
+FROM %%VTECH%%.UTIL_PROS_ISAC
+WHERE    
+TRGT_M='ACCT_BALN_BKDT' AND SRCE_SYST_M='GDW'
+AND COMT_F = 'Y'  AND SUCC_F='Y')
+
+/*To exclude any adjustments that fall in the period where the GL is closed*/
+AND BKDT_ADJ_FROM_D <= ADJ_TO_D
+
+GROUP BY ACCT_I,SRCE_SYST_C, BALN_TYPE_C ,CALC_FUNC_C,TIME_PERD_C,ADJ_FROM_D,
+BKDT_ADJ_FROM_D,ADJ_TO_D,EFFT_D,Gl_RECN_F, PROS_KEY_EFFT_I;
+
+
+.IF ERRORCODE <> 0 THEN .GOTO EXITERR
+
+.QUIT 0
+.LOGOFF
+
+.LABEL EXITERR
+.QUIT 1
+.LOGOFF
+.EXIT
+```
+
+### 2. Reference Stored Procedure Translation (for context)
+```sql
+
+CREATE OR REPLACE PROCEDURE ACCT_BALN_BKDT_ADJ_RULE_ISRT()
+RETURNS STRING
+LANGUAGE SQL
+AS
+$$
+BEGIN
+    -- This is a minimal reference SP for DBT conversion
+    -- The DBT model will be generated directly from the original BTEQ
+    RETURN 'SUCCESS';
+END;
+$$;
+
+```
+
+### 3. Additional Analysis
+Direct BTEQ to DBT conversion for ACCT_BALN_BKDT_ADJ_RULE_ISRT (focus on BTEQ, SP is minimal reference only)
+
+
+## DBT Conversion Requirements
+
+### 1. DBT Model Structure
+- Start with proper Jinja config block using config() macro
+- Use appropriate materialization strategy (ibrg_cld_table with truncate-load)
+- Add meaningful tags for categorization including 'stream_acct_baln_bkdt'
+- Include pre_hook and post_hook for logging with parameterized process/stream names
+- Set proper database/schema references using vars
+
+### 2. Configuration Standards (REQUIRED)
+- ALWAYS use materialized='ibrg_cld_table'
+- ALWAYS include incremental_strategy='truncate-load' when DELETE+INSERT pattern exists  
+- ALWAYS use database=var('target_database')
+- ALWAYS use schema='pddstg'
+- ALWAYS include tmp_database=var('dcf_database')
+- ALWAYS include tmp_schema=var('dcf_schema')
+- ALWAYS include tmp_relation_type='view'
+- Use log_process_start() and log_process_success() macro calls with parameterized process/stream names
+
+### 3. DCF Table Reference Standards
+- DO NOT use ref() macro for source tables - use proper database.schema variable constructs
+- Transform table references like: `%%VTECH%%.ACCT_BALN_ADJ` → `{{ var('vtech_db') }}.{{ var('vtech_sch') }}.ACCT_BALN_ADJ`
+- Use var() macro for configuration values and database/schema references
+
+### 4. Model Naming and Documentation
+- Extract the model name from the BTEQ procedure name (e.g., ACCT_BALN_BKDT_ADJ_RULE_ISRT → ACCT_BALN_BKDT_ADJ_RULE)
+- Use the format "Model: MODEL_NAME" in the comment section
+- Include clear purpose and business logic descriptions
+- List all dependencies using var() constructs
+
+## Process Name Extraction
+For logging hooks, derive process_name and stream_name from the BTEQ procedure name:
+- Example: ACCT_BALN_BKDT_ADJ_RULE_ISRT → process_name='ACCT_BALN_BKDT', stream_name='ACCT_BALN_BKDT_ADJ_RULE'
+
+The output should be formatted as a JSON instance that conforms to the JSON schema below.
+
+As an example, for the schema {"properties": {"foo": {"title": "Foo", "description": "a list of strings", "type": "array", "items": {"type": "string"}}}, "required": ["foo"]}
+the object {"foo": ["bar", "baz"]} is a well-formatted instance of the schema. The object {"properties": {"foo": ["bar", "baz"]}} is not well-formatted.
+
+Here is the output schema:
+```
+{"description": "Structured response for DBT model conversion.", "properties": {"filename": {"description": "The filename for the DBT model (without .sql extension), derived from the model name in lowercase", "title": "Filename", "type": "string"}, "model_name": {"description": "The business model name extracted from BTEQ procedure name (e.g., ACCT_BALN_BKDT_ADJ_RULE)", "title": "Model Name", "type": "string"}, "process_name": {"description": "Process name for logging hooks (e.g., ACCT_BALN_BKDT)", "title": "Process Name", "type": "string"}, "stream_name": {"description": "Stream name for logging hooks (e.g., ACCT_BALN_BKDT_ADJ_RULE)", "title": "Stream Name", "type": "string"}, "dbt_sql": {"description": "Complete DBT model SQL code with Jinja templating", "title": "Dbt Sql", "type": "string"}, "purpose": {"description": "Brief description of the model's business purpose", "title": "Purpose", "type": "string"}, "business_logic": {"description": "Key business logic points and transformation details", "items": {"type": "string"}, "title": "Business Logic", "type": "array"}, "dependencies": {"description": "Source table dependencies using var() constructs", "items": {"type": "string"}, "title": "Dependencies", "type": "array"}, "migration_notes": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "default": [], "description": "Important notes about the conversion from BTEQ to DBT", "title": "Migration Notes"}}, "required": ["filename", "model_name", "process_name", "stream_name", "dbt_sql", "purpose", "business_logic", "dependencies"]}
+```
+
+Provide a complete, valid JSON response that matches the schema exactly.

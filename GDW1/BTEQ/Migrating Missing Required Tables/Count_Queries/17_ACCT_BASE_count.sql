@@ -1,6 +1,0 @@
--- Count query for STARCADPRODDATA.ACCT_BASE
--- Snowflake table: PS_CLD_RW.STARCADPRODDATA.ACCT_BASE
--- Teradata counterpart: STARCADPRODDATA.ACCT_BASE
-
-SELECT count(1) AS record_count
-FROM STARCADPRODDATA.ACCT_BASE; 

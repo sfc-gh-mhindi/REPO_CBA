@@ -1,6 +1,0 @@
--- Count query for PDCBODS.ACCT_MSTR_CYT_DATA
--- Snowflake table: PS_CLD_RW.PDCBODS.ACCT_MSTR_CYT_DATA
--- Teradata counterpart: PDCBODS.ACCT_MSTR_CYT_DATA
-
-SELECT count(1) AS record_count
-FROM PDCBODS.ACCT_MSTR_CYT_DATA; 

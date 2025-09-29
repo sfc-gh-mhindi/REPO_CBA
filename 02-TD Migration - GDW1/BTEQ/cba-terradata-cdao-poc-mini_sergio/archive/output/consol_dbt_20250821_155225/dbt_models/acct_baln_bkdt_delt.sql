@@ -1,0 +1,77 @@
+{%- set process_name = 'ACCT_BALN_BKDT_DELT' -%}
+{%- set stream_name = 'ACCT_BALN_BKDT' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('cad_prod_data_db'),
+    schema='acct_baln',
+    tags=['account_balance', 'delete_operation', 'staging'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_DELT Process started - Deleting modified records from ACCT_BALN_BKDT') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT_DELT Process ended - Records deleted successfully') }}"
+    ]
+  )
+}}
+
+/*
+    Model: acct_baln_bkdt_delt
+    Purpose: Delete accounts from ACCT_BALN_BKDT so that modified data can be inserted in next step
+    Business Logic: Removes records that have been modified as a result of applying adjustments
+                   These records will be reinserted from STG2 in the next step
+    Dependencies: 
+        - ACCT_BALN_BKDT (target table for deletion)
+        - ACCT_BALN_BKDT_STG1 (staging table with modified records)
+    
+    Version: 1.0
+    Created: 2011-10-05 by Suresh Vajapeyajula
+    Converted to DBT: DELETE operation converted to table materialization
+*/
+
+WITH records_to_keep AS (
+    -- Select records from ACCT_BALN_BKDT that should NOT be deleted
+    -- (i.e., records that don't match the staging criteria)
+    SELECT 
+        bal.ACCT_I,
+        bal.BALN_TYPE_C,
+        bal.CALC_FUNC_C,
+        bal.TIME_PERD_C,
+        bal.BKDT_EFFT_D,
+        bal.BKDT_EXPY_D,
+        bal.BALN_A,
+        bal.CALC_F,
+        bal.PROS_KEY_EFFT_I,
+        bal.PROS_KEY_EXPY_I
+    FROM {{ ref('acct_baln_bkdt') }} bal
+    LEFT JOIN {{ ref('acct_baln_bkdt_stg1') }} stg1
+        ON stg1.ACCT_I = bal.ACCT_I    
+        AND stg1.BALN_TYPE_C = bal.BALN_TYPE_C                    
+        AND stg1.CALC_FUNC_C = bal.CALC_FUNC_C                   
+        AND stg1.TIME_PERD_C = bal.TIME_PERD_C                   
+        AND stg1.BKDT_EFFT_D = bal.BKDT_EFFT_D                        
+        AND stg1.BKDT_EXPY_D = bal.BKDT_EXPY_D                        
+        AND stg1.BALN_A = bal.BALN_A                        
+        AND stg1.CALC_F = bal.CALC_F                        
+        AND COALESCE(stg1.PROS_KEY_EFFT_I, 0) = COALESCE(bal.PROS_KEY_EFFT_I, 0)
+        AND COALESCE(stg1.PROS_KEY_EXPY_I, 0) = COALESCE(bal.PROS_KEY_EXPY_I, 0)
+    WHERE stg1.ACCT_I IS NULL  -- Keep only records that don't match staging
+),
+
+final AS (
+    SELECT 
+        ACCT_I,
+        BALN_TYPE_C,
+        CALC_FUNC_C,
+        TIME_PERD_C,
+        BKDT_EFFT_D,
+        BKDT_EXPY_D,
+        BALN_A,
+        CALC_F,
+        PROS_KEY_EFFT_I,
+        PROS_KEY_EXPY_I
+    FROM records_to_keep
+)
+
+SELECT * FROM final

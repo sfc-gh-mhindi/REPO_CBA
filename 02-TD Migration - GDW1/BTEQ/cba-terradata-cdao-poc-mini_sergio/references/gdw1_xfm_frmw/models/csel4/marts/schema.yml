@@ -1,0 +1,171 @@
+version: 2
+
+models:
+  - name: appt_dept
+    description: |
+      Target APPT_DEPT table containing appointment department relationships.
+      Implements incremental loading with SCD Type 1 logic.
+      
+      Key Business Rules:
+      - DEPT_I comes directly from NOMINATED_BRANCH_ID (not from product lookup)
+      - Primary Key: (APPT_I, DEPT_ROLE_C, EFFT_D)
+      - Audit columns track insert and update operations
+      
+    columns:
+      - name: appt_i
+        description: "Appointment ID (CSE:PL:pl_app_id)"
+        tests:
+          - not_null
+          
+      - name: dept_role_c
+        description: "Department role code (default: PP)"
+        tests:
+          - not_null
+          
+      - name: efft_d
+        description: "Effective date"
+        tests:
+          - not_null
+          
+      - name: dept_i
+        description: "Department ID (from NOMINATED_BRANCH_ID)"
+        tests:
+          - not_null
+          
+      - name: expy_d
+        description: "Expiry date"
+        
+      - name: batch_i
+        description: "Batch identifier"
+        tests:
+          - not_null
+          
+      - name: process_i
+        description: "Process identifier"
+        tests:
+          - not_null
+          
+      - name: audit_insrt_ts
+        description: "Record insert timestamp"
+        tests:
+          - not_null
+          
+      - name: audit_insrt_u
+        description: "User who inserted record"
+        tests:
+          - not_null
+          
+      - name: audit_updt_ts
+        description: "Record update timestamp (NULL for new records)"
+        
+      - name: audit_updt_u
+        description: "User who last updated record (NULL for new records)"
+        
+    tests:
+      # Composite primary key test
+      - unique:
+          column_name: "CONCAT(appt_i, '|', dept_role_c, '|', efft_d)"
+          
+      # Referential integrity test (when reference tables are available)
+      # - relationships:
+      #     to: ref('ref_departments')
+      #     field: dept_id
+      #     where: "dept_i IS NOT NULL"
+
+  - name: appt_pdct
+    description: |
+      Target APPT_PDCT table containing appointment product relationships.
+      Implements incremental loading with SCD Type 1 logic.
+      
+      Key Business Rules:
+      - APPT_PDCT_I composed key: CSE + PP + PL_APP_ID
+      - APPT_I composed key: CSE:PL:PL_APP_ID  
+      - Product lookup via MAP_CSE_PACK_PDCT_PL
+      - Primary Key: APPT_PDCT_I
+      
+    columns:
+      - name: appt_pdct_i
+        description: "Application Product ID (CSEPP + pl_app_id)"
+        tests:
+          - not_null
+          - unique
+          
+      - name: appt_i
+        description: "Appointment ID (CSE:PL:pl_app_id)"
+        tests:
+          - not_null
+          
+      - name: appt_qlfy_c
+        description: "Application qualifier code (hardcoded: PP)"
+        
+      - name: pdct_n
+        description: "Product number from lookup"
+        tests:
+          - not_null
+          
+      - name: srce_syst_c
+        description: "Source system code (hardcoded: CSE)"
+        tests:
+          - not_null
+          
+      - name: srce_syst_appt_pdct_i
+        description: "Source system application product ID"
+        tests:
+          - not_null
+          
+      - name: new_acct_f
+        description: "New account flag (hardcoded: N)"
+        
+      - name: copy_from_othr_appt_f
+        description: "Copy from other appointment flag (hardcoded: N)"
+        
+      - name: efft_d
+        description: "Effective date"
+        tests:
+          - not_null
+          
+      - name: expy_d
+        description: "Expiry date"
+        tests:
+          - not_null
+
+  - name: dept_appt
+    description: |
+      Target DEPT_APPT table containing department appointment relationships.
+      Implements incremental loading with SCD Type 1 logic.
+      
+      Key Business Rules:
+      - DEPT_ROLE_C hardcoded to 'NOMN' (Nomination)
+      - DEPT_I comes directly from NOMINATED_BRANCH_ID
+      - Composite Primary Key: (APPT_I, DEPT_ROLE_C, DEPT_I)
+      
+    columns:
+      - name: appt_i
+        description: "Appointment ID (CSE:PL:pl_app_id)"
+        tests:
+          - not_null
+          
+      - name: dept_role_c
+        description: "Department role code (hardcoded: NOMN)"
+        tests:
+          - not_null
+          
+      - name: dept_i
+        description: "Department ID (from NOMINATED_BRANCH_ID)"
+        tests:
+          - not_null
+          
+      - name: efft_d
+        description: "Effective date"
+        tests:
+          - not_null
+          
+      - name: expy_d
+        description: "Expiry date"
+        tests:
+          - not_null
+          
+    tests:
+      # Composite primary key test
+      - unique:
+          column_name: "CONCAT(appt_i, '|', dept_role_c, '|', dept_i)"

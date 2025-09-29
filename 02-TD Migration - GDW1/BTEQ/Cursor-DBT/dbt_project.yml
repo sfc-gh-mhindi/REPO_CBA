@@ -1,0 +1,160 @@
+name: 'GDW1_BTEQ_Migration'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project
+profile: 'GDW1_BTEQ_Migration'
+
+# Dispatch configuration for custom macros
+dispatch:
+  - macro_namespace: dbt
+    search_order: ['GDW1_BTEQ_Migration', 'dbt']
+
+# These configurations specify where dbt should look for different types of files
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configuring models - All table materializations will use appropriate formats
+models:
+  GDW1_BTEQ_Migration:
+    # Default model configuration
+    +materialized: view
+    +docs:
+      node_color: "#A8DADC"
+    +enabled: true  # Enable all models by default
+    
+    # Staging layer - raw data preparation
+    staging:
+      +materialized: view
+      +tags: ['staging']
+      +enabled: true
+      +database: "{{ var('source_database') }}"
+      +schema: "{{ var('stg_schema') }}"
+
+    # Intermediate layer - business logic processing (deploy to DCF database)
+    intermediate:
+      +materialized: table
+      +tags: ['intermediate']
+      +enabled: true
+      +database: "{{ var('intermediate_database') }}"
+      +schema: "{{ var('intermediate_schema') }}"
+      
+      # Account Balance Processing
+      account_balance:
+        +tags: ['intermediate', 'account_balance', 'acct_baln_bkdt']
+        +enabled: true
+        
+      # Derived Account Party Processing  
+      derived_account_party:
+        +tags: ['intermediate', 'derived_account_party', 'derv_acct_paty']
+        +enabled: true
+        
+      # Portfolio Technical Processing
+      portfolio_technical:
+        +tags: ['intermediate', 'portfolio_technical', 'prtf_tech']
+        +enabled: true
+        
+      # Process Control and Utilities
+      process_control:
+        +tags: ['intermediate', 'process_control', 'utilities']
+        +enabled: true
+
+    # Marts layer - final presentation tables
+    marts:
+      +database: "{{ var('target_database') }}"
+      +schema: "{{ var('target_schema') }}"
+      +materialized: table
+      +tags: ['marts']
+      +enabled: true
+      
+      # Account Balance Marts
+      account_balance:
+        +tags: ['marts', 'account_balance']
+        +enabled: true
+        
+      # Derived Account Party Marts
+      derived_account_party:
+        +tags: ['marts', 'derived_account_party']
+        +enabled: true
+        
+      # Portfolio Technical Marts
+      portfolio_technical:
+        +tags: ['marts', 'portfolio_technical']
+        +enabled: true
+
+# Global configurations
+vars:
+  # Database configurations
+  source_database: NPD_D12_DMN_GDWMIG_IBRG_V
+  target_database: NPD_D12_DMN_GDWMIG_IBRG
+  dcf_database: NPD_D12_DMN_GDWMIG_IBRG_V
+  intermediate_database: NPD_D12_DMN_GDWMIG_IBRG_V
+  
+  # source_database: PSUND_MIGR_DCF
+  # target_database: PSUND_MIGR_CLD
+  # dcf_database: PSUND_MIGR_DCF
+  # intermediate_database: PSUND_MIGR_DCF
+
+  # Schema configurations
+  # Source schemas (for reading views)
+  raw_schema: P_V_RAW_001_STD_0
+  stg_schema: P_V_STG_001_STD_0
+  bus_schema: P_V_BUS_001_STD_0
+  ref_schema: P_V_REF_001_STD_0
+  inp_schema: P_V_INP_001_STD_0
+  out_schema: P_V_OUT_001_STD_0
+  dcf_schema: P_D_DCF_001_STD_0
+  
+  # Target schemas (for writing tables)
+  target_schema: P_D_GDW_001_STD_0
+  intermediate_schema: P_D_DCF_001_STD_0
+  
+  # BTEQ Migration specific variables (mapped from original %%variables%%)
+  CAD_PROD_DATA: NPD_D12_DMN_GDWMIG_IBRG.P_D_GDW_001_STD_0 #PSUND_MIGR_CLD.P_D_GDW_001_STD_0
+  CAD_PROD_MACRO: NPD_D12_DMN_GDWMIG_IBRG_V.P_D_DCF_001_STD_0 #PSUND_MIGR_DCF.P_D_DCF_001_STD_0
+  DDSTG: NPD_D12_DMN_GDWMIG_IBRG_V.P_V_STG_001_STD_0 #PSUND_MIGR_DCF.P_V_STG_001_STD_0
+  VTECH: NPD_D12_DMN_GDWMIG_IBRG_V.P_V_TECH_001_STD_0 #PSUND_MIGR_DCF.P_V_TECH_001_STD_0
+  VCBODS: NPD_D12_DMN_GDWMIG_IBRG_V.P_V_CBODS_001_STD_0 #PSUND_MIGR_DCF.P_V_CBODS_001_STD_0
+  VEXTR: NPD_D12_DMN_GDWMIG_IBRG_V.P_V_EXTR_001_STD_0 #PSUND_MIGR_DCF.P_V_EXTR_001_STD_0
+  STARMACRDB: NPD_D12_DMN_GDWMIG_IBRG_V.P_D_DCF_001_STD_0 #PSUND_MIGR_DCF.P_D_DCF_001_STD_0
+  
+  # Environment and processing variables
+  ENV_C: PROD
+  STRM_C: GDW1_BTEQ_MIGRATION
+  GDW_USER: "{{ env_var('DBT_USER', 'dbt_service_user') }}"
+  TBSHORT: GDW1
+  
+  # DCF Processing Control
+  enable_dcf_audit: true
+  dcf_cycle_frequency: 1
+  dcf_processing_window_days: 7
+  business_date_range: 7
+  extended_date_range: 30
+  
+  # Stream configurations for different processing groups
+  default_stream_name: GDW1_BTEQ_MIGRATION
+  account_balance_stream: GDW1_ACCT_BALN_PROCESSING
+  derived_party_stream: GDW1_DERV_ACCT_PATY_PROCESSING
+  portfolio_stream: GDW1_PRTF_TECH_PROCESSING
+  
+  # File processing configurations
+  file_stage_name: GDW1_FILE_STAGE
+  batch_processing_enabled: true
+  
+  # DBT Utils configuration
+  surrogate_key_treat_nulls_as_empty_strings: true
+
+# Snapshot configurations (for SCD Type 2 if needed)
+snapshots:
+  GDW1_BTEQ_Migration:
+    +target_database: "{{ var('target_database') }}"
+    +target_schema: "{{ var('target_schema') }}_SNAPSHOTS"
+    +strategy: timestamp
+    +updated_at: UPDATED_TS 

@@ -1,3 +1,0 @@
-PartitionKey,FileType,Category,CodeUnit,CodeUnitId,FileName,LineNumber,LinesOfCode,EWI Count,FDM Count,PRF Count,HighestEWISeverity,UDFsUsed,EWI,FDM,PRF,ConversionStatus,LoCConversionPercentage,Deployment Order
-62d6f220-9b9b-476b-b4a1-7fb42c59ca71,SQL,VIEW,CREATE VIEW,PVTECH.ACCT_BALN_ADJ,TMP2.sql,30,53,0,1,0,N/A,N/A,N/A,SSC-FDM-0007,N/A,Success,100%,1*
-62d6f220-9b9b-476b-b4a1-7fb42c59ca71,SQL,TABLE,CREATE TABLE,STAR_CAD_PROD_DATA.ACCT_BALN_ADJ,TMP2.sql,2,25,0,1,0,N/A,N/A,N/A,SSC-FDM-TD0024,N/A,Success,100%,0

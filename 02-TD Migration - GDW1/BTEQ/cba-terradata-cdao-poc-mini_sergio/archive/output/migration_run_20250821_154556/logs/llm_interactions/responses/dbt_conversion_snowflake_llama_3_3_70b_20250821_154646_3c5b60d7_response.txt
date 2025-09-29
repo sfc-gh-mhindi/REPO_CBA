@@ -1,0 +1,75 @@
+# LLM Response
+Interaction ID: 20250821_154646_3c5b60d7
+Success: True
+Processing Time: 7533ms
+Quality Score: None
+
+# Response
+```sql
+{%- set process_name = 'ACCT_BALN_BKDT' -%}
+{%- set stream_name = 'ACCT_BALN_BKDT_STREAM' -%}
+
+{{
+  config(
+    materialized='table',
+    database=var('CAD_PROD_DATA'),
+    schema=var('DDSTG'),
+    tags=['ACCT_BALN_BKDT', 'ACCT_BALN_BKDT_STREAM'],
+    pre_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT process started') }}"
+    ],
+    post_hook=[
+        "{{ log_dcf_exec_msg('ACCT_BALN_BKDT process ended') }}"
+    ]
+  )
+}}
+
+/*
+    Model Documentation
+    Purpose: Populate ACCT's into ACCT BALN with the modified adjustments
+    Business Logic: Insert data into ACCT_BALN_BKDT from ACCT_BALN_BKDT_STG2
+    Dependencies: ACCT_BALN_BKDT_STG2
+*/
+
+WITH acct_baln_bkdt_stg2 AS (
+    SELECT 
+        ACCT_I,                        
+        BALN_TYPE_C,                   
+        CALC_FUNC_C,                   
+        TIME_PERD_C,                   
+        BALN_A,                        
+        CALC_F,                        
+        SRCE_SYST_C,                   
+        ORIG_SRCE_SYST_C,              
+        LOAD_D,                        
+        BKDT_EFFT_D,                   
+        BKDT_EXPY_D,                  
+        PROS_KEY_EFFT_I,               
+        PROS_KEY_EXPY_I,               
+        BKDT_PROS_KEY_I
+    FROM 
+        {{ source('DDSTG', 'ACCT_BALN_BKDT_STG2') }}
+),
+
+final AS (
+    SELECT 
+        ACCT_I,                        
+        BALN_TYPE_C,                   
+        CALC_FUNC_C,                   
+        TIME_PERD_C,                   
+        BALN_A,                        
+        CALC_F,                        
+        SRCE_SYST_C,                   
+        ORIG_SRCE_SYST_C,              
+        LOAD_D,                        
+        BKDT_EFFT_D,                   
+        BKDT_EXPY_D,                  
+        PROS_KEY_EFFT_I,               
+        PROS_KEY_EXPY_I,               
+        BKDT_PROS_KEY_I
+    FROM 
+        acct_baln_bkdt_stg2
+)
+
+SELECT * FROM final
+```

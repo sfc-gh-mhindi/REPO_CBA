@@ -1,6 +1,0 @@
--- Count query for DGRDDB.GRD_PRTF_TYPE_ENHC_PSST
--- Snowflake table: PS_CLD_RW.PDGRD.GRD_PRTF_TYPE_ENHC_PSST
--- Teradata counterpart: DGRDDB.GRD_PRTF_TYPE_ENHC_PSST
-
-SELECT count(1) AS record_count
-FROM DGRDDB.GRD_PRTF_TYPE_ENHC_PSST; 

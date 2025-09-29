@@ -1,1 +1,0 @@
-.logon teradata.gdw.cba/%%GDW_USER%%,%%GDW_PASS%%; 

@@ -1,6 +1,0 @@
--- Count query for PDDSTG.ACCT_REL_HLS_REME_HIST
--- Snowflake table: PS_CLD_RW.PDCBSTG.ACCT_REL_HLS_REME_HIST
--- Teradata counterpart: PDDSTG.ACCT_REL_HLS_REME_HIST
-
-SELECT count(1) AS record_count
-FROM PDDSTG.ACCT_REL_HLS_REME_HIST; 

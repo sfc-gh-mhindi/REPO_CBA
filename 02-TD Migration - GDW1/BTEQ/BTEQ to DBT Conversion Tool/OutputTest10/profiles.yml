@@ -1,0 +1,26 @@
+bteq_test10_profile:
+  outputs:
+    dev:
+      account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'
+      database: PSUND_MIGR_DCF
+      keepalives_idle: 240
+      password: '{{ env_var("SNOWFLAKE_PASSWORD") }}'
+      role: '{{ env_var("SNOWFLAKE_ROLE") }}'
+      schema: P_D_DCF_001_STD_0
+      search_path: PSUND_MIGR_DCF.P_D_DCF_001_STD_0
+      threads: 4
+      type: snowflake
+      user: '{{ env_var("SNOWFLAKE_USER") }}'
+      warehouse: '{{ env_var("SNOWFLAKE_WAREHOUSE") }}'
+    prod:
+      account: '{{ env_var("SNOWFLAKE_ACCOUNT") }}'
+      database: PSUND_MIGR_CLD
+      keepalives_idle: 240
+      password: '{{ env_var("SNOWFLAKE_PASSWORD") }}'
+      role: '{{ env_var("SNOWFLAKE_ROLE") }}'
+      schema: P_D_GDW_001_STD_0
+      threads: 8
+      type: snowflake
+      user: '{{ env_var("SNOWFLAKE_USER") }}'
+      warehouse: '{{ env_var("SNOWFLAKE_WAREHOUSE") }}'
+  target: dev

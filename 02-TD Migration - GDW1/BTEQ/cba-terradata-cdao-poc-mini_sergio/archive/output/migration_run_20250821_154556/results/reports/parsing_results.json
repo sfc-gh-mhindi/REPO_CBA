@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_files": 1,
+    "successfully_parsed": 1,
+    "failed_files": 0,
+    "total_sql_blocks": 1,
+    "total_controls": 6
+  },
+  "detailed_results": [
+    {
+      "file": "ACCT_BALN_BKDT_ISRT.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250821_154556/results/parsed/ACCT_BALN_BKDT_ISRT_parsed.json",
+      "sql_blocks_count": 1,
+      "controls_count": 6,
+      "errors": []
+    }
+  ]
+}

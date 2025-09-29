@@ -1,0 +1,279 @@
+{
+  "summary": {
+    "total_files": 47,
+    "successfully_parsed": 11,
+    "failed_files": 36,
+    "total_sql_blocks": 6,
+    "total_controls": 206
+  },
+  "detailed_results": [
+    {
+      "file": "DERV_ACCT_PATY_07_CRAT_DELTAS.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_08_APPLY_DELTAS.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Placeholder found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_AUDT_GET_PROS_KEY.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_06_SET_MAX_PRFR_FLAG.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Between found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_AVG_CALL_PROC.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/ACCT_BALN_BKDT_AVG_CALL_PROC_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 7,
+      "errors": []
+    },
+    {
+      "file": "sp_comt_btch_key.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Placeholder found"
+    },
+    {
+      "file": "prtf_tech_own_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Var found"
+    },
+    {
+      "file": "sp_get_btch_key.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/sp_get_btch_key_parsed.json",
+      "sql_blocks_count": 1,
+      "controls_count": 13,
+      "errors": []
+    },
+    {
+      "file": "ACCT_BALN_BKDT_DELT.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_GET_PROS_KEY.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "prtf_tech_paty_own_rel_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "prtf_tech_paty_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "prtf_tech_int_grup_enhc_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "prtf_tech_acct_int_grup_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "prtf_tech_int_grup_own_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Var found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_03_SET_ACCT_PRTF.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_ISRT.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/ACCT_BALN_BKDT_ISRT_parsed.json",
+      "sql_blocks_count": 1,
+      "controls_count": 6,
+      "errors": []
+    },
+    {
+      "file": "prtf_tech_acct_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Var found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_04_POP_CURR_TABL.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Literal found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_99_DROP_WORK_TABL_CHG0379808.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/DERV_ACCT_PATY_99_DROP_WORK_TABL_CHG0379808_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 64,
+      "errors": []
+    },
+    {
+      "file": "sp_comt_pros_key.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "sp_get_pros_key.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/sp_get_pros_key_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 12,
+      "errors": []
+    },
+    {
+      "file": "prtf_tech_int_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "prtf_tech_paty_rel_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_UTIL_PROS_UPDT.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/ACCT_BALN_BKDT_UTIL_PROS_UPDT_parsed.json",
+      "sql_blocks_count": 1,
+      "controls_count": 6,
+      "errors": []
+    },
+    {
+      "file": "prtf_tech_own_rel_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "bteq_login.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/bteq_login_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 1,
+      "errors": []
+    },
+    {
+      "file": "DERV_ACCT_PATY_99_DROP_WORK_TABL.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/DERV_ACCT_PATY_99_DROP_WORK_TABL_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 70,
+      "errors": []
+    },
+    {
+      "file": "DERV_ACCT_PATY_00_DATAWATCHER.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Add found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_AUDT_ISRT.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_99_SP_COMT_PROS_KEY.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/DERV_ACCT_PATY_99_SP_COMT_PROS_KEY_parsed.json",
+      "sql_blocks_count": 1,
+      "controls_count": 8,
+      "errors": []
+    },
+    {
+      "file": "prtf_tech_grd_prtf_type_enhc_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "BTEQ_SAP_EDO_WKLY_LOAD.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "prtf_tech_acct_own_rel_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "prtf_tech_paty_int_grup_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, EQ found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_06_SET_MAX_PRFR_FLAG_CHG0379808.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Between found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_01_SP_GET_BTCH_KEY.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/DERV_ACCT_PATY_01_SP_GET_BTCH_KEY_parsed.json",
+      "sql_blocks_count": 0,
+      "controls_count": 12,
+      "errors": []
+    },
+    {
+      "file": "ACCT_BALN_BKDT_RECN_GET_PROS_KEY.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_STG_ISRT.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_RECN_ISRT.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Star found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_05_SET_PRTF_PRFR_FLAG.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, NEQ found"
+    },
+    {
+      "file": "prtf_tech_acct_rel_psst.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "DERV_ACCT_PATY_01_SP_GET_PROS_KEY.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    },
+    {
+      "file": "ACCT_BALN_BKDT_ADJ_RULE_ISRT.sql",
+      "success": true,
+      "parsed_file": "output/migration_run_20250822_160302/results/parsed/ACCT_BALN_BKDT_ADJ_RULE_ISRT_parsed.json",
+      "sql_blocks_count": 2,
+      "controls_count": 7,
+      "errors": []
+    },
+    {
+      "file": "DERV_ACCT_PATY_99_SP_COMT_BTCH_KEY.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Placeholder found"
+    },
+    {
+      "file": "prtf_tech_daly_datawatcher_c.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, And found"
+    },
+    {
+      "file": "BTEQ_TAX_INSS_MNLY_LOAD.sql",
+      "success": false,
+      "error": "sequence item 0: expected str instance, Column found"
+    }
+  ]
+}

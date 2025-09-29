@@ -1,0 +1,405 @@
+# LLM RESPONSE
+Interaction ID: a9a66859
+Conversion Type: bteq2sp
+Procedure: ACCT_BALN_BKDT_ADJ_RULE_ISRT
+Model: claude-4-sonnet
+Status: SUCCESS
+Processing Time: 104614ms
+Response Length: 15317 characters
+Quality Score: 0.8
+Timestamp: 2025-08-22T14:15:32.874354
+
+================================================================================
+RAW RESPONSE:
+================================================================================
+```sql
+CREATE OR REPLACE PROCEDURE ACCT_BALN_BKDT_ADJ_RULE_ISRT(
+    P_DDSTG_SCHEMA STRING DEFAULT 'DDSTG',
+    P_VTECH_SCHEMA STRING DEFAULT 'VTECH',
+    P_ERROR_TABLE STRING DEFAULT 'PROCESS_ERROR_LOG',
+    P_PROCESS_KEY STRING DEFAULT 'ACCT_BALN_BKDT_ADJ_RULE_ISRT',
+    P_DEBUG_MODE BOOLEAN DEFAULT FALSE
+)
+RETURNS STRING
+LANGUAGE SQL
+EXECUTE AS CALLER
+AS
+$$
+DECLARE
+-- =============================================================================
+-- Procedure: ACCT_BALN_BKDT_ADJ_RULE_ISRT
+-- Purpose: Calculate backdated adjustments from ACCT_BALN_ADJ and apply to ACCT_BALN
+-- 
+-- Description: This procedure processes account balance adjustments by calculating
+--              backdated adjustment periods based on business day rules and applies
+--              them to the account balance backdated adjustment rule table.
+--
+-- Parameters:
+--   P_DDSTG_SCHEMA   - Target schema for staging tables (default: DDSTG)
+--   P_VTECH_SCHEMA   - Source schema for base tables (default: VTECH)
+--   P_ERROR_TABLE    - Error logging table name (default: PROCESS_ERROR_LOG)
+--   P_PROCESS_KEY    - Process identifier for logging (default: procedure name)
+--   P_DEBUG_MODE     - Enable debug logging (default: FALSE)
+--
+-- Returns: SUCCESS/ERROR message with processing details
+--
+-- Migration Notes:
+--   - Converted from Teradata BTEQ script 90_ISRT_ACCT_BALN_BKDT_ADJ_RULE
+--   - YEAR(4) TO MONTH intervals converted to DATEDIFF(MONTH, ...)
+--   - ADD_MONTHS function converted to DATEADD(MONTH, ...)
+--   - QUALIFY clause preserved (supported in Snowflake)
+--   - Double quotes in string literals converted to single quotes
+--
+-- Version History:
+--   1.0  22/07/2011 Suresh Vajapeyajula - Initial Teradata version
+--   2.0  2025-01-XX Migration Team      - Snowflake conversion
+-- =============================================================================
+
+    -- Control variables
+    v_error_code INTEGER DEFAULT 0;
+    v_error_message STRING DEFAULT '';
+    v_current_step STRING DEFAULT 'INITIALIZATION';
+    v_rows_deleted INTEGER DEFAULT 0;
+    v_rows_inserted INTEGER DEFAULT 0;
+    v_start_time TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP();
+    
+    -- Dynamic SQL variables
+    v_target_table STRING;
+    v_source_schema STRING;
+    v_sql_statement STRING;
+    
+    -- Business logic variables
+    v_last_batch_run_date DATE;
+    v_max_adj_batch_date DATE;
+    
+    -- Exception handling
+    validation_error EXCEPTION (-20001, 'Parameter validation failed');
+    business_logic_error EXCEPTION (-20002, 'Business logic validation failed');
+    data_processing_error EXCEPTION (-20003, 'Data processing error');
+
+BEGIN
+    -- =============================================================================
+    -- INITIALIZATION AND VALIDATION
+    -- =============================================================================
+    
+    v_current_step := 'PARAMETER_VALIDATION';
+    
+    -- Validate input parameters
+    IF (P_DDSTG_SCHEMA IS NULL OR TRIM(P_DDSTG_SCHEMA) = '') THEN
+        RAISE validation_error;
+    END IF;
+    
+    IF (P_VTECH_SCHEMA IS NULL OR TRIM(P_VTECH_SCHEMA) = '') THEN
+        RAISE validation_error;
+    END IF;
+    
+    -- Set dynamic table references
+    v_target_table := P_DDSTG_SCHEMA || '.ACCT_BALN_BKDT_ADJ_RULE';
+    v_source_schema := P_VTECH_SCHEMA;
+    
+    -- Debug logging
+    IF (P_DEBUG_MODE) THEN
+        CALL SYSTEM$LOG('INFO', 'Starting ' || P_PROCESS_KEY || ' at ' || v_start_time::STRING);
+        CALL SYSTEM$LOG('INFO', 'Target table: ' || v_target_table);
+        CALL SYSTEM$LOG('INFO', 'Source schema: ' || v_source_schema);
+    END IF;
+    
+    -- =============================================================================
+    -- BUSINESS VALIDATION - CHECK BATCH RUN DATES
+    -- =============================================================================
+    
+    v_current_step := 'BUSINESS_VALIDATION';
+    
+    -- Get the last successful batch run date for ACCT_BALN_BKDT
+    BEGIN
+        v_sql_statement := 'SELECT MAX(BTCH_RUN_D) FROM ' || v_source_schema || 
+                          '.UTIL_PROS_ISAC WHERE TRGT_M = ''ACCT_BALN_BKDT'' ' ||
+                          'AND SRCE_SYST_M = ''GDW'' AND COMT_F = ''Y'' AND SUCC_F = ''Y''';
+        
+        EXECUTE IMMEDIATE v_sql_statement INTO v_last_batch_run_date;
+        
+        -- Get the max batch run date for ACCT_BALN_ADJ
+        v_sql_statement := 'SELECT MAX(BTCH_RUN_D) FROM ' || v_source_schema || 
+                          '.UTIL_PROS_ISAC WHERE TRGT_M = ''ACCT_BALN_ADJ'' ' ||
+                          'AND SRCE_SYST_M = ''SAP'' AND COMT_F = ''Y'' AND SUCC_F = ''Y''';
+        
+        EXECUTE IMMEDIATE v_sql_statement INTO v_max_adj_batch_date;
+        
+        -- Validate batch dates
+        IF (v_last_batch_run_date IS NULL OR v_max_adj_batch_date IS NULL) THEN
+            v_error_message := 'Required batch run dates not found in UTIL_PROS_ISAC';
+            RAISE business_logic_error;
+        END IF;
+        
+        IF (P_DEBUG_MODE) THEN
+            CALL SYSTEM$LOG('INFO', 'Last BKDT batch date: ' || v_last_batch_run_date::STRING);
+            CALL SYSTEM$LOG('INFO', 'Max ADJ batch date: ' || v_max_adj_batch_date::STRING);
+        END IF;
+        
+    EXCEPTION
+        WHEN OTHER THEN
+            v_error_code := SQLCODE;
+            v_error_message := 'Business validation failed: ' || SQLERRM;
+            RAISE business_logic_error;
+    END;
+    
+    -- =============================================================================
+    -- DATA PROCESSING - DELETE EXISTING RECORDS
+    -- =============================================================================
+    
+    v_current_step := 'DELETE_EXISTING_DATA';
+    
+    BEGIN
+        -- Start transaction
+        BEGIN TRANSACTION;
+        
+        -- Delete all existing records from target table
+        v_sql_statement := 'DELETE FROM ' || v_target_table;
+        EXECUTE IMMEDIATE v_sql_statement;
+        
+        v_rows_deleted := SQLROWCOUNT;
+        
+        IF (P_DEBUG_MODE) THEN
+            CALL SYSTEM$LOG('INFO', 'Deleted ' || v_rows_deleted || ' existing records');
+        END IF;
+        
+    EXCEPTION
+        WHEN OTHER THEN
+            ROLLBACK;
+            v_error_code := SQLCODE;
+            v_error_message := 'Delete operation failed: ' || SQLERRM;
+            RAISE data_processing_error;
+    END;
+    
+    -- =============================================================================
+    -- DATA PROCESSING - INSERT BACKDATED ADJUSTMENT RULES
+    -- =============================================================================
+    
+    v_current_step := 'INSERT_ADJUSTMENT_RULES';
+    
+    BEGIN
+        -- Complex INSERT statement with backdated logic
+        v_sql_statement := '
+        INSERT INTO ' || v_target_table || '
+        (
+            ACCT_I, 
+            SRCE_SYST_C,
+            BALN_TYPE_C,
+            CALC_FUNC_C,
+            TIME_PERD_C,
+            ADJ_FROM_D,
+            BKDT_ADJ_FROM_D,
+            ADJ_TO_D,
+            ADJ_A,
+            EFFT_D,
+            GL_RECN_F,
+            PROS_KEY_EFFT_I               
+        )
+        SELECT 
+            DT1.ACCT_I,
+            DT1.SRCE_SYST_C, 
+            DT1.BALN_TYPE_C,
+            DT1.CALC_FUNC_C,
+            DT1.TIME_PERD_C,
+            DT1.ADJ_FROM_D,
+            CASE 
+                -- Same month: no backdating needed
+                WHEN DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) = 0 
+                THEN DT1.ADJ_FROM_D 
+                
+                -- One month difference and within business day 4
+                WHEN DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) = 1 
+                     AND DT1.EFFT_D <= BSDY_4.CALR_CALR_D 
+                THEN DT1.ADJ_FROM_D
+                
+                -- One month difference and after business day 4
+                WHEN DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) = 1 
+                     AND DT1.EFFT_D > BSDY_4.CALR_CALR_D  
+                THEN DATE_TRUNC(''MONTH'', DT1.EFFT_D)
+                
+                -- More than one month and within business day 4
+                WHEN DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) > 1 
+                     AND DT1.EFFT_D <= BSDY_4.CALR_CALR_D 
+                THEN DATEADD(MONTH, -1, DATE_TRUNC(''MONTH'', DT1.EFFT_D))
+                
+                -- More than one month and after business day 4
+                WHEN DATEDIFF(MONTH, DT1.ADJ_FROM_D, DT1.EFFT_D) > 1 
+                     AND DT1.EFFT_D > BSDY_4.CALR_CALR_D  
+                THEN DATE_TRUNC(''MONTH'', DT1.EFFT_D)
+                
+                ELSE DT1.ADJ_FROM_D
+            END AS BKDT_ADJ_FROM_D,
+            DT1.ADJ_TO_D,
+            SUM(DT1.ADJ_A) AS ADJ_A,  -- Aggregate similar adjustments
+            DT1.EFFT_D,
+            DT1.GL_RECN_F,
+            DT1.PROS_KEY_EFFT_I
+        FROM
+        (
+            SELECT	
+                ADJ.ACCT_I,
+                ADJ.SRCE_SYST_C, 
+                ADJ.BALN_TYPE_C,
+                ADJ.CALC_FUNC_C,
+                ADJ.TIME_PERD_C,
+                ADJ.ADJ_FROM_D,
+                ADJ.ADJ_TO_D,
+                -- Adjust effective date for current period impacts
+                CASE 
+                    WHEN ADJ.EFFT_D = ADJ.ADJ_TO_D 
+                    THEN DATEADD(DAY, 1, ADJ.EFFT_D)
+                    ELSE ADJ.EFFT_D 
+                END AS EFFT_D,
+                ADJ.GL_RECN_F,
+                ADJ.ADJ_A,
+                ADJ.PROS_KEY_EFFT_I
+            FROM ' || v_source_schema || '.ACCT_BALN_ADJ ADJ
+            WHERE	
+                ADJ.SRCE_SYST_C = ''SAP''
+                AND ADJ.BALN_TYPE_C = ''BALN''
+                AND ADJ.CALC_FUNC_C = ''SPOT'' 
+                AND ADJ.TIME_PERD_C = ''E'' 
+                AND ADJ.ADJ_A <> 0  -- Exclude zero-value adjustments
+                AND ADJ.EFFT_D >= ''' || v_last_batch_run_date || '''  -- Delta processing
+        ) DT1
+        INNER JOIN
+        (
+            -- Business day 4 calculation
+            SELECT	
+                CALR_YEAR_N,
+                CALR_MNTH_N,
+                CALR_CALR_D
+            FROM ' || v_source_schema || '.GRD_RPRT_CALR_CLYR
+            WHERE	
+                CALR_WEEK_DAY_N NOT IN (1,7)  -- Exclude weekends
+                AND CALR_NON_WORK_DAY_F = ''N''  -- Exclude holidays
+                AND CALR_CALR_D BETWEEN DATEADD(MONTH, -13, CURRENT_DATE()) 
+                                    AND DATEADD(MONTH, 1, CURRENT_DATE())
+            QUALIFY ROW_NUMBER() OVER (
+                PARTITION BY CALR_YEAR_N, CALR_MNTH_N 
+                ORDER BY CALR_CALR_D
+            ) = 4  -- 4th business day of month
+        ) BSDY_4
+        ON YEAR(DT1.EFFT_D) = YEAR(BSDY_4.CALR_CALR_D)
+           AND MONTH(DT1.EFFT_D) = MONTH(BSDY_4.CALR_CALR_D)
+        WHERE
+            -- Include adjustments from previous run for open records
+            DT1.EFFT_D <= ''' || v_max_adj_batch_date || '''
+            -- Exclude already processed records
+            AND DT1.EFFT_D > ''' || v_last_batch_run_date || '''
+        GROUP BY 
+            DT1.ACCT_I, DT1.SRCE_SYST_C, DT1.BALN_TYPE_C, DT1.CALC_FUNC_C,
+            DT1.TIME_PERD_C, DT1.ADJ_FROM_D, BKDT_ADJ_FROM_D, DT1.ADJ_TO_D,
+            DT1.EFFT_D, DT1.GL_RECN_F, DT1.PROS_KEY_EFFT_I
+        HAVING 
+            -- Exclude adjustments where GL period is closed
+            BKDT_ADJ_FROM_D <= MAX(DT1.ADJ_TO_D)';
+        
+        EXECUTE IMMEDIATE v_sql_statement;
+        
+        v_rows_inserted := SQLROWCOUNT;
+        
+        -- Commit transaction
+        COMMIT;
+        
+        IF (P_DEBUG_MODE) THEN
+            CALL SYSTEM$LOG('INFO', 'Inserted ' || v_rows_inserted || ' adjustment rules');
+        END IF;
+        
+    EXCEPTION
+        WHEN OTHER THEN
+            ROLLBACK;
+            v_error_code := SQLCODE;
+            v_error_message := 'Insert operation failed: ' || SQLERRM;
+            RAISE data_processing_error;
+    END;
+    
+    -- =============================================================================
+    -- SUCCESS COMPLETION
+    -- =============================================================================
+    
+    v_current_step := 'COMPLETION';
+    
+    IF (P_DEBUG_MODE) THEN
+        CALL SYSTEM$LOG('INFO', 'Process completed successfully');
+        CALL SYSTEM$LOG('INFO', 'Total execution time: ' || 
+                       DATEDIFF(SECOND, v_start_time, CURRENT_TIMESTAMP()) || ' seconds');
+    END IF;
+    
+    RETURN 'SUCCESS: ' || P_PROCESS_KEY || ' completed successfully. ' ||
+           'Deleted: ' || v_rows_deleted || ' rows, ' ||
+           'Inserted: ' || v_rows_inserted || ' rows. ' ||
+           'Duration: ' || DATEDIFF(SECOND, v_start_time, CURRENT_TIMESTAMP()) || 's';
+
+EXCEPTION
+    -- =============================================================================
+    -- ERROR HANDLING
+    -- =============================================================================
+    
+    WHEN validation_error THEN
+        ROLLBACK;
+        v_error_message := 'Parameter validation failed in step: ' || v_current_step;
+        
+        BEGIN
+            EXECUTE IMMEDIATE 'INSERT INTO ' || P_ERROR_TABLE || 
+                            ' (PROCESS_KEY, ERROR_CODE, ERROR_MESSAGE, ERROR_STEP, ERROR_TIMESTAMP) ' ||
+                            'VALUES (?, ?, ?, ?, ?)' 
+            USING (P_PROCESS_KEY, -20001, v_error_message, v_current_step, CURRENT_TIMESTAMP());
+        EXCEPTION
+            WHEN OTHER THEN
+                -- Ignore logging errors
+                NULL;
+        END;
+        
+        RETURN 'ERROR: ' || v_error_message;
+        
+    WHEN business_logic_error THEN
+        ROLLBACK;
+        
+        BEGIN
+            EXECUTE IMMEDIATE 'INSERT INTO ' || P_ERROR_TABLE || 
+                            ' (PROCESS_KEY, ERROR_CODE, ERROR_MESSAGE, ERROR_STEP, ERROR_TIMESTAMP) ' ||
+                            'VALUES (?, ?, ?, ?, ?)' 
+            USING (P_PROCESS_KEY, -20002, v_error_message, v_current_step, CURRENT_TIMESTAMP());
+        EXCEPTION
+            WHEN OTHER THEN
+                NULL;
+        END;
+        
+        RETURN 'ERROR: ' || v_error_message;
+        
+    WHEN data_processing_error THEN
+        ROLLBACK;
+        
+        BEGIN
+            EXECUTE IMMEDIATE 'INSERT INTO ' || P_ERROR_TABLE || 
+                            ' (PROCESS_KEY, ERROR_CODE, ERROR_MESSAGE, ERROR_STEP, ERROR_TIMESTAMP) ' ||
+                            'VALUES (?, ?, ?, ?, ?)' 
+            USING (P_PROCESS_KEY, -20003, v_error_message, v_current_step, CURRENT_TIMESTAMP());
+        EXCEPTION
+            WHEN OTHER THEN
+                NULL;
+        END;
+        
+        RETURN 'ERROR: ' || v_error_message;
+        
+    WHEN OTHER THEN
+        ROLLBACK;
+        v_error_code := SQLCODE;
+        v_error_message := 'Unexpected error in step ' || v_current_step || ': ' || SQLERRM;
+        
+        BEGIN
+            EXECUTE IMMEDIATE 'INSERT INTO ' || P_ERROR_TABLE || 
+                            ' (PROCESS_KEY, ERROR_CODE, ERROR_MESSAGE, ERROR_STEP, ERROR_TIMESTAMP) ' ||
+                            'VALUES (?, ?, ?, ?, ?)' 
+            USING (P_PROCESS_KEY, v_error_code, v_error_message, v_current_step, CURRENT_TIMESTAMP());
+        EXCEPTION
+            WHEN OTHER THEN
+                NULL;
+        END;
+        
+        RETURN 'FATAL ERROR: ' || v_error_message || ' (Code: ' || v_error_code || ')';
+        
+END;
+$$;
+```

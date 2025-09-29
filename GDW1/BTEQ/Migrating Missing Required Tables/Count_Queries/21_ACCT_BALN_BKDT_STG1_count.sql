@@ -1,6 +1,0 @@
--- Count query for PDDSTG.ACCT_BALN_BKDT_STG1
--- Snowflake table: PS_CLD_RW.PDDSTG.ACCT_BALN_BKDT_STG1
--- Teradata counterpart: PDDSTG.ACCT_BALN_BKDT_STG1
-
-SELECT count(1) AS record_count
-FROM PDDSTG.ACCT_BALN_BKDT_STG1; 

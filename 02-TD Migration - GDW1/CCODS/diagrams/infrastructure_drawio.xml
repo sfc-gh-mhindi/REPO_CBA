@@ -1,0 +1,176 @@
+<mxfile host="app.diagrams.net" modified="2025-01-27T00:00:00.000Z" agent="Assistant" etag="CSEL_CCODS_Infrastructure" version="24.7.17">
+  <diagram name="CSEL_CCODS_Infrastructure" id="infrastructure">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Main Snowflake Environment Container -->
+        <mxCell id="snowflake_env" value="SNOWFLAKE ENVIRONMENT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=3;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="1070" height="720" as="geometry" />
+        </mxCell>
+        
+        <!-- NPD_D12_DMN_GDWMIG Database -->
+        <mxCell id="main_db" value="NPD_D12_DMN_GDWMIG Database" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="500" height="300" as="geometry" />
+        </mxCell>
+        
+        <!-- TMP Schema -->
+        <mxCell id="tmp_schema" value="TMP Schema" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#388E3C;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="140" width="460" height="240" as="geometry" />
+        </mxCell>
+        
+        <!-- CSEL Procedure -->
+        <mxCell id="csel_proc" value="P_EXECUTE_DBT_CSEL&#xa;🔄 18 Steps&#xa;Procedure" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="170" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- CCODS Procedure -->
+        <mxCell id="ccods_proc" value="P_EXECUTE_DBT_CCODS&#xa;🔄 2 Steps&#xa;Procedure" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="170" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Shared DBT Project -->
+        <mxCell id="dbt_project" value="GDW1_DBT&#xa;📦 Shared Project&#xa;CSEL + CCODS Models" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#F57C00;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="170" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- CSEL Task -->
+        <mxCell id="csel_task" value="T_EXECUTE_DBT_CSEL&#xa;⏰ 3:00 AM Daily&#xa;Australia/Sydney" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="260" width="130" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- CCODS Task -->
+        <mxCell id="ccods_task" value="T_EXECUTE_DBT_CCODS&#xa;⏰ 4:00 AM Daily&#xa;Australia/Sydney" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="270" y="260" width="130" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- NPD_D12_DMN_GDWMIG_IBRG_V Database -->
+        <mxCell id="ibrg_db" value="NPD_D12_DMN_GDWMIG_IBRG_V Database" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#388E3C;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="100" width="480" height="300" as="geometry" />
+        </mxCell>
+        
+        <!-- P_V_OUT_001_STD_0 Schema -->
+        <mxCell id="std_schema" value="P_V_OUT_001_STD_0 Schema" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#F57C00;strokeWidth=2;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="640" y="140" width="440" height="240" as="geometry" />
+        </mxCell>
+        
+        <!-- Audit Table -->
+        <mxCell id="audit_table" value="DCF_T_EXEC_LOG&#xa;📊 Unified Audit&#xa;Both CSEL &amp; CCODS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="170" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Control Table -->
+        <mxCell id="control_table" value="RUN_STRM_TMPL&#xa;⚙️ Control Table&#xa;Stream Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="810" y="170" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Model Outputs -->
+        <mxCell id="model_outputs" value="Model Outputs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F8E9;strokeColor=#689F38;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="260" width="280" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- CSEL Models -->
+        <mxCell id="csel_models" value="📋 CSEL Models&#xa;• Appointments&#xa;• Products&#xa;• Departments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="680" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- CCODS Models -->
+        <mxCell id="ccods_models" value="📈 CCODS Models&#xa;• BCFINSG Transform&#xa;• PLAN_BALN_SEGM_MSTR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="820" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- External Systems -->
+        <mxCell id="external_systems" value="External Systems" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="450" width="500" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- DBT Workspace -->
+        <mxCell id="dbt_workspace" value="Snowflake&#xa;DBT Workspace&#xa;🔧 Development" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="480" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Compute Warehouse -->
+        <mxCell id="warehouse" value="wh_usr_npd_d12_&#xa;gdwmig_001&#xa;⚡ Compute Warehouse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#D32F2F;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="480" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Scheduling -->
+        <mxCell id="scheduling" value="Scheduling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#388E3C;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="450" width="480" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- CSEL Schedule -->
+        <mxCell id="csel_schedule" value="3:00 AM&#xa;Australia/Sydney&#xa;🌅 CSEL Start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="480" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- CCODS Schedule -->
+        <mxCell id="ccods_schedule" value="4:00 AM&#xa;Australia/Sydney&#xa;🌄 CCODS Start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="480" width="130" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Flow Arrows -->
+        <mxCell id="flow1" value="" style="endArrow=classic;html=1;strokeColor=#4CAF50;strokeWidth=3;" edge="1" parent="1" source="csel_schedule" target="csel_task">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow2" value="" style="endArrow=classic;html=1;strokeColor=#4CAF50;strokeWidth=3;" edge="1" parent="1" source="ccods_schedule" target="ccods_task">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow3" value="" style="endArrow=classic;html=1;strokeColor=#2196F3;strokeWidth=2;" edge="1" parent="1" source="csel_task" target="csel_proc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow4" value="" style="endArrow=classic;html=1;strokeColor=#9C27B0;strokeWidth=2;" edge="1" parent="1" source="ccods_task" target="ccods_proc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow5" value="" style="endArrow=classic;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="csel_proc" target="dbt_project">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow6" value="" style="endArrow=classic;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="ccods_proc" target="dbt_project">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="flow7" value="" style="endArrow=classic;html=1;strokeColor=#4CAF50;strokeWidth=2;" edge="1" parent="1" source="dbt_project" target="audit_table">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Title -->
+        <mxCell id="title" value="CSEL &amp; CCODS Snowflake Infrastructure" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="400" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Data Flow: 3:00 AM CSEL → 1 Hour Buffer → 4:00 AM CCODS → Production Ready" style="text;html=1;strokeColor=none;fillColor=#F1F8E9;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;strokeColor=#689F38;" vertex="1" parent="1">
+          <mxGeometry x="200" y="630" width="600" height="30" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile> 

@@ -1,0 +1,11 @@
+{
+  "interaction_id": "c2016650",
+  "conversion_type": "bteq2dbt",
+  "procedure_name": "ACCT_BALN_BKDT_ADJ_RULE_ISRT",
+  "model": "claude-4-sonnet",
+  "prompt_length": 9927,
+  "context_data": {
+    "conversion_type": "bteq_to_dbt_structured"
+  },
+  "timestamp": "2025-08-22T14:46:36.697416"
+}
