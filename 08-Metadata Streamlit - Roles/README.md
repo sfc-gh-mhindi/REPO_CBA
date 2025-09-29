@@ -245,47 +245,6 @@ GRANT USAGE ON WAREHOUSE VIEWER_WH TO ROLE STREAMLIT_VIEWER;
 - **Use different roles for different environments**
 - **Limit production access to authorized personnel only**
 
-#### Warehouse Management
-```sql
--- Use separate warehouses for different purposes
-CREATE WAREHOUSE STREAMLIT_DEV_WH WITH WAREHOUSE_SIZE = 'SMALL';
-CREATE WAREHOUSE STREAMLIT_PROD_WH WITH WAREHOUSE_SIZE = 'MEDIUM';
-CREATE WAREHOUSE STREAMLIT_VIEWER_WH WITH WAREHOUSE_SIZE = 'X-SMALL';
-
--- Grant appropriate access
-GRANT USAGE ON WAREHOUSE STREAMLIT_DEV_WH TO ROLE STREAMLIT_DEVELOPER;
-GRANT USAGE ON WAREHOUSE STREAMLIT_PROD_WH TO ROLE STREAMLIT_ADMIN;
-GRANT USAGE ON WAREHOUSE STREAMLIT_VIEWER_WH TO ROLE STREAMLIT_VIEWER;
-```
-
-### Monitoring and Auditing
-
-#### Track Streamlit Usage
-```sql
--- Query to monitor Streamlit app access
-SELECT 
-    user_name,
-    role_name,
-    query_text,
-    start_time,
-    execution_status
-FROM query_history 
-WHERE query_text ILIKE '%STREAMLIT%'
-  AND start_time >= CURRENT_DATE - 7
-ORDER BY start_time DESC;
-```
-
-#### Monitor Privilege Grants
-```sql
--- Check current Streamlit privileges
-SHOW GRANTS ON STREAMLIT <database_name>.<schema_name>.<app_name>;
-
--- Check role assignments
-SHOW GRANTS TO ROLE STREAMLIT_VIEWER;
-```
-
----
-
 ## Common Scenarios and Solutions
 
 ### Scenario 1: User Cannot Create Streamlit App
@@ -394,7 +353,3 @@ SHOW GRANTS ON SCHEMA <database_name>.<schema_name>;
 - Use resource monitors to control warehouse usage for Streamlit apps
 
 ---
-
-**Last Updated:** [Current Date]  
-**Version:** 1.0  
-**Maintained By:** [Team/Person responsible] 
