@@ -304,3 +304,199 @@ GROUP BY schema_name;
 ---
 
 **Note**: Managed schemas are particularly valuable in enterprise environments where data governance, compliance, and security are critical requirements. They provide a robust foundation for implementing consistent access control policies across your Snowflake data platform.
+
+## 📊 Managed Schemas Access Control Flow Diagram
+
+The following diagram illustrates how managed schemas control access and simplify ownership delegation:
+
+```mermaid
+flowchart TD
+    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    
+    subgraph "Normal Schema Access Control"
+        A1[Schema Owner] --> B1[Object Owner 1]
+        A1 --> B2[Object Owner 2]
+        A1 --> B3[Object Owner 3]
+        
+        B1 --> C1[Can Grant Access<br/>to Object 1]
+        B2 --> C2[Can Grant Access<br/>to Object 2]
+        B3 --> C3[Can Grant Access<br/>to Object 3]
+        
+        C1 --> D1[User A]
+        C1 --> D2[User B]
+        C2 --> D3[User C]
+        C3 --> D4[User D]
+        
+        style A1 fill:#ffcdd2
+        style B1 fill:#ffcdd2
+        style B2 fill:#ffcdd2
+        style B3 fill:#ffcdd2
+        style C1 fill:#ffcdd2
+        style C2 fill:#ffcdd2
+        style C3 fill:#ffcdd2
+    end
+    
+    subgraph "Managed Schema Access Control"
+        E1[Schema Owner<br/>ONLY] --> F1[Object Owner 1<br/>CANNOT Grant Access]
+        E1 --> F2[Object Owner 2<br/>CANNOT Grant Access]
+        E1 --> F3[Object Owner 3<br/>CANNOT Grant Access]
+        
+        E1 --> G1[Centralized Access<br/>Management]
+        
+        G1 --> H1[User A]
+        G1 --> H2[User B]
+        G1 --> H3[User C]
+        G1 --> H4[User D]
+        
+        style E1 fill:#c8e6c9
+        style F1 fill:#c8e6c9
+        style F2 fill:#c8e6c9
+        style F3 fill:#c8e6c9
+        style G1 fill:#4caf50,color:#ffffff
+    end
+    
+    subgraph "Key Differences"
+        I1["❌ Normal Schema:<br/>Multiple Access Points<br/>Security Risk"]
+        I2["✅ Managed Schema:<br/>Single Access Point<br/>Secure & Controlled"]
+        
+        style I1 fill:#ffcdd2
+        style I2 fill:#c8e6c9
+    end
+```
+
+## 🔄 Managed Schema Implementation Workflow
+
+```mermaid
+sequenceDiagram
+    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    
+    participant Admin as Schema Owner<br/>(Data Governance Admin)
+    participant Engineer as Data Engineer<br/>(Object Creator)
+    participant Analyst as Data Analyst<br/>(End User)
+    participant System as Snowflake<br/>(Managed Schema)
+    
+    Note over Admin,System: Schema Setup Phase
+    Admin->>System: CREATE SCHEMA analytics WITH MANAGED ACCESS
+    Admin->>System: GRANT OWNERSHIP ON SCHEMA analytics TO ROLE data_governance_admin
+    
+    Note over Engineer,System: Object Creation Phase
+    Engineer->>System: CREATE TABLE analytics.sensitive_data (id INT, ssn VARCHAR)
+    System-->>Engineer: ✅ Table created successfully
+    
+    Note over Engineer,System: Access Request Phase
+    Engineer->>Admin: Request: "Can I grant access to analyst_role?"
+    Admin->>System: GRANT SELECT ON TABLE analytics.sensitive_data TO ROLE analyst_role
+    System-->>Admin: ✅ Access granted
+    
+    Note over Engineer,System: Failed Access Attempt
+    Engineer->>System: GRANT SELECT ON TABLE analytics.sensitive_data TO ROLE external_user
+    System-->>Engineer: ❌ Error: Insufficient privileges to operate on table
+    
+    Note over Analyst,System: Successful Data Access
+    Analyst->>System: SELECT * FROM analytics.sensitive_data
+    System-->>Analyst: ✅ Data returned (with proper permissions)
+    
+    Note over Admin,System: Access Management
+    Admin->>System: REVOKE SELECT ON TABLE analytics.sensitive_data FROM ROLE analyst_role
+    System-->>Admin: ✅ Access revoked
+    
+    Analyst->>System: SELECT * FROM analytics.sensitive_data
+    System-->>Analyst: ❌ Error: Insufficient privileges
+```
+
+## 🏢 Enterprise Managed Schema Architecture
+
+```mermaid
+graph TB
+    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    
+    subgraph "Enterprise Data Governance"
+        DG[Data Governance<br/>Administrator]
+    end
+    
+    subgraph "Managed Schemas"
+        MS1[PII_DATA<br/>WITH MANAGED ACCESS]
+        MS2[CUSTOMER_DATA<br/>WITH MANAGED ACCESS]
+        MS3[ANALYTICS<br/>WITH MANAGED ACCESS]
+        MS4[SHARED_DATA<br/>WITH MANAGED ACCESS]
+    end
+    
+    subgraph "Object Creators"
+        DE1[Data Engineer 1]
+        DE2[Data Engineer 2]
+        DE3[Data Engineer 3]
+        DE4[Data Engineer 4]
+    end
+    
+    subgraph "Data Consumers"
+        DA1[Data Analyst]
+        DA2[Business User]
+        DA3[External Partner]
+        DA4[Reporting Team]
+    end
+    
+    subgraph "Objects in Schemas"
+        T1[Table: customer_pii]
+        T2[Table: transactions]
+        T3[Table: metrics]
+        T4[Table: shared_reports]
+    end
+    
+    %% Governance Control
+    DG --> MS1
+    DG --> MS2
+    DG --> MS3
+    DG --> MS4
+    
+    %% Object Creation (No Access Control)
+    DE1 -.-> T1
+    DE2 -.-> T2
+    DE3 -.-> T3
+    DE4 -.-> T4
+    
+    %% Schema Containment
+    MS1 --> T1
+    MS2 --> T2
+    MS3 --> T3
+    MS4 --> T4
+    
+    %% Access Control (Only through Schema Owner)
+    DG --> DA1
+    DG --> DA2
+    DG --> DA3
+    DG --> DA4
+    
+    %% Data Access
+    DA1 --> T1
+    DA2 --> T2
+    DA3 --> T4
+    DA4 --> T3
+    
+    %% Styling
+    style DG fill:#4caf50,color:#ffffff
+    style MS1 fill:#2196f3,color:#ffffff
+    style MS2 fill:#2196f3,color:#ffffff
+    style MS3 fill:#2196f3,color:#ffffff
+    style MS4 fill:#2196f3,color:#ffffff
+    style DE1 fill:#ff9800,color:#ffffff
+    style DE2 fill:#ff9800,color:#ffffff
+    style DE3 fill:#ff9800,color:#ffffff
+    style DE4 fill:#ff9800,color:#ffffff
+    style DA1 fill:#9c27b0,color:#ffffff
+    style DA2 fill:#9c27b0,color:#ffffff
+    style DA3 fill:#9c27b0,color:#ffffff
+    style DA4 fill:#9c27b0,color:#ffffff
+```
+
+## 🔐 Security Comparison Matrix
+
+| Aspect | Normal Schema | Managed Schema |
+|--------|---------------|----------------|
+| **Access Control Points** | Multiple (Schema + Object Owners) | Single (Schema Owner Only) |
+| **Security Risk** | High (Privilege Escalation Possible) | Low (Centralized Control) |
+| **Audit Complexity** | Complex (Multiple Grant Sources) | Simple (Single Source) |
+| **Compliance** | Difficult to Maintain | Easy to Maintain |
+| **Administration** | Distributed & Complex | Centralized & Simple |
+| **Object Owner Powers** | Full Access Control | No Access Control |
+| **Governance** | Weak | Strong |
+
