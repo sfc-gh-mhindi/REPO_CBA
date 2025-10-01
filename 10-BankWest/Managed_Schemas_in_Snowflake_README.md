@@ -352,7 +352,7 @@ flowchart TD
         style F1 fill:#c8e6c9
         style F2 fill:#c8e6c9
         style F3 fill:#c8e6c9
-        style G1 fill:#4caf50,color:#ffffff
+        style G1 fill:#4caf50,color:#000000
     end
     
     subgraph "Key Differences"
@@ -473,19 +473,19 @@ graph TB
     DA4 --> T3
     
     %% Styling
-    style DG fill:#4caf50,color:#ffffff
-    style MS1 fill:#2196f3,color:#ffffff
-    style MS2 fill:#2196f3,color:#ffffff
-    style MS3 fill:#2196f3,color:#ffffff
-    style MS4 fill:#2196f3,color:#ffffff
-    style DE1 fill:#ff9800,color:#ffffff
-    style DE2 fill:#ff9800,color:#ffffff
-    style DE3 fill:#ff9800,color:#ffffff
-    style DE4 fill:#ff9800,color:#ffffff
-    style DA1 fill:#9c27b0,color:#ffffff
-    style DA2 fill:#9c27b0,color:#ffffff
-    style DA3 fill:#9c27b0,color:#ffffff
-    style DA4 fill:#9c27b0,color:#ffffff
+    style DG fill:#4caf50,color:#000000
+    style MS1 fill:#2196f3,color:#000000
+    style MS2 fill:#2196f3,color:#000000
+    style MS3 fill:#2196f3,color:#000000
+    style MS4 fill:#2196f3,color:#000000
+    style DE1 fill:#ff9800,color:#000000
+    style DE2 fill:#ff9800,color:#000000
+    style DE3 fill:#ff9800,color:#000000
+    style DE4 fill:#ff9800,color:#000000
+    style DA1 fill:#9c27b0,color:#000000
+    style DA2 fill:#9c27b0,color:#000000
+    style DA3 fill:#9c27b0,color:#000000
+    style DA4 fill:#9c27b0,color:#000000
 ```
 
 ## 🔐 Security Comparison Matrix
