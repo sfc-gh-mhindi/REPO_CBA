@@ -311,7 +311,7 @@ The following diagram illustrates how managed schemas control access and simplif
 
 ```mermaid
 flowchart TD
-    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff' }}}%%
     
     subgraph "Normal Schema Access Control"
         A1[Schema Owner] --> B1[Object Owner 1]
@@ -368,7 +368,7 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff' }}}%%
     
     participant Admin as Schema Owner<br/>(Data Governance Admin)
     participant Engineer as Data Engineer<br/>(Object Creator)
@@ -408,7 +408,7 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    %%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff'}}}%%
+    %%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#1f77b4', 'primaryTextColor': '#000000', 'primaryBorderColor': '#0d47a1', 'lineColor': '#1976d2', 'secondaryColor': '#f5f5f5', 'tertiaryColor': '#ffffff', 'background': '#ffffff', 'mainBkg': '#ffffff', 'secondBkg': '#f5f5f5', 'tertiaryBkg': '#ffffff' }}}%%
     
     subgraph "Enterprise Data Governance"
         DG[Data Governance<br/>Administrator]
