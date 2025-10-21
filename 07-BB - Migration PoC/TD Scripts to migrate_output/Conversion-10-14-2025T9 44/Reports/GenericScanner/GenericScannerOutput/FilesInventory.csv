@@ -1,0 +1,4 @@
+FileName,Extension,Technology,Status,isBinary,Bytes,ContentType,ContentLines,CommentLines,BlankLines
+/BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,sql,SQL,OK,a,61127,Code,1524,129,194
+/storage,,Other,OK,B,57344,Other,364,0,12
+/BV_B360_CRM_CUST_DIMN_V3 1.sql,sql,SQL,OK,a,2755,Code,85,6,9

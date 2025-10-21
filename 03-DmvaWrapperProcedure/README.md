@@ -19,7 +19,8 @@ CREATE OR REPLACE PROCEDURE NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_T
     "P_CHUNKING_DATA_TYPE" VARCHAR DEFAULT null,                 -- Data type for chunking column
     "P_SKIP_WAITING_FOR_MIGRATION_TASKS" VARCHAR DEFAULT 'N',    -- Skip task monitoring (Y/N)
     "P_LOAD_TYPE" VARCHAR DEFAULT 'FULL',                        -- Load type: FULL or INCREMENTAL
-    "P_REFRESH_STRUCTURES_YN" VARCHAR DEFAULT 'Y'                -- Refresh structures (Y/N)
+    "P_REFRESH_STRUCTURES_YN" VARCHAR DEFAULT 'Y',               -- Refresh structures (Y/N)
+    "P_SUPPRESS_LOOP_MESSAGES" VARCHAR DEFAULT 'N'               -- Suppress loop messages (Y/N)
 )
 RETURNS VARCHAR
 ```
@@ -52,6 +53,7 @@ RETURNS VARCHAR
 | **P_SKIP_WAITING_FOR_MIGRATION_TASKS** | VARCHAR | No | 'N' | Skip monitoring migration tasks. Set to 'Y' for asynchronous execution |
 | **P_LOAD_TYPE** | VARCHAR | No | 'FULL' | Load strategy: 'FULL' (clean and reload) or 'INCREMENTAL' (append data) |
 | **P_REFRESH_STRUCTURES_YN** | VARCHAR | No | 'Y' | Control structure setup: 'Y' (full setup) or 'N' (data migration only) |
+| **P_SUPPRESS_LOOP_MESSAGES** | VARCHAR | No | 'N' | Suppress verbose loop messages in output: 'Y' (suppress) or 'N' (show all messages) |
 
 ## Execution Flow
 
@@ -126,7 +128,8 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     null, null, null,             -- Chunking parameters (not used)
     'N',                          -- Wait for completion
     'FULL',                       -- Fresh migration
-    'Y'                           -- Full structure setup
+    'Y',                          -- Full structure setup
+    'N'                           -- Show all messages
 );
 ```
 
@@ -145,7 +148,8 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'DATE',                       -- Date data type
     'N',                          -- Monitor tasks
     'FULL',                       -- Fresh load
-    'Y'                           -- Setup structures
+    'Y',                          -- Setup structures
+    'Y'                           -- Suppress loop messages
 );
 ```
 
@@ -162,7 +166,8 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     null, null, null,             -- Chunking parameters
     'N',                          -- Wait for completion
     'INCREMENTAL',                -- Preserve existing data
-    'Y'                           -- Full setup
+    'Y',                          -- Full setup
+    'N'                           -- Show all messages
 );
 ```
 
@@ -179,7 +184,8 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     null, null, null,             -- Chunking parameters
     'N',                          -- Monitor completion
     'FULL',                       -- Clean load
-    'N'                           -- Skip structure setup
+    'N',                          -- Skip structure setup
+    'N'                           -- Show all messages
 );
 ```
 
@@ -196,7 +202,8 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     null, null, null,             -- Chunking parameters
     'Y',                          -- Skip waiting (async)
     'FULL',                       -- Fresh migration
-    'Y'                           -- Full setup
+    'Y',                          -- Full setup
+    'N'                           -- Show all messages
 );
 ```
 
@@ -215,8 +222,32 @@ CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
     'NUMBER',                     -- Numeric data type
     'N',                          -- Monitor completion
     'FULL',                       -- Fresh migration
-    'Y'                           -- Full setup
+    'Y',                          -- Full setup
+    'Y'                           -- Suppress loop messages (reduce output)
 );
+```
+
+### Example 7: Production Migration with Reduced Output
+```sql
+-- Production migration with minimal output for cleaner logs
+-- Ideal for automated pipelines and scheduled jobs
+CALL NPD_D12_DMN_GDWMIG.MIGRATION_TRACKING_V2.P_MIGRATE_TERADATA_TO_SNOWFLAKE(
+    'K_PDDSTG',                   -- Source schema
+    'PRODUCTION_TABLE',           -- Source table
+    'NPD_D12_DMN_GDWMIG',        -- Target database
+    'PRODUCTION',                 -- Target schema
+    'TD_PRODUCTION_TABLE',        -- Target table
+    'Y',                          -- Enable chunking for large table
+    'CREATED_DATE',               -- Date column for chunking
+    '2024-01-01',                 -- Start date
+    'DATE',                       -- Date data type
+    'N',                          -- Monitor completion
+    'FULL',                       -- Fresh migration
+    'Y',                          -- Full setup
+    'Y'                           -- Suppress verbose loop messages
+);
+-- This reduces output from potentially thousands of lines to only essential status messages
+-- while maintaining key milestones, row counts, and error reporting
 ```
 
 ## Return Value
@@ -225,11 +256,13 @@ The procedure returns a detailed execution log containing:
 
 - **Timestamps:** Each step execution time
 - **Parameter Values:** All input parameters and their validation
-- **Progress Updates:** Real-time status of metadata and migration tasks
+- **Progress Updates:** Real-time status of metadata and migration tasks (verbosity controlled by P_SUPPRESS_LOOP_MESSAGES)
 - **Row Counts:** Before and after migration verification
 - **Error Messages:** Detailed error information if failures occur
-- **Loop Counters:** Task monitoring progress indicators
+- **Loop Counters:** Task monitoring progress indicators (suppressed when P_SUPPRESS_LOOP_MESSAGES = 'Y')
 - **Final Status:** Migration completion confirmation
+
+**Note:** When `P_SUPPRESS_LOOP_MESSAGES = 'Y'`, the loop-based monitoring messages are omitted from the output, resulting in a more concise execution log. This is useful for production environments or when processing many tables where verbose output can become overwhelming.
 
 ## Error Handling and Validation
 
@@ -237,6 +270,7 @@ The procedure returns a detailed execution log containing:
 - **P_LOAD_TYPE:** Must be 'FULL' or 'INCREMENTAL'
 - **P_REFRESH_STRUCTURES_YN:** Must be 'Y' or 'N'
 - **P_SKIP_WAITING_FOR_MIGRATION_TASKS:** Must be 'Y' or 'N'
+- **P_SUPPRESS_LOOP_MESSAGES:** Must be 'Y' or 'N'
 - **Chunking Parameters:** When chunking is enabled, all chunking parameters must be provided
 
 ### Runtime Validation
@@ -310,4 +344,9 @@ The procedure returns a detailed execution log containing:
 ### Monitoring Approach
 - **Synchronous:** For critical migrations requiring immediate validation
 - **Asynchronous:** For large migrations during off-peak hours
-- **Hybrid:** Start synchronous, switch to asynchronous for long-running tasks 
+- **Hybrid:** Start synchronous, switch to asynchronous for long-running tasks
+
+### Output Verbosity Control
+- **Show All Messages (P_SUPPRESS_LOOP_MESSAGES = 'N'):** Ideal for debugging, monitoring progress in real-time, and troubleshooting issues
+- **Suppress Loop Messages (P_SUPPRESS_LOOP_MESSAGES = 'Y'):** Best for production runs, automated pipelines, and reducing output size when monitoring hundreds of tasks
+- **When to Suppress:** Large table migrations with many partitions, scheduled jobs with logging to external systems, or when output size becomes unwieldy 

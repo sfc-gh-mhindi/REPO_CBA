@@ -1,0 +1,4 @@
+﻿DB Name,Table Name,Type of Run,Nbr of Columns,Nbr of Rows,Size on Source (in GB),TD - Calculating Partition Checksums and Validation Measures,TD - Unloading,SF - Loading,SF - Storing Partition Checksums and Validations,Total Duration,Notes
+K_STAR_CAD_PROD_DATA,DERV_ACCT_PATY,Full,11,1063490694,118.96,5,2,2,1,7,
+K_STAR_CAD_PROD_DATA,ACCT_BASE,Full,135,900156213,116.02,2,1,2,2,6,
+K_PDSRCCS,PLAN_BALN_SEGM_MSTR,Full,29,544455967,43.18,20,6,10,3,22,"Updated max_select_columns = 154, distinct_counts = true and all other aggregations false"

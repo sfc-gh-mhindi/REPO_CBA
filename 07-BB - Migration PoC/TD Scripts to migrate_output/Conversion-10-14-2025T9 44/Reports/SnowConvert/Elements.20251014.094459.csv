@@ -1,0 +1,91 @@
+SessionID,Category,Grammar Element,File Type,Total Count,Not Converted Count (Self)
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,LENGTH,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,ALL,SQL,8,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,THEN,SQL,168,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,MIN,SQL,9,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CURRENT_DATE,SQL,13,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,ASC,SQL,11,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,OREPLACE,SQL,6,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,IN,SQL,9,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL,CREATE TABLE,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,LEADING,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Statement - Control of Flow,SEARCHED CASE EXPRESSION,SQL,87,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,TO_CHAR,SQL,49,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,LEFT JOIN,SQL,15,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,IS NULL / IS NOT NULL,SQL,68,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Statement - Control of Flow,SIMPLE CASE EXPRESSION,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,HAVING,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,SELECT,SQL,72,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,SUM,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,LIKE,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Data Type,INTEGER,SQL,5,1
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CURRENT_TIMESTAMP,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL,CREATE MULTISET TABLE,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Data Type,CHAR,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,ORDER BY,SQL,23,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,ROW_NUMBER,SQL,22,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL Content,[CREATE TABLE] VOLATILE,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,INITCAP,SQL,8,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CONCAT,SQL,20,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DML,DELETE,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CEIL,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,TRIM,SQL,35,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,AND,SQL,84,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,SUBSTRING,SQL,6,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,JOIN,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Set Operator,EXCEPT,SQL,62,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,NULL,SQL,19,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,WITH,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,NOT LIKE,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Data Type,VARCHAR,SQL,38,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,NOT IN,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,MAX,SQL,52,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,/,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CHARACTER_LENGTH,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,VALUES,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,DESC,SQL,40,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Set Operator,UNION ALL,SQL,8,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,DISTINCT,SQL,7,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,-,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,XMLAGG,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,=,SQL,188,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,+,SQL,5,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,LOWER,SQL,4,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Data Type,FLOAT,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,OR,SQL,11,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,FIELD ACCESS,SQL,537,1
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,RIGHT,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,LPAD,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,GROUP BY,SQL,8,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL Content,[Create Table] PRIMARY INDEX,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,<>,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL,DROP TABLE,SQL,33,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,LEFT,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,COALESCE,SQL,21,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DML,INTO,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,COUNT,SQL,13,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,POSITION,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,INTERVAL,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,>=,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,<,SQL,14,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,PFTCF.HASH_MD5,SQL,5,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,||,SQL,275,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,FROM,SQL,72,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,ON,SQL,18,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,ADD_MONTHS,SQL,13,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Set Operator,UNION,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,REGEXP_REPLACE,SQL,1,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,UPPER,SQL,12,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,<=,SQL,4,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CHR,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,WHERE,SQL,28,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DML,INSERT,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Query,PARTITION BY,SQL,11,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,DDL Content,TABLE AS query_expr,SQL,37,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,QUALIFY,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,TRAILING,SQL,3,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,*,SQL,2,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,CAST,SQL,52,1
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,SUBSTR,SQL,5,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Operator,>,SQL,14,0
+7346d270-1110-4c9c-957b-5fb9f2ba21df,Functions & Expressions,ABS,SQL,15,0

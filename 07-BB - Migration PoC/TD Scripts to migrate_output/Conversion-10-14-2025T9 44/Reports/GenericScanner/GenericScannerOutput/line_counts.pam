@@ -1,0 +1,10 @@
+FileId,LineKind,Count
+/BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,Code,1524
+/BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,Comment,129
+/BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,Blank,194
+/storage,Other,364
+/storage,Comment,0
+/storage,Blank,12
+/BV_B360_CRM_CUST_DIMN_V3 1.sql,Code,85
+/BV_B360_CRM_CUST_DIMN_V3 1.sql,Comment,6
+/BV_B360_CRM_CUST_DIMN_V3 1.sql,Blank,9

@@ -1,0 +1,4 @@
+Path,Technology,FileKind,BinaryKind,Bytes,SupportedStatus
+/BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,SQL,SourceCodeFile,NotBinary,61127,DoesNotApply,DoesNotApply
+/storage,Other,Other,Unknown,57344,DoesNotApply,DoesNotApply
+/BV_B360_CRM_CUST_DIMN_V3 1.sql,SQL,SourceCodeFile,NotBinary,2755,DoesNotApply,DoesNotApply

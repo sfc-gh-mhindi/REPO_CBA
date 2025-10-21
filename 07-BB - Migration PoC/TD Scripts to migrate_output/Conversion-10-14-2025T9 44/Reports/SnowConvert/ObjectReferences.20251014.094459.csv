@@ -1,0 +1,90 @@
+PartitionKey,FileName,Caller_CodeUnit,Caller_CodeUnit_Database,Caller_CodeUnit_Schema,Caller_CodeUnit_Name,Caller_CodeUnit_FullName,Referenced_Element_Type,Referenced_Element_Database,Referenced_Element_Schema,Referenced_Element_Name,Referenced_Element_FullName,Line,Relation_Type
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CRM_CUST_DIMN_V3 1.sql,INSERT,N/A,N/A,N/A,N/A,CREATE TABLE,N/A,N/A,VT_ALL_CUST_BASE,VT_ALL_CUST_BASE,85,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp,vt_payaways_ftp,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,54,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp,vt_payaways_ftp,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,58,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp_eal_dates,vt_payaways_ftp_eal_dates,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,89,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp_eal_dates,vt_payaways_ftp_eal_dates,CREATE TABLE,,N/A,vt_payaways_ftp,vt_payaways_ftp,91,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp_lat_det,vt_payaways_ftp_lat_det,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,145,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_agg,vt_payaways_agg,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,185,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_agg,vt_payaways_agg,CREATE TABLE,,N/A,vt_payaways_ftp_lat_det,vt_payaways_ftp_lat_det,227,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_agg,vt_payaways_agg,CREATE TABLE,,N/A,vt_payaways_ftp_lat_det,vt_payaways_ftp_lat_det,231,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_agg,vt_payaways_agg,CREATE TABLE,,N/A,vt_payaways_ftp,vt_payaways_ftp,236,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_agg,vt_payaways_agg,CREATE TABLE,,N/A,vt_payaways_ftp_eal_dates,vt_payaways_ftp_eal_dates,243,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_base,vt_payaways_base,252,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_ftp_eal_dates,vt_payaways_ftp_eal_dates,253,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_ftp_lat_det,vt_payaways_ftp_lat_det,254,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_ftp,vt_payaways_ftp,255,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_descriptions,vt_payaways_descriptions,CREATE TABLE,,N/A,vt_payaways_agg,vt_payaways_agg,418,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_agg,vt_payaways_agg,424,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_ftp_ranks,vt_payaways_ftp_ranks,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,445,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_nftp_recurring_ranking_rule,vt_payaways_nftp_recurring_ranking_rule,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,475,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_nftp_nonrecurring_ranking_rule,vt_payaways_nftp_nonrecurring_ranking_rule,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,506,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_nftp_missing_fields_ranking_rules,vt_payaways_nftp_missing_fields_ranking_rules,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,543,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,CREATE TABLE,,N/A,vt_payaways_ftp_ranks,vt_payaways_ftp_ranks,571,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,CREATE TABLE,,N/A,vt_payaways_nftp_recurring_ranking_rule,vt_payaways_nftp_recurring_ranking_rule,576,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,CREATE TABLE,,N/A,vt_payaways_nftp_nonrecurring_ranking_rule,vt_payaways_nftp_nonrecurring_ranking_rule,581,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,CREATE TABLE,,N/A,vt_payaways_nftp_missing_fields_ranking_rules,vt_payaways_nftp_missing_fields_ranking_rules,586,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_rankings,vt_payaways_rankings,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,629,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_payaways_rankings,vt_payaways_rankings,CREATE TABLE,,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,630,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_descriptions,vt_payaways_descriptions,640,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_ftp_ranks,vt_payaways_ftp_ranks,641,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_nftp_recurring_ranking_rule,vt_payaways_nftp_recurring_ranking_rule,642,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_nftp_nonrecurring_ranking_rule,vt_payaways_nftp_nonrecurring_ranking_rule,643,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_nftp_missing_fields_ranking_rules,vt_payaways_nftp_missing_fields_ranking_rules,644,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_final_ranks,vt_payaways_final_ranks,645,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_cust_detl,vt_pn_cust_detl,CREATE TABLE,,N/A,vt_pn_filtered_scores,vt_pn_filtered_scores,758,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_model_def,vt_pn_model_def,CREATE TABLE,,N/A,vt_pn_cust_detl,vt_pn_cust_detl,872,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_increasing_propensity,vt_pn_increasing_propensity,CREATE TABLE,,N/A,vt_pn_model_def,vt_pn_model_def,896,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_multiple_needs,vt_pn_multiple_needs,CREATE TABLE,,N/A,vt_pn_model_def,vt_pn_model_def,974,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_multiple_needs,vt_pn_multiple_needs,CREATE TABLE,,N/A,vt_pn_increasing_propensity,vt_pn_increasing_propensity,976,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_high_need,vt_pn_high_need,CREATE TABLE,,N/A,vt_pn_model_def,vt_pn_model_def,1000,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_high_need,vt_pn_high_need,CREATE TABLE,,N/A,vt_pn_increasing_propensity,vt_pn_increasing_propensity,1006,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_high_need,vt_pn_high_need,CREATE TABLE,,N/A,vt_pn_model_def,vt_pn_model_def,1011,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_combined_insights,vt_pn_combined_insights,CREATE TABLE,,N/A,vt_pn_increasing_propensity,vt_pn_increasing_propensity,1038,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_combined_insights,vt_pn_combined_insights,CREATE TABLE,,N/A,vt_pn_multiple_needs,vt_pn_multiple_needs,1057,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_combined_insights,vt_pn_combined_insights,CREATE TABLE,,N/A,vt_pn_high_need,vt_pn_high_need,1076,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_ranked_insights,vt_pn_ranked_insights,CREATE TABLE,,N/A,vt_pn_combined_insights,vt_pn_combined_insights,1108,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_pn_final,vt_pn_final,CREATE TABLE,,N/A,vt_pn_ranked_insights,vt_pn_ranked_insights,1130,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_filtered_scores,vt_pn_filtered_scores,1135,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_cust_detl,vt_pn_cust_detl,1136,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_model_def,vt_pn_model_def,1137,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_increasing_propensity,vt_pn_increasing_propensity,1138,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_multiple_needs,vt_pn_multiple_needs,1139,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_high_need,vt_pn_high_need,1140,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_combined_insights,vt_pn_combined_insights,1141,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_ranked_insights,vt_pn_ranked_insights,1142,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,grouped_descriptions,grouped_descriptions,CREATE TABLE,,N/A,cashflow_shortfall_description,cashflow_shortfall_description,1186,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,non_multiple_parties,non_multiple_parties,CREATE TABLE,,N/A,cashflow_shortfall_description,cashflow_shortfall_description,1230,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,multiple_parties,multiple_parties,CREATE TABLE,,N/A,cashflow_shortfall_description,cashflow_shortfall_description,1292,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,multiple_parties,multiple_parties,CREATE TABLE,,N/A,grouped_descriptions,grouped_descriptions,1295,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,final_results,final_results,CREATE TABLE,,N/A,non_multiple_parties,non_multiple_parties,1324,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,final_results,final_results,CREATE TABLE,,N/A,multiple_parties,multiple_parties,1327,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,all_cashflow_insights,all_cashflow_insights,CREATE TABLE,N/A,N/A,final_results,final_results,1350,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,ranked_insights,ranked_insights,CREATE TABLE,N/A,N/A,all_cashflow_insights,all_cashflow_insights,1453,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,final_cashflow_table,final_cashflow_table,CREATE TABLE,N/A,N/A,ranked_insights,ranked_insights,1477,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,cashflow_shortfall_description,cashflow_shortfall_description,1484,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,grouped_descriptions,grouped_descriptions,1485,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,non_multiple_parties,non_multiple_parties,1486,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,multiple_parties,multiple_parties,1487,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,N/A,N/A,final_results,final_results,1488,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,N/A,N/A,all_cashflow_insights,all_cashflow_insights,1489,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,N/A,N/A,ranked_insights,ranked_insights,1490,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_stnd,vt_stnd,CREATE TABLE,,N/A,vt_payaways_rankings,vt_payaways_rankings,1509,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_stnd,vt_stnd,CREATE TABLE,,N/A,vt_pn_final,vt_pn_final,1528,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_stnd,vt_stnd,CREATE TABLE,N/A,N/A,final_cashflow_table,final_cashflow_table,1547,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_payaways_rankings,vt_payaways_rankings,1552,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_pn_final,vt_pn_final,1553,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,N/A,N/A,final_cashflow_table,final_cashflow_table,1554,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,vt_stnd_comb,vt_stnd_comb,CREATE TABLE,,N/A,vt_stnd,vt_stnd,1573,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_stnd,vt_stnd,1578,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_REF,VT_REF,CREATE TABLE,,N/A,vt_stnd_comb,vt_stnd_comb,1609,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_COMBINED,VT_COMBINED,CREATE TABLE,,N/A,vt_stnd_comb,vt_stnd_comb,1642,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,vt_stnd_comb,vt_stnd_comb,1659,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_UPDATED,VT_UPDATED,CREATE TABLE,,N/A,VT_COMBINED,VT_COMBINED,1697,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_NEW,VT_NEW,CREATE TABLE,,N/A,VT_COMBINED,VT_COMBINED,1750,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_NEW,VT_NEW,CREATE TABLE,,N/A,VT_REF,VT_REF,1752,SELECT - JOIN
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,VT_COMBINED,VT_COMBINED,1782,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,DROP TABLE,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,VT_REF,VT_REF,1783,DROP
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_REFRESHED,VT_REFRESHED,CREATE TABLE,,N/A,VT_UPDATED,VT_UPDATED,1787,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,CREATE TABLE,N/A,N/A,VT_REFRESHED,VT_REFRESHED,CREATE TABLE,,N/A,VT_NEW,VT_NEW,1789,SELECT - FROM
+7346d270-1110-4c9c-957b-5fb9f2ba21df,BV_B360_CUST_VAU_MGMT_ACTN_INSG 1.sql,INSERT,N/A,N/A,N/A,N/A,CREATE TABLE,,N/A,VT_REFRESHED,VT_REFRESHED,1822,SELECT - FROM
