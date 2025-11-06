@@ -23,6 +23,13 @@
    - 3.2 [Detailed Architecture Components](#32-detailed-architecture-components)
      - 3.2.1 [Storage Layer](#321-storage-layer)
      - 3.2.2 [Ingestion Layer (EL)](#322-ingestion-layer-el)
+       - [DARE Data Source](#dare-data-source)
+       - [Illion Data Source](#illion-data-source)
+       - [ACES Data Source](#aces-data-source)
+       - [GDW Data Source](#gdw-data-source)
+       - [Omnia Data Source](#omnia-data-source)
+       - [CSV Files Data Source](#csv-files-data-source)
+       - [AI Models Data Source](#ai-models-data-source)
      - 3.2.3 [Transformation Layer (T)](#323-transformation-layer-t)
      - 3.2.4 [Consumption Layer](#324-consumption-layer)
    - 3.3 [Detailed Component Mapping](#33-detailed-component-mapping)
@@ -347,14 +354,92 @@ graph LR
 
 #### 3.2.2 Ingestion Layer (EL)
 
-**Batch Ingestion:**
-- **CDC for DARE**: Implement change data capture for real-time synchronization of transactional data
-- **File Ingestion**: Automated ingestion pipelines for Illion files, CSV files, and Parquet files from Omnia
-- **Database Replication**: Direct connectivity to Teradata GDW for historical data migration and ongoing synchronization
+The ingestion layer supports three different types of data ingestion requirements:
+- **Manual**: User-driven data uploads requiring human intervention
+- **Periodic**: Scheduled data ingestion on regular intervals (daily, weekly, monthly)
+- **Real-time**: Immediate data availability without traditional ingestion processes
 
-**Real-time Streaming:**
-- **ACES Watchlist**: Real-time streaming ingestion for time-sensitive watchlist updates using Snowflake Streams
-- **API Integration**: REST API endpoints for real-time data feeds from external systems
+##### DARE Data Source
+**Type**: Periodic
+**Ingestion Options**:
+
+**Option 1: Alteryx Repointing**
+```mermaid
+graph LR
+    DARE[DARE SQL Database] --> Alteryx[Alteryx Workflow]
+    Alteryx --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+**Option 2: OpenFlow Integration**
+```mermaid
+graph LR
+    DARE[DARE Azure SQL] --> OpenFlow[OpenFlow ETL]
+    OpenFlow --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+##### Illion Data Source
+**Type**: Periodic
+**Ingestion Approach**: Repoint Alteryx to write to Snowflake QPD raw layer instead of Teradata
+
+```mermaid
+graph LR
+    Illion[Illion Files] --> Alteryx[Alteryx Workflow]
+    Alteryx --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+##### ACES Data Source
+**Type**: Manual
+**Implementation**: Streamlit application for user file uploads
+
+```mermaid
+graph LR
+    User[Business User] --> Streamlit[Streamlit UI App]
+    Streamlit --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
+```
+
+Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer for subsequent processing.
+
+##### GDW Data Source
+**Type**: Immediately accessible (no ingestion needed)
+**Implementation**: As part of the greenfield initiative, GDW tables will be available as AWS Glue catalog linked externally managed Iceberg tables. QPD only needs to raise a request to access required tables. Per the HLSA design for greenfield, GDW externally managed Iceberg tables will be created in the requestor's database (QPD), pointing to the correct storage location in GDW.
+
+##### Omnia Data Source
+**Type**: Immediately accessible (no ingestion needed)
+**Implementation**: As part of the greenfield initiative, Omnia tables (OTC parquet files) will be available as external tables pointing to their current AWS S3 location. QPD only needs to raise a request to access required tables.
+
+##### CSV Files Data Source
+**Type**: Periodic
+**Ingestion Options**:
+
+**Option 1: SSIS Repointing**
+```mermaid
+graph LR
+    CSV[CSV Files] --> SSIS[SSIS Package]
+    SSIS --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+**Option 2: OpenFlow Integration**
+```mermaid
+graph LR
+    CSV[CSV Files Location] --> OpenFlow[OpenFlow ETL]
+    OpenFlow --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+**Option 3: S3 External Landing**
+```mermaid
+graph LR
+    CSV[CSV Files] --> S3[AWS S3 External Landing]
+    S3 --> SF_Raw[Snowflake QPD Raw Layer]
+```
+
+##### AI Models Data Source
+**Type**: Periodic
+**Implementation**: Repoint AWS SageMaker output to write directly to Snowflake QPD raw layer instead of Teradata
+
+```mermaid
+graph LR
+    SageMaker[AWS SageMaker] --> SF_Raw[Snowflake QPD Raw Layer]
+```
 
 #### 3.2.3 Transformation Layer (T)
 
