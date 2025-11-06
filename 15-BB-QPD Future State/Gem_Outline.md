@@ -18,17 +18,16 @@
    - 2.4 [Consumption Analysis](#24-consumption-analysis)
    - 2.5 [Current State Pain Points](#25-current-state-pain-points)
 
-3. [Architecture Vision and Principles](#3-architecture-vision-and-principles)
-   - 3.1 [Guiding Principles](#31-guiding-principles)
+3. [Future State Architecture Diagram](#3-future-state-architecture-diagram)
+   - 3.1 [Conceptual Architecture](#31-conceptual-architecture)
+   - 3.2 [Detailed Architecture Components](#32-detailed-architecture-components)
+     - 3.2.1 [Storage Layer](#321-storage-layer)
+     - 3.2.2 [Ingestion Layer (EL)](#322-ingestion-layer-el)
+     - 3.2.3 [Transformation Layer (T)](#323-transformation-layer-t)
+     - 3.2.4 [Consumption Layer](#324-consumption-layer)
+   - 3.3 [Detailed Component Mapping](#33-detailed-component-mapping)
 
-4. [Future State Architecture Diagram](#4-future-state-architecture-diagram)
-   - 4.1 [Conceptual Architecture](#41-conceptual-architecture)
-   - 4.2 [Detailed Architecture Components](#42-detailed-architecture-components)
-     - 4.2.1 [Ingestion Layer (EL)](#421-ingestion-layer-el)
-     - 4.2.2 [Storage Layer](#422-storage-layer)
-     - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t)
-     - 4.2.4 [Consumption Layer](#424-consumption-layer)
-   - 4.3 [Detailed Component Mapping](#43-detailed-component-mapping)
+4. [Guiding Principles](#4-guiding-principles)
 
 5. [Security, Governance, and Operations](#5-security-governance-and-operations)
    - 5.1 [Security](#51-security)
@@ -199,28 +198,12 @@ Current downstream consumers include:
 
 ---
 
-## 3. Architecture Vision and Principles
+## 3. Future State Architecture Diagram
 
-### 3.1 Guiding Principles
-
-- **Cloud-Native**: Prioritize fully managed, scalable cloud services that eliminate infrastructure management overhead
-- **ELT First**: Favor Extract, Load, Transform approach leveraging cloud data warehouse compute power over traditional ETL
-- **Decoupled Compute and Storage**: Ensure performance optimization and cost efficiency through independent scaling
-- **Self-Service**: Enable easier data access and analytics capabilities for business users, analysts, and data scientists
-- **Data Governance**: Incorporate security, data quality, and lineage tracking by design across all data flows
-- **Scalability**: Design for elastic scalability to handle varying workloads and data volumes
-- **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
-- **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
-- **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
-
----
-
-## 4. Future State Architecture Diagram
-
-### 4.1 Conceptual Architecture
+### 3.1 Conceptual Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Data Sources"
         A1[SQL Database - DARE]
         A2[Illion Files]
@@ -266,22 +249,45 @@ graph TB
         F3[Security & Access Control]
         F4[Monitoring & Alerting]
     end
+    
+    A1 --> B1
+    A2 --> B2
+    A3 --> B3
+    A4 --> B3
+    A5 --> B1
+    A6 --> B2
+    A7 --> B4
+    
+    B1 --> C1
+    B2 --> C2
+    B3 --> C3
+    B4 --> C4
+    
+    C1 --> D1
+    C2 --> D2
+    C3 --> D3
+    C4 --> D4
+    
+    D1 --> E1
+    D2 --> E2
+    D3 --> E3
+    D4 --> E4
+    E1 --> E5
+    
+    F1 --> C1
+    F1 --> C2
+    F1 --> C3
+    F2 --> D1
+    F2 --> D2
+    F3 --> E1
+    F3 --> E2
+    F4 --> D1
+    F4 --> D2
 ```
 
-### 4.2 Detailed Architecture Components
+### 3.2 Detailed Architecture Components
 
-#### 4.2.1 Ingestion Layer (EL)
-
-**Batch Ingestion:**
-- **CDC for DARE**: Implement change data capture for real-time synchronization of transactional data
-- **File Ingestion**: Automated ingestion pipelines for Illion files, CSV files, and Parquet files from Omnia
-- **Database Replication**: Direct connectivity to Teradata GDW for historical data migration and ongoing synchronization
-
-**Real-time Streaming:**
-- **ACES Watchlist**: Real-time streaming ingestion for time-sensitive watchlist updates using Snowflake Streams
-- **API Integration**: REST API endpoints for real-time data feeds from external systems
-
-#### 4.2.2 Storage Layer
+#### 3.2.1 Storage Layer
 
 **Raw Data Zone (Bronze):**
 - Snowflake stages for landing raw, unprocessed data in original formats
@@ -298,7 +304,18 @@ graph TB
 - Dimensional modeling and aggregated datasets for reporting and analytics
 - High-performance compute resources for complex analytical workloads
 
-#### 4.2.3 Transformation Layer (T)
+#### 3.2.2 Ingestion Layer (EL)
+
+**Batch Ingestion:**
+- **CDC for DARE**: Implement change data capture for real-time synchronization of transactional data
+- **File Ingestion**: Automated ingestion pipelines for Illion files, CSV files, and Parquet files from Omnia
+- **Database Replication**: Direct connectivity to Teradata GDW for historical data migration and ongoing synchronization
+
+**Real-time Streaming:**
+- **ACES Watchlist**: Real-time streaming ingestion for time-sensitive watchlist updates using Snowflake Streams
+- **API Integration**: REST API endpoints for real-time data feeds from external systems
+
+#### 3.2.3 Transformation Layer (T)
 
 **ELT Tool/Framework:**
 - **dbt (Data Build Tool)**: Primary transformation framework for SQL-based data modeling
@@ -310,7 +327,7 @@ graph TB
 - **Data Vault Modeling**: Scalable and auditable data warehouse design for historical tracking
 - **Dimensional Models**: Star schema design optimized for analytical queries and reporting
 
-#### 4.2.4 Consumption Layer
+#### 3.2.4 Consumption Layer
 
 **Tableau/Reporting:**
 - Direct connectivity to Snowflake with native optimization and caching
@@ -328,7 +345,7 @@ graph TB
 - **MLOps Pipeline**: Automated model training, validation, and deployment workflows
 - **Feature Store**: Centralized repository for ML features with versioning and lineage
 
-### 4.3 Detailed Component Mapping
+### 3.3 Detailed Component Mapping
 
 | **Current Tool/System** | **Snowflake Capability** | **Migration Approach** |
 |------------------------|---------------------------|------------------------|
@@ -338,6 +355,20 @@ graph TB
 | Teradata QPD | Snowflake Data Warehouse | Direct migration with performance optimization |
 | SQL Scripts | Snowflake SQL + Stored Procedures | Code conversion and cloud optimization |
 | File Processing | Snowflake Stages + Tasks | Automated file ingestion and processing |
+
+---
+
+## 4. Guiding Principles
+
+- **Cloud-Native**: Prioritize fully managed, scalable cloud services that eliminate infrastructure management overhead
+- **ELT First**: Favor Extract, Load, Transform approach leveraging cloud data warehouse compute power over traditional ETL
+- **Decoupled Compute and Storage**: Ensure performance optimization and cost efficiency through independent scaling
+- **Self-Service**: Enable easier data access and analytics capabilities for business users, analysts, and data scientists
+- **Data Governance**: Incorporate security, data quality, and lineage tracking by design across all data flows
+- **Scalability**: Design for elastic scalability to handle varying workloads and data volumes
+- **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
+- **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
+- **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
 
 ---
 
