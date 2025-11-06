@@ -291,11 +291,45 @@ graph LR
 
 The architecture implements a two-database approach:
 1. **QPD Database**: Internal usage with standard managed schemas for raw and transformed data
-2. **Catalog Linked Database**: External catalog integration for gold layer data products
+2. **QPD Catalog Linked Database**: External catalog integration for gold layer data products
+
+**Landing Layer:**
+- **Purpose**: Landing zone for data sources to push data files to QPD for ingestion
+- **Implementation**: Two-tier landing architecture supporting different data ingestion patterns
+- **Storage Types**: 
+  1. **External Landing (AWS S3 Bucket)**: For externally pushed files from automated data sources
+  2. **Internal Landing (Snowflake Internal Stage)**: For manually submitted data files (e.g., ACES watchlist entries)
+- Provides secure, scalable file storage with lifecycle management policies and flexible ingestion capabilities
+
+```mermaid
+graph LR
+    subgraph "Landing Layer"
+        subgraph "External Landing"
+            S3[AWS S3 Bucket]
+        end
+        subgraph "Internal Landing" 
+            SF_Stage[Snowflake Internal Stage]
+        end
+    end
+    
+    subgraph "Data Sources"
+        Auto[Automated Sources<br/>Illion, DARE, etc.]
+        Manual[Manual Sources<br/>ACES Watchlist]
+    end
+    
+    subgraph "Raw Data Zone"
+        Bronze[Bronze Tables<br/>QPD Database]
+    end
+    
+    Auto --> S3
+    Manual --> SF_Stage
+    S3 --> Bronze
+    SF_Stage --> Bronze
+```
 
 **Raw Data Zone (Bronze):**
 - **Purpose**: Landing zone for raw, unprocessed data in original formats with schema-on-read approach for maximum flexibility and data preservation
-- **Implementation**: Schema in QPD database that receives data copied from external stage pointing to AWS S3 bucket, or directly from ingestion tools into its tables
+- **Implementation**: Schema in QPD database that receives data from both Landing Layer sublayers: external stage pointing to AWS S3 bucket for automated sources, and Snowflake internal stage for manual file submissions
 - **Table Types**: Native Snowflake tables
 - Cost-effective storage with automated lifecycle management
 
