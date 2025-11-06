@@ -289,20 +289,27 @@ graph LR
 
 #### 3.2.1 Storage Layer
 
+The architecture implements a two-database approach:
+1. **QPD Database**: Internal usage with standard managed schemas for raw and transformed data
+2. **Catalog Linked Database**: External catalog integration for gold layer data products
+
 **Raw Data Zone (Bronze):**
-- Snowflake stages for landing raw, unprocessed data in original formats
-- Schema-on-read approach for maximum flexibility and data preservation
+- **Purpose**: Landing zone for raw, unprocessed data in original formats with schema-on-read approach for maximum flexibility and data preservation
+- **Implementation**: Schema in QPD database that receives data copied from external stage pointing to AWS S3 bucket, or directly from ingestion tools into its tables
+- **Table Types**: Native Snowflake tables
 - Cost-effective storage with automated lifecycle management
 
 **Curated Data Zone (Silver):**
-- Cleansed and standardized data with enforced schema and quality rules
-- Business rule applications and data enrichment processes
-- Optimized for downstream consumption with improved query performance
+- **Purpose**: Cleansed and standardized data with enforced schema and quality rules, optimized for downstream consumption with improved query performance
+- **Implementation**: Schema of native tables within QPD database for business rule applications and data enrichment processes
+- **Table Types**: Native Snowflake tables
+- Supports complex transformations and data quality validations
 
 **Data Warehouse (Gold):**
-- Business-ready analytical data models optimized for specific use cases
-- Dimensional modeling and aggregated datasets for reporting and analytics
-- High-performance compute resources for complex analytical workloads
+- **Purpose**: Business-ready analytical data models optimized for specific use cases with dimensional modeling and aggregated datasets for reporting and analytics
+- **Implementation**: Resides on catalog linked database enabling external ecosystem integration and advanced analytics workflows
+- **Table Types**: Externally managed Iceberg tables on AWS Glue catalog linked database
+- High-performance compute resources for complex analytical workloads and cross-platform data sharing
 
 #### 3.2.2 Ingestion Layer (EL)
 
