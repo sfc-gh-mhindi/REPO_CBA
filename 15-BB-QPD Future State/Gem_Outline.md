@@ -9,7 +9,7 @@
    - 1.1 [Background](#11-background)
    - 1.2 [Purpose of this Document](#12-purpose-of-this-document)
    - 1.3 [Executive Summary](#13-executive-summary)
-   - 1.4 [Current Challenge](#14-current-challenge)
+   - 1.4 [Current Challenges](#14-current-challenge)
 
 2. [Current State Architecture Review](#2-current-state-architecture-review)
    - 2.1 [Current Architecture Diagram](#21-current-architecture-diagram)
@@ -89,21 +89,14 @@ This document defines the target future state architecture for QPD, outlining th
 
 The proposed solution involves migrating QPD to Snowflake Cloud Data Platform, implementing a modern ELT (Extract, Load, Transform) approach that leverages cloud-native capabilities. The transformation will retire legacy systems including Alteryx, SSIS, and R-Connect for core data movement, replacing them with Snowflake-native features, dbt for transformations, and Fivetran for data integration. This approach will deliver significant cost savings, improved performance, enhanced scalability, and enable self-service analytics capabilities.
 
-### 1.4 Current Challenge
+### 1.4 Current Challenges
 
 The existing architecture faces several critical challenges:
 
-- **Performance Issues**: Query performance degradation and resource contention
-- **Scalability Limitations**: Fixed infrastructure unable to handle growing data volumes
-- **Maintenance Complexity**: Multiple tools requiring specialized expertise and coordination
-- **Cost Concerns**: High licensing and infrastructure costs with limited flexibility
-- **Technology Debt**: Legacy systems constraining innovation and modern analytics capabilities
-- **Data Quality Issues**: Inconsistent governance and quality controls across tools
 - **Data Accumulation**: Many sandpits contain years of historical data that users rely on for continuity. Snowflake's architecture requires a clear strategy for migrating this data while preserving analytical workflows
 - **Cross-Domain Complexity**: Sandpit datasets often span multiple domains (e.g., Consumer Finance, Customer Service, Wealth). Snowflake's domain-aligned governance model necessitates careful segmentation and integration planning
 - **Functional Dependency**: Sandpit workflows are tightly coupled with historical data. Migrating without this context risks disrupting business-critical insights and reporting
 - **Data Ownership and Stewardship**: Teradata sandpits lack federated ownership. Snowflake's governance framework requires clearly defined data stewardship to support access controls, lineage, and accountability
-- **Retention and Relevance**: With typical retention periods of 12 months, it is essential to identify which datasets are still relevant and ensure only necessary data is migrated
 - **Consumer Enablement**: Analytical consumers including CEE, Tableau users, and analysts expect seamless access to data in the new platform. Snowflake must support these consumption patterns without compromising performance or governance
 
 ---
@@ -178,15 +171,7 @@ graph TB
 
 ### 2.3 Target System (QPD)
 
-The current Teradata QPD system serves as the central data warehouse for quantitative portfolio decisions, housing critical financial and risk data models. It supports complex analytical workloads including:
-
-- Portfolio risk calculations and modeling
-- Credit decision support analytics
-- Regulatory reporting and compliance metrics
-- Real-time fraud detection data feeds
-- Machine learning model training datasets
-
-The system processes terabytes of data daily and supports mission-critical business functions with strict SLA requirements for data freshness and query performance.
+QPD serves as an analytical sandpit built on Teradata technology, designed to facilitate a wide range of production reporting, analytics, and control functions. Numerous key processes, including NBCs and Model Score calculations, depend on the comprehensive and reliable data available within the QPD Sandpit environment.
 
 ### 2.4 Consumption Analysis
 
