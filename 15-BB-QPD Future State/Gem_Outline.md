@@ -395,9 +395,11 @@ graph LR
 graph LR
     User[Business User] --> Streamlit[Streamlit UI App]
     Streamlit --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
+    SF_Internal --> Snowpipe[Snowflake Pipe Objects]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer for subsequent processing.
+Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowflake Pipe objects detect when a file has been added and automatically copy it into the Snowflake QPD Raw Layer table for subsequent processing.
 
 ##### GDW Data Source
 **Type**: Immediately accessible (no ingestion needed)
