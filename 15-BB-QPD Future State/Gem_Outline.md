@@ -185,12 +185,17 @@ Current downstream consumers include:
 
 ### 2.5 Current State Pain Points
 
-- **Performance Issues**: Query performance bottlenecks and resource contention
+<!-- - **Performance Issues**: Query performance bottlenecks and resource contention
 - **Scalability Limitations**: Fixed infrastructure unable to handle growing data volumes and user demands
 - **Maintenance Complexity**: Multiple disparate tools requiring specialized expertise and complex coordination
 - **Cost Concerns**: High licensing costs, infrastructure overhead, and limited cost optimization capabilities
 - **Technology Debt**: Legacy systems constraining innovation and preventing adoption of modern analytics capabilities
-- **Data Quality Issues**: Inconsistent governance frameworks and quality controls across multiple transformation tools
+- **Data Quality Issues**: Inconsistent governance frameworks and quality controls across multiple transformation tools -->
+
+- **Diverse Platforms**: Multiple platforms make it difficult to sustain a common skillset amongst staff
+- **Coupled Compute and Storage**: Fixed infrastructure architecture limiting independent scaling and cost optimization
+- **Technology Fragmentation**: Different technologies being used for ingestion and transformation creating operational complexity
+- **Cross-Domain Data Access**: Data residing in different domains creates overhead to pull into QPD
 
 ---
 
