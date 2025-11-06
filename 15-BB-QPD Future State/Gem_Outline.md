@@ -300,6 +300,39 @@ The architecture implements a two-database approach:
 1. **QPD Database**: Internal usage with standard managed schemas for raw and transformed data
 2. **QPD Catalog Linked Database**: External catalog integration for gold layer data products
 
+```mermaid
+graph TB
+    subgraph "QPD Database"
+        subgraph "Landing Layer"
+            subgraph "External Landing"
+                S3[AWS S3 Bucket<br/>Automated Sources]
+            end
+            subgraph "Internal Landing"
+                SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
+            end
+        end
+        
+        subgraph "Raw Data Zone (Bronze)"
+            Bronze[Native Snowflake Tables<br/>Schema-on-read]
+        end
+        
+        subgraph "Curated Data Zone (Silver)"
+            Silver[Native Snowflake Tables<br/>Cleansed & Standardized]
+        end
+    end
+    
+    subgraph "QPD Catalog Linked Database"
+        subgraph "Data Warehouse (Gold)"
+            Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog]
+        end
+    end
+    
+    S3 --> Bronze
+    SF_Stage --> Bronze
+    Bronze --> Silver
+    Silver --> Gold
+```
+
 **Landing Layer:**
 - **Purpose**: Landing zone for data sources to push data files to QPD for ingestion
 - **Implementation**: Two-tier landing architecture supporting different data ingestion patterns
