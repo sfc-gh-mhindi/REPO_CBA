@@ -392,6 +392,42 @@ The ingestion layer supports three different types of data ingestion requirement
 - **Periodic**: Scheduled data ingestion on regular intervals (daily, weekly, monthly)
 - **Real-time**: Immediate data availability without traditional ingestion processes
 
+The selection of appropriate ingestion methodology for each data source depends on several key factors including the nature of the data source, the variety of data types it contains, and its specific periodicity requirements. Different sources require tailored approaches to ensure optimal performance, reliability, and alignment with business requirements.
+
+```mermaid
+graph TB
+    subgraph "Data Sources & Ingestion Methods"
+        subgraph "Periodic Sources"
+            DARE[DARE SQL Database<br/>→ Alteryx Repointing]
+            Illion[Illion Files<br/>→ Alteryx Repointing]
+            CSV[CSV Files<br/>→ SSIS Repointing]
+            AI[AI Models SageMaker<br/>→ Direct Repointing]
+        end
+        
+        subgraph "Manual Sources"
+            ACES[ACES Watchlist<br/>→ Streamlit UI App]
+        end
+        
+        subgraph "Immediately Accessible"
+            GDW[GDW Tables<br/>→ Glue Catalog Linked]
+            Omnia[Omnia Parquet<br/>→ External Tables]
+        end
+    end
+    
+    subgraph "Target Layers"
+        Raw[Snowflake QPD Raw Layer]
+        Direct[Direct Access<br/>No Ingestion Required]
+    end
+    
+    DARE --> Raw
+    Illion --> Raw
+    CSV --> Raw
+    AI --> Raw
+    ACES --> Raw
+    GDW --> Direct
+    Omnia --> Direct
+```
+
 ##### DARE Data Source
 **Type**: Periodic
 **Ingestion Options**:
