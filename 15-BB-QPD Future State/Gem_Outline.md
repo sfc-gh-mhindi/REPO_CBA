@@ -3,11 +3,66 @@
 
 ---
 
+## Table of Contents
+
+1. [Introduction and Executive Summary](#introduction-and-executive-summary)
+   - 1.1 [Background](#11-background)
+   - 1.2 [Purpose of this Document](#12-purpose-of-this-document)
+   - 1.3 [Executive Summary](#13-executive-summary)
+   - 1.4 [Current Challenge](#14-current-challenge)
+
+2. [Current State Architecture Review](#2-current-state-architecture-review)
+   - 2.1 [Current Architecture Diagram](#21-current-architecture-diagram)
+   - 2.2 [Data Sources Analysis](#22-data-sources-analysis)
+   - 2.3 [Target System (QPD)](#23-target-system-qpd)
+   - 2.4 [Consumption Analysis](#24-consumption-analysis)
+   - 2.5 [Current State Pain Points](#25-current-state-pain-points)
+
+3. [Architecture Vision and Principles](#3-architecture-vision-and-principles)
+   - 3.1 [Guiding Principles](#31-guiding-principles)
+
+4. [Future State Architecture Diagram](#4-future-state-architecture-diagram)
+   - 4.1 [Conceptual Architecture](#41-conceptual-architecture)
+   - 4.2 [Detailed Architecture Components](#42-detailed-architecture-components)
+     - 4.2.1 [Ingestion Layer (EL)](#421-ingestion-layer-el)
+     - 4.2.2 [Storage Layer](#422-storage-layer)
+     - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t)
+     - 4.2.4 [Consumption Layer](#424-consumption-layer)
+   - 4.3 [Detailed Component Mapping](#43-detailed-component-mapping)
+
+5. [Security, Governance, and Operations](#5-security-governance-and-operations)
+   - 5.1 [Security](#51-security)
+   - 5.2 [Data Governance](#52-data-governance)
+   - 5.3 [Operational Model (FinOps)](#53-operational-model-finops)
+
+6. [Business Benefits and Conclusion](#6-business-benefits-and-conclusion)
+   - 6.1 [Expected Benefits](#61-expected-benefits)
+   - 6.2 [Next Steps](#62-next-steps)
+
+7. [Use Case Scenarios and Architecture Application](#7-use-case-scenarios-and-architecture-application)
+   - 7.1 [Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)](#71-smart-mini-data-load-dare--alteryx--qpd--tableau)
+   - 7.2 [Illion Bureau Data Load](#72-illion-bureau-data-load)
+   - 7.3 [Direct Debit Monitoring Tool](#73-direct-debit-monitoring-tool)
+   - 7.4 [Watchlist Integration](#74-watchlist-integration)
+   - 7.5 [Cashflow Model Output](#75-cashflow-model-output)
+   - 7.6 [Customer Value Management (CVM) Insights to Service Domain](#76-customer-value-management-cvm-insights-to-service-domain)
+   - 7.7 [BB Data Quality Platform](#77-bb-data-quality-platform)
+
+8. [Document Information](#document-information)
+
+---
+
 ## Introduction and Executive Summary
 
 ### 1.1 Background
 
-The current QPD (Quantitative Portfolio Decisions) system relies heavily on Teradata as the central data warehouse, supported by a complex ecosystem of disparate tools and data sources. The current architecture includes:
+To align with our cloud-first strategy and simplify our data platforms, we are gradually transitioning away from legacy systems such as Teradata. While Teradata has served multiple teams effectively over the years, it has become increasingly expensive and less compatible with modern cloud-native architectures.
+
+As an initial step, we successfully migrated Teradata to AWS. However, a significant portion of the ongoing cost is attributed to sandpit environments, particularly QPD sandpits, which are widely used for testing and analysis across teams. These environments consume substantial storage and compute resources, and many are either unmanaged or no longer actively used.
+
+To address this, we are initiating a phased migration of QPD sandpit workloads to more efficient platforms such as Snowflake and AWS-native services. This transition is expected to reduce operational costs, enhance data security, and streamline platform governance.
+
+The current QPD (Quantitative Portfolio Decisions) system architecture includes:
 
 **Data Sources:**
 - SQL Database (DARE)
@@ -24,11 +79,11 @@ The current QPD (Quantitative Portfolio Decisions) system relies heavily on Tera
 - SSIS for data integration
 - R-Connect for statistical analysis and data movement
 
-This fragmented approach has created significant challenges including high total cost of ownership (TCO), performance bottlenecks, scalability limitations, maintenance complexity, and limited support for modern analytics workloads.
+This fragmented approach, combined with the legacy Teradata infrastructure, has created significant challenges including high total cost of ownership (TCO), performance bottlenecks, scalability limitations, maintenance complexity, and limited support for modern analytics workloads.
 
 ### 1.2 Purpose of this Document
 
-This document defines the target future state architecture for QPD, outlining the migration from the current Teradata-based system to a modern cloud data platform. It establishes the required platform capabilities, data flow architecture, migration strategy, and quantifiable business benefits. The document serves as a blueprint for stakeholders to understand the transformation scope, approach, and expected outcomes.
+This document defines the target future state architecture for QPD, outlining the migration from the current Teradata-based system to a modern cloud data platform. It establishes the required platform capabilities, data flow architecture, and quantifiable business benefits. Additionally, this document translates and maps the use cases validated in the Proof of Concept (PoC) to the future state architecture, demonstrating how these scenarios will be supported in the target Snowflake environment. The document serves as a blueprint for stakeholders to understand the transformation scope, approach, and expected outcomes.
 
 ### 1.3 Executive Summary
 
@@ -44,6 +99,12 @@ The existing architecture faces several critical challenges:
 - **Cost Concerns**: High licensing and infrastructure costs with limited flexibility
 - **Technology Debt**: Legacy systems constraining innovation and modern analytics capabilities
 - **Data Quality Issues**: Inconsistent governance and quality controls across tools
+- **Data Accumulation**: Many sandpits contain years of historical data that users rely on for continuity. Snowflake's architecture requires a clear strategy for migrating this data while preserving analytical workflows
+- **Cross-Domain Complexity**: Sandpit datasets often span multiple domains (e.g., Consumer Finance, Customer Service, Wealth). Snowflake's domain-aligned governance model necessitates careful segmentation and integration planning
+- **Functional Dependency**: Sandpit workflows are tightly coupled with historical data. Migrating without this context risks disrupting business-critical insights and reporting
+- **Data Ownership and Stewardship**: Teradata sandpits lack federated ownership. Snowflake's governance framework requires clearly defined data stewardship to support access controls, lineage, and accountability
+- **Retention and Relevance**: With typical retention periods of 12 months, it is essential to identify which datasets are still relevant and ensure only necessary data is migrated
+- **Consumer Enablement**: Analytical consumers including CEE, Tableau users, and analysts expect seamless access to data in the new platform. Snowflake must support these consumption patterns without compromising performance or governance
 
 ---
 
@@ -384,68 +445,132 @@ graph TB
 
 ## 7. Use Case Scenarios and Architecture Application
 
-### 7.1 Real-Time Fraud Detection
+### 7.1 Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)
 
-**Current State:** Batch processing with 4-6 hour latency for fraud model updates
-**Future State:** Real-time streaming ingestion with sub-minute model scoring
-**Architecture Components:**
-- Snowflake Streams for real-time transaction ingestion
-- Native ML functions for immediate scoring
-- API endpoints for instant fraud alerts
+**Use Case:** Smart Mini Data Load used for merchant migration and mobile user analysis, this flow transforms DARE SQL Server data via Alteryx and loads it into QPD for Tableau dashboarding. It supports weekly refreshes and validation of transactional counts.
 
-### 7.2 Regulatory Reporting (CCAR/CECL)
+**Current State:**
+- **Source:** DARE SQL Server tables
+- **Tool:** Alteryx workflows
+- **Target:** QPD tables
+- **Output:** Tableau dashboards for merchant migration and mobile user analysis
+- **Load Frequency:** Weekly
 
-**Current State:** Month-end batch processes requiring significant manual intervention
-**Future State:** Automated daily reporting with audit trail capabilities
-**Architecture Components:**
-- Automated dbt transformations for regulatory calculations
-- Version-controlled data lineage for audit compliance
-- Snowflake's built-in time-travel for historical analysis
+**Future State Architecture:**
+- **Ingestion:** Fivetran connector for DARE SQL Server with automated CDC
+- **Transformation:** dbt models replacing Alteryx workflows for data preparation
+- **Storage:** Snowflake tables with optimized clustering for query performance
+- **Consumption:** Tableau connected directly to Snowflake with live connectivity
+- **Benefits:** Reduced processing time, automated data quality checks, real-time insights
 
-### 7.3 Portfolio Risk Analytics
+### 7.2 Illion Bureau Data Load
 
-**Current State:** Complex R-Connect scripts with performance bottlenecks
-**Future State:** Native Snowflake statistical functions with elastic compute
-**Architecture Components:**
-- Snowflake's statistical and mathematical functions
-- Integration with Python/R for advanced modeling
-- Scalable compute warehouses for Monte Carlo simulations
+**Use Case:** Monthly Credit Bureau Reporting - Monthly bureau files from Illion are ingested and transformed using SQL and Alteryx, then loaded into QPD for credit risk dashboards. This supports regulatory and financial insights with ~90K records per month.
 
-### 7.4 Customer 360 Analytics
+**Current State:**
+- **Source:** Illion files - External
+- **Tool:** SQL + Alteryx
+- **Target:** ILLION_TXN_DATA_LOAD in QPD
+- **Output:** Tableau dashboards for bureau-level insights
+- **Size Estimate:** ~79,985 to 89,023 records per month
+- **Load Frequency:** Monthly
 
-**Current State:** Data siloed across multiple systems with inconsistent views
-**Future State:** Unified customer data platform with real-time updates
-**Architecture Components:**
-- Data sharing capabilities across business units
-- Master data management with Snowflake's MERGE capabilities
-- Self-service analytics with governed data access
+**Future State Architecture:**
+- **Ingestion:** Snowflake External Stages with automated file detection via Snowpipe
+- **Transformation:** dbt models for data cleansing and business rule application
+- **Storage:** Snowflake tables with time-travel capabilities for audit compliance
+- **Consumption:** Enhanced Tableau dashboards with real-time refresh capabilities
+- **Benefits:** Automated processing, improved data lineage, reduced manual intervention
 
-### 7.5 ESG Reporting and Analytics
+### 7.3 Direct Debit Monitoring Tool
 
-**Current State:** Manual data collection and spreadsheet-based reporting
-**Future State:** Automated ESG metrics collection and standardized reporting
-**Architecture Components:**
-- External data integration for ESG metrics
-- Automated calculation frameworks using dbt
-- Interactive dashboards for stakeholder reporting
+**Use Case:** DDMT (Direct Debit Monitoring Tool) is a standalone internal tool used by frontline teams to monitor direct debit facility utilisation, identify breaches, and support annual reviews. It consumes data loaded into QPD tables via SSIS packages, which processes encrypted APCA names, CommBiz limits, and claims data from shared folders.
 
-### 7.6 Credit Risk Modeling
+**Current State:**
+- **Source:** Raw files (claims data, APCA names, DD limits) manually placed in shared folders
+- **Tool:** SSIS package loads data into QPD tables
+- **Target:** QPD tables used by DDMT tool
+- **Output:** DDMT for monitoring and annual review support
+- **Load Frequency:** Manual/periodic uploads
 
-**Current State:** Batch model training with limited feature engineering capabilities
-**Future State:** Real-time feature engineering with automated model retraining
-**Architecture Components:**
-- Feature store with automated feature computation
-- MLOps pipeline for model lifecycle management
-- A/B testing framework for model performance comparison
+**Future State Architecture:**
+- **Ingestion:** Snowflake External Stages with automated file processing via Tasks
+- **Transformation:** dbt models for data validation and encryption handling
+- **Storage:** Secure Snowflake tables with row-level security and audit logging
+- **Consumption:** Modernized DDMT tool with direct Snowflake connectivity or API layer
+- **Benefits:** Automated file processing, enhanced security, improved audit capabilities
 
-### 7.7 Market Data Analytics
+### 7.4 Watchlist Integration
 
-**Current State:** Limited market data integration with performance constraints
-**Future State:** Real-time market data ingestion with advanced analytics
-**Architecture Components:**
-- High-frequency data ingestion using Snowpipe
-- Time-series analytics with native functions
-- Integration with external market data providers
+**Use Case:** The Watchlist Integration supports the Customer Experience Engine (CEE) by enabling conflict checks and risk classification workflows. The ACES Watchlist, a critical component of credit risk oversight, is manually loaded into QPD to support consolidated reporting and downstream analytics.
+
+**Current State:**
+- **Source:** ACES Watchlist entries manually curated by business units and submitted monthly
+- **Tool:** Files received from ACES team, validated and manually loaded into QPD by BB Data Office
+- **Target:** QPD tables for consolidated reporting
+- **Output:** Monthly Watchlist Reports for credit risk teams and business units to monitor flagged borrowers, trigger escalations to Group Credit Structuring (GCS), and support regulatory and internal audit requirements
+- **Load Frequency:** Weekly
+
+**Future State Architecture:**
+- **Ingestion:** Automated API integration with ACES system or secure file transfer to Snowflake stages
+- **Transformation:** dbt models for data validation, conflict resolution, and business rule application
+- **Storage:** Snowflake tables with secure access controls and complete audit trail
+- **Consumption:** Real-time dashboards and automated alerting for risk teams, API integration with CEE
+- **Benefits:** Reduced manual processing, real-time risk monitoring, enhanced compliance capabilities
+
+### 7.5 Cashflow Model Output
+
+**Use Case:** The CVM Cashflow Forecast initiative is part of the broader MEP (Model Execution Pipeline) framework. It aims to operationalise credit and debit cashflow forecasting models using AWS SageMaker, Glue ETL, and Teradata QPD. These forecasts are consumed by platforms like Bankers Workbench (BWB) to support customer engagement and advisory.
+
+**Current State:**
+- **Tables:** Final table for structured credit forecasts & Final table for structured debit forecasts
+- **Tool:** QPD for table creation, testing, and structured storage; AWS SageMaker for model scoring and output generation; AWS Glue for ETL and writeback to Teradata; GitHub for managing config.yaml and container PRs
+- **Output:** Structured cashflow forecasts with quantile predictions (10%, 50%, 90%) for credit and debit transactions
+- **Enables:** Cashflow shortfall alerts, Predictive advisory & Integration into Bankers Workbench for customer engagement
+- **Load Frequency:** Staging Tables loaded when new SageMaker outputs are available; Final Tables auto-refreshed post-staging via Glue ETL; ETL Runtime ~40 minutes per batch; Scoring Frequency: Weekly or model-triggered, aligned with retraining cycles
+
+**Future State Architecture:**
+- **ML Pipeline:** Snowflake native ML capabilities with Snowpark for model execution and scoring
+- **Data Storage:** Snowflake tables with native support for semi-structured data and time-travel capabilities
+- **Transformation:** dbt models for data processing and quantile calculations replacing Glue ETL
+- **Integration:** Direct API connectivity to Bankers Workbench eliminating complex ETL processes
+- **Benefits:** Simplified architecture, reduced latency, enhanced model monitoring, improved scalability
+
+### 7.6 Customer Value Management (CVM) Insights to Service Domain
+
+**Use Case:** CVM (Customer Value Management) delivers actionable insights such as payaway patterns, predicted needs, and customer engagement scores from QPD to the Service Domain (SD). These insights are consumed by downstream participants like Bankers Workbench (BWB) to support personalised customer engagement and AI model feedback loops.
+
+**Current State:**
+- **Source:** QPD tables in the BB Datamart
+- **Tool:** API layer extracts data from QPD and pushes it into Aurora DB within the CBI Service Domain. Job status checks are in place to monitor successful delivery
+- **Target:** Aurora DB in the CBI Service Domain, which feeds into the Banker Workbench (BWB) and other downstream systems
+- **Output:** Top 20 CVM insights, historical engagement patterns, and payaway behaviour used by bankers to drive customer conversations and engagement strategies
+- **Load Frequency:** Weekly refresh of CVM insights to ensure recency and relevance for customer interactions
+
+**Future State Architecture:**
+- **Data Sharing:** Snowflake secure data sharing capabilities eliminating complex API extractions
+- **Real-time Processing:** Snowflake Streams for real-time insight generation and updates
+- **Integration:** Direct Snowflake connectivity to Service Domain applications via native connectors
+- **Analytics:** Enhanced CVM scoring models using Snowflake's native ML functions
+- **Benefits:** Real-time insights, simplified data pipeline, improved customer experience, enhanced model feedback loops
+
+### 7.7 BB Data Quality Platform
+
+**Use Case:** Data Quality Tool aims to offer the following business outcomes for Business Banking: ability to assess data by data producers and data stewards using self-service functionality; expose data with issues for remediation to frontline, data producers and data stewards; track and monitor data quality in Omnia and GDW v2.
+
+**Current State:**
+- **Source:** GDW Sandpit (1 table), Omnia Sandpit (2 tables)
+- **Tool:** Scoop (for data movement), SMTP Email Relay (for notifications), Tableau & R-Shiny Tool (for visualisation and remediation)
+- **Target:** GDW Target Tables, Omnia Target Tables: XYZ
+- **Output:** DQ Exception records with metadata and context, Email notifications to RMs and Data Stewards, Dashboards with RAG status, Exception counts & Drill-down capabilities, R-Shiny portal for remediation with row-level security
+- **Load Frequency:** Daily
+
+**Future State Architecture:**
+- **Data Quality Framework:** Snowflake native data quality functions and Great Expectations integration
+- **Monitoring:** Automated data quality scoring with Snowflake Tasks and alerting capabilities
+- **Visualization:** Modern Tableau dashboards with real-time data quality metrics connected directly to Snowflake
+- **Self-Service:** Snowflake's Information Schema and Account Usage views for data steward access
+- **Benefits:** Automated quality monitoring, real-time exception detection, simplified remediation workflows, enhanced data governance
 
 ---
 
