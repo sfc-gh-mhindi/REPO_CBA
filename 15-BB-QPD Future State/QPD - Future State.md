@@ -442,6 +442,7 @@ graph TB
 
 ##### DARE Data Source
 **Type**: Periodic
+
 **Ingestion Options**:
 
 
