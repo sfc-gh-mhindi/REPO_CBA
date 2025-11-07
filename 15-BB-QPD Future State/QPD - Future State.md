@@ -445,7 +445,6 @@ graph TB
 
 **Ingestion Options**:
 
-
 **Option 1: Alteryx Repointing**
 ```mermaid
 graph LR
@@ -462,6 +461,7 @@ graph LR
 
 ##### Illion Data Source
 **Type**: Periodic
+
 **Ingestion Approach**: Repoint Alteryx to write to AWS S3 External Landing layer, then copy to Snowflake QPD raw layer
 
 ```mermaid
@@ -473,6 +473,7 @@ graph LR
 
 ##### ACES Data Source
 **Type**: Manual
+
 **Implementation**: Streamlit application for user file uploads
 
 ```mermaid
@@ -487,14 +488,17 @@ Upon file upload and submission through the Streamlit interface, files are autom
 
 ##### GDW Data Source
 **Type**: Immediately accessible (no ingestion needed)
+
 **Implementation**: As part of the greenfield initiative, GDW tables will be available as AWS Glue catalog linked externally managed Iceberg tables. QPD only needs to raise a request to access required tables. Per the HLSA design for greenfield, GDW externally managed Iceberg tables will be created in the requestor's database (QPD), pointing to the correct storage location in GDW.
 
 ##### Omnia Data Source
 **Type**: Immediately accessible (no ingestion needed)
+
 **Implementation**: As part of the greenfield initiative, Omnia tables (OTC parquet files) will be available as external tables pointing to their current AWS S3 location. QPD only needs to raise a request to access required tables.
 
 ##### CSV Files Data Source
 **Type**: Periodic
+
 **Ingestion Options**:
 
 **Option 1: SSIS Repointing**
@@ -522,6 +526,7 @@ graph LR
 
 ##### AI Models Data Source
 **Type**: Periodic
+
 **Implementation**: Repoint AWS SageMaker output to write directly to Snowflake QPD raw layer instead of Teradata
 
 ```mermaid
