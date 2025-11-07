@@ -444,6 +444,7 @@ graph TB
 **Type**: Periodic
 **Ingestion Options**:
 
+
 **Option 1: Alteryx Repointing**
 ```mermaid
 graph LR
