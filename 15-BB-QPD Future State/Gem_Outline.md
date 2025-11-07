@@ -18,11 +18,13 @@
    - 2.4 [Consumption Analysis](#24-consumption-analysis)
    - 2.5 [Current State Pain Points](#25-current-state-pain-points)
 
-3. [Future State Architecture Diagram](#3-future-state-architecture-diagram)
-   - 3.1 [Conceptual Architecture](#31-conceptual-architecture)
-   - 3.2 [Detailed Architecture Components](#32-detailed-architecture-components)
-     - 3.2.1 [Storage Layer](#321-storage-layer)
-     - 3.2.2 [Ingestion Layer (EL)](#322-ingestion-layer-el)
+3. [Guiding Principles](#3-guiding-principles)
+
+4. [Future State Architecture Diagram](#4-future-state-architecture-diagram)
+   - 4.1 [Conceptual Architecture](#41-conceptual-architecture)
+   - 4.2 [Detailed Architecture Components](#42-detailed-architecture-components)
+     - 4.2.1 [Storage Layer](#421-storage-layer)
+     - 4.2.2 [Ingestion Layer (EL)](#422-ingestion-layer-el)
        - [DARE Data Source](#dare-data-source)
        - [Illion Data Source](#illion-data-source)
        - [ACES Data Source](#aces-data-source)
@@ -30,31 +32,25 @@
        - [Omnia Data Source](#omnia-data-source)
        - [CSV Files Data Source](#csv-files-data-source)
        - [AI Models Data Source](#ai-models-data-source)
-     - 3.2.3 [Transformation Layer (T)](#323-transformation-layer-t)
-     - 3.2.4 [Consumption Layer](#324-consumption-layer)
-   - 3.3 [Detailed Component Mapping](#33-detailed-component-mapping)
-
-4. [Guiding Principles](#4-guiding-principles)
+     - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t)
+     - 4.2.4 [Consumption Layer](#424-consumption-layer)
+     - 4.2.5 [Orchestration](#425-orchestration)
+   - 4.3 [Detailed Component Mapping](#43-detailed-component-mapping)
 
 5. [Security, Governance, and Operations](#5-security-governance-and-operations)
-   - 5.1 [Security](#51-security)
-   - 5.2 [Data Governance](#52-data-governance)
-   - 5.3 [Operational Model (FinOps)](#53-operational-model-finops)
+   - 5.1 [Data Governance](#51-data-governance)
+   - 5.2 [Monitoring & Alerting Capabilities](#52-monitoring--alerting-capabilities)
 
-6. [Business Benefits and Conclusion](#6-business-benefits-and-conclusion)
-   - 6.1 [Expected Benefits](#61-expected-benefits)
-   - 6.2 [Next Steps](#62-next-steps)
+6. [Use Case Scenarios and Architecture Application](#6-use-case-scenarios-and-architecture-application)
+   - 6.1 [Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)](#61-smart-mini-data-load-dare--alteryx--qpd--tableau)
+   - 6.2 [Illion Bureau Data Load](#62-illion-bureau-data-load)
+   - 6.3 [Direct Debit Monitoring Tool](#63-direct-debit-monitoring-tool)
+   - 6.4 [Watchlist Integration](#64-watchlist-integration)
+   - 6.5 [Cashflow Model Output](#65-cashflow-model-output)
+   - 6.6 [Customer Value Management (CVM) Insights to Service Domain](#66-customer-value-management-cvm-insights-to-service-domain)
+   - 6.7 [BB Data Quality Platform](#67-bb-data-quality-platform)
 
-7. [Use Case Scenarios and Architecture Application](#7-use-case-scenarios-and-architecture-application)
-   - 7.1 [Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)](#71-smart-mini-data-load-dare--alteryx--qpd--tableau)
-   - 7.2 [Illion Bureau Data Load](#72-illion-bureau-data-load)
-   - 7.3 [Direct Debit Monitoring Tool](#73-direct-debit-monitoring-tool)
-   - 7.4 [Watchlist Integration](#74-watchlist-integration)
-   - 7.5 [Cashflow Model Output](#75-cashflow-model-output)
-   - 7.6 [Customer Value Management (CVM) Insights to Service Domain](#76-customer-value-management-cvm-insights-to-service-domain)
-   - 7.7 [BB Data Quality Platform](#77-bb-data-quality-platform)
-
-8. [Document Information](#document-information)
+7. [Document Information](#document-information)
 
 ---
 
@@ -205,9 +201,23 @@ Current downstream consumers include:
 
 ---
 
-## 3. Future State Architecture Diagram
+## 3. Guiding Principles
 
-### 3.1 Conceptual Architecture
+- **Cloud-Native**: Prioritize fully managed, scalable cloud services that eliminate infrastructure management overhead
+- **ELT First**: Favor Extract, Load, Transform approach leveraging cloud data warehouse compute power over traditional ETL
+- **Decoupled Compute and Storage**: Ensure performance optimization and cost efficiency through independent scaling
+- **Self-Service**: Enable easier data access and analytics capabilities for business users, analysts, and data scientists
+- **Data Governance**: Incorporate security, data quality, and lineage tracking by design across all data flows
+- **Scalability**: Design for elastic scalability to handle varying workloads and data volumes
+- **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
+- **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
+- **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
+
+---
+
+## 4. Future State Architecture Diagram
+
+### 4.1 Conceptual Architecture
 
 ```mermaid
 graph LR
@@ -542,6 +552,15 @@ graph LR
 - **MLOps Pipeline**: Automated model training, validation, and deployment workflows
 - **Feature Store**: Centralized repository for ML features with versioning and lineage
 
+#### 3.2.5 Orchestration
+
+**Snowflake Tasks:**
+- Scheduled job execution for automated data pipeline operations
+- Native task scheduling for data ingestion, transformation, and quality checks
+- Task dependency management for complex workflow orchestration
+- Automated retry mechanisms and error handling
+- Resource optimization through intelligent task scheduling
+
 ### 3.3 Detailed Component Mapping
 
 | **Current Tool/System** | **Snowflake Capability** | **Migration Approach** |
@@ -552,20 +571,6 @@ graph LR
 | Teradata QPD | Snowflake Data Warehouse | Direct migration with performance optimization |
 | SQL Scripts | Snowflake SQL + Stored Procedures | Code conversion and cloud optimization |
 | File Processing | Snowflake Stages + Tasks | Automated file ingestion and processing |
-
----
-
-## 4. Guiding Principles
-
-- **Cloud-Native**: Prioritize fully managed, scalable cloud services that eliminate infrastructure management overhead
-- **ELT First**: Favor Extract, Load, Transform approach leveraging cloud data warehouse compute power over traditional ETL
-- **Decoupled Compute and Storage**: Ensure performance optimization and cost efficiency through independent scaling
-- **Self-Service**: Enable easier data access and analytics capabilities for business users, analysts, and data scientists
-- **Data Governance**: Incorporate security, data quality, and lineage tracking by design across all data flows
-- **Scalability**: Design for elastic scalability to handle varying workloads and data volumes
-- **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
-- **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
-- **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
 
 ---
 
@@ -625,45 +630,9 @@ graph LR
 
 ---
 
-## 6. Business Benefits and Conclusion
+## 6. Use Case Scenarios and Architecture Application
 
-### 6.1 Expected Benefits
-
-**Quantifiable Benefits:**
-- **60-70% TCO Reduction**: Elimination of Teradata licensing costs and infrastructure overhead
-- **5x Faster Time-to-Market**: Accelerated development of new analytical models and reports
-- **10x Improved Scalability**: Elastic scaling capabilities handling 10x current data volumes
-- **50% Reduction in Data Pipeline Maintenance**: Automated data operations and self-healing capabilities
-- **90% Improvement in Query Performance**: Cloud-native optimization and intelligent caching
-- **Zero Infrastructure Management**: Fully managed service eliminating operational overhead
-
-**Strategic Benefits:**
-- **Enhanced Agility**: Rapid deployment of new analytics use cases and data products
-- **Improved Data Quality**: Built-in governance and quality frameworks
-- **Advanced Analytics Enablement**: Native support for machine learning and AI workloads
-- **Self-Service Capabilities**: Empowered business users with direct data access
-- **Regulatory Compliance**: Enhanced audit trails and compliance reporting capabilities
-- **Future-Proof Architecture**: Cloud-native foundation supporting emerging technologies
-
-### 6.2 Next Steps
-
-**Immediate Actions (Next 30 Days):**
-1. **Platform Proof-of-Concept**: Deploy Snowflake trial environment and validate core use cases
-2. **Detailed Data Mapping**: Comprehensive analysis of current data flows and transformation logic
-3. **Budget Request**: Finalize business case and secure funding approval for migration project
-4. **Team Formation**: Assemble cross-functional migration team with necessary skills and expertise
-
-**Short-term Milestones (3-6 Months):**
-- Complete technical architecture design and tooling selection
-- Establish development and testing environments
-- Begin pilot migration with non-critical workloads
-- Implement foundational security and governance frameworks
-
----
-
-## 7. Use Case Scenarios and Architecture Application
-
-### 7.1 Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)
+### 6.1 Smart Mini Data Load (DARE → Alteryx → QPD → Tableau)
 
 **Use Case:** Smart Mini Data Load used for merchant migration and mobile user analysis, this flow transforms DARE SQL Server data via Alteryx and loads it into QPD for Tableau dashboarding. It supports weekly refreshes and validation of transactional counts.
 
@@ -681,7 +650,7 @@ graph LR
 - **Consumption:** Tableau connected directly to Snowflake with live connectivity
 - **Benefits:** Reduced processing time, automated data quality checks, real-time insights
 
-### 7.2 Illion Bureau Data Load
+### 6.2 Illion Bureau Data Load
 
 **Use Case:** Monthly Credit Bureau Reporting - Monthly bureau files from Illion are ingested and transformed using SQL and Alteryx, then loaded into QPD for credit risk dashboards. This supports regulatory and financial insights with ~90K records per month.
 
@@ -700,7 +669,7 @@ graph LR
 - **Consumption:** Enhanced Tableau dashboards with real-time refresh capabilities
 - **Benefits:** Automated processing, improved data lineage, reduced manual intervention
 
-### 7.3 Direct Debit Monitoring Tool
+### 6.3 Direct Debit Monitoring Tool
 
 **Use Case:** DDMT (Direct Debit Monitoring Tool) is a standalone internal tool used by frontline teams to monitor direct debit facility utilisation, identify breaches, and support annual reviews. It consumes data loaded into QPD tables via SSIS packages, which processes encrypted APCA names, CommBiz limits, and claims data from shared folders.
 
@@ -718,7 +687,7 @@ graph LR
 - **Consumption:** Modernized DDMT tool with direct Snowflake connectivity or API layer
 - **Benefits:** Automated file processing, enhanced security, improved audit capabilities
 
-### 7.4 Watchlist Integration
+### 6.4 Watchlist Integration
 
 **Use Case:** The Watchlist Integration supports the Customer Experience Engine (CEE) by enabling conflict checks and risk classification workflows. The ACES Watchlist, a critical component of credit risk oversight, is manually loaded into QPD to support consolidated reporting and downstream analytics.
 
@@ -736,7 +705,7 @@ graph LR
 - **Consumption:** Real-time dashboards and automated alerting for risk teams, API integration with CEE
 - **Benefits:** Reduced manual processing, real-time risk monitoring, enhanced compliance capabilities
 
-### 7.5 Cashflow Model Output
+### 6.5 Cashflow Model Output
 
 **Use Case:** The CVM Cashflow Forecast initiative is part of the broader MEP (Model Execution Pipeline) framework. It aims to operationalise credit and debit cashflow forecasting models using AWS SageMaker, Glue ETL, and Teradata QPD. These forecasts are consumed by platforms like Bankers Workbench (BWB) to support customer engagement and advisory.
 
@@ -754,7 +723,7 @@ graph LR
 - **Integration:** Direct API connectivity to Bankers Workbench eliminating complex ETL processes
 - **Benefits:** Simplified architecture, reduced latency, enhanced model monitoring, improved scalability
 
-### 7.6 Customer Value Management (CVM) Insights to Service Domain
+### 6.6 Customer Value Management (CVM) Insights to Service Domain
 
 **Use Case:** CVM (Customer Value Management) delivers actionable insights such as payaway patterns, predicted needs, and customer engagement scores from QPD to the Service Domain (SD). These insights are consumed by downstream participants like Bankers Workbench (BWB) to support personalised customer engagement and AI model feedback loops.
 
@@ -772,7 +741,7 @@ graph LR
 - **Analytics:** Enhanced CVM scoring models using Snowflake's native ML functions
 - **Benefits:** Real-time insights, simplified data pipeline, improved customer experience, enhanced model feedback loops
 
-### 7.7 BB Data Quality Platform
+### 6.7 BB Data Quality Platform
 
 **Use Case:** Data Quality Tool aims to offer the following business outcomes for Business Banking: ability to assess data by data producers and data stewards using self-service functionality; expose data with issues for remediation to frontline, data producers and data stewards; track and monitor data quality in Omnia and GDW v2.
 
