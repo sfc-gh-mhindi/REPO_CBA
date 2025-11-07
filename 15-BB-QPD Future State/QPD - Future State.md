@@ -302,9 +302,9 @@ graph LR
     F4 --> D2
 ```
 
-### 3.2 Detailed Architecture Components
+### 4.2 Detailed Architecture Components
 
-#### 3.2.1 Storage Layer
+#### 4.2.1 Storage Layer
 
 The architecture implements a two-database approach:
 1. **QPD Database**: Internal usage with standard managed schemas for raw and transformed data
@@ -395,7 +395,7 @@ graph LR
 - **Table Types**: Externally managed Iceberg tables on AWS Glue catalog linked database
 - High-performance compute resources for complex analytical workloads and cross-platform data sharing
 
-#### 3.2.2 Ingestion Layer (EL)
+#### 4.2.2 Ingestion Layer (EL)
 
 The ingestion layer supports three different types of data ingestion requirements:
 - **Manual**: User-driven data uploads requiring human intervention
@@ -534,19 +534,30 @@ graph LR
     SageMaker[AWS SageMaker] --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-#### 3.2.3 Transformation Layer (T)
+#### 4.2.3 Transformation Layer (T)
 
-**ELT Tool/Framework:**
-- **dbt (Data Build Tool)**: Primary transformation framework for SQL-based data modeling
-- **Snowflake SQL**: Native stored procedures and functions for complex business logic
-- **Python/Scala**: Custom transformations using Snowflake's native programming capabilities
+**Current State:**
+- **Teradata Control Framework (TCF)**: Existing transformation orchestration and control
+- **BTEQ**: Teradata's scripting language for data transformations and SQL execution
+
+**Target Transformation Options:**
+
+**Option 1: SnowConvert AI Conversion**
+- Automated conversion of TCF and BTEQ scripts to Snowflake stored procedures using SnowConvert AI tool
+- Preserves existing transformation logic with minimal manual intervention
+- Rapid migration path with automated code translation
+
+**Option 2: dbt Modernization**
+- Convert existing TCF/BTEQ transformations to dbt (Data Build Tool) models
+- Modern SQL-based data modeling framework with version control and testing capabilities
+- Enhanced maintainability and collaboration through code-based transformation definitions
 
 **QPD Structure:**
 - **Bronze/Silver/Gold Architecture**: Layered approach ensuring data quality progression
 - **Data Vault Modeling**: Scalable and auditable data warehouse design for historical tracking
 - **Dimensional Models**: Star schema design optimized for analytical queries and reporting
 
-#### 3.2.4 Consumption Layer
+#### 4.2.4 Consumption Layer
 
 **Tableau/Reporting:**
 - Direct connectivity to Snowflake with native optimization and caching
@@ -564,7 +575,7 @@ graph LR
 - **MLOps Pipeline**: Automated model training, validation, and deployment workflows
 - **Feature Store**: Centralized repository for ML features with versioning and lineage
 
-#### 3.2.5 Orchestration
+#### 4.2.5 Orchestration
 
 **Snowflake Tasks:**
 - Scheduled job execution for automated data pipeline operations
@@ -573,7 +584,7 @@ graph LR
 - Automated retry mechanisms and error handling
 - Resource optimization through intelligent task scheduling
 
-### 3.3 Detailed Component Mapping
+### 4.3 Detailed Component Mapping
 
 | **Current Tool/System** | **Snowflake Capability** | **Migration Approach** |
 |------------------------|---------------------------|------------------------|
