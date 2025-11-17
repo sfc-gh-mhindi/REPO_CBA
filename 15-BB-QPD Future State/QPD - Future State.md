@@ -536,26 +536,144 @@ graph LR
 
 #### 4.2.3 Transformation Layer (T)
 
-**Current State:**
-- **Teradata Control Framework (TCF)**: Existing transformation orchestration and control
-- **BTEQ**: Teradata's scripting language for data transformations and SQL execution
+## **Current State Transformation Analysis**
 
-**Target Transformation Options:**
+Based on discovery, the current transformation landscape can be categorized by complexity:
 
-**Option 1: SnowConvert AI Conversion**
-- Automated conversion of TCF and BTEQ scripts to Snowflake stored procedures using SnowConvert AI tool
-- Preserves existing transformation logic with minimal manual intervention
-- Rapid migration path with automated code translation
+### **Transformation Complexity Matrix**
 
-**Option 2: dbt Modernization**
-- Convert existing TCF/BTEQ transformations to dbt (Data Build Tool) models
-- Modern SQL-based data modeling framework with version control and testing capabilities
-- Enhanced maintainability and collaboration through code-based transformation definitions
+| **Tool** | **Data Source** | **Complexity** | **Transformation Types** | **Volume** |
+|----------|----------------|----------------|-------------------------|------------|
+| Alteryx | DARE, Illion | **Low-Medium** | Clean, cast, joins | Multiple workflows (1:1 mapping) |
+| SQL Scripts | Illion Files | **Low** | Clean, cast, column selection | Limited scripts |
+| SSIS | CSV Files (DDM) | **Low** | File movement, clean and dump | Few packages |
+| BTEQ Scripts | Various | **Low-Medium** | Fastload/Multiload, staging → transform → target. Castings, remove columns, remove special characters, aggregations | Multiple scripts |
+| R-Connect | GDW Sandpit (200 tables) | **High** | Complex joins, aggregations, scheduled jobs (daily/weekly/monthly) | ~200 jobs |
 
-**QPD Structure:**
-- **Bronze/Silver/Gold Architecture**: Layered approach ensuring data quality progression
-- **Data Vault Modeling**: Scalable and auditable data warehouse design for historical tracking
-- **Dimensional Models**: Star schema design optimized for analytical queries and reporting
+### **Key Observations:**
+- **Simple Transformations**: Data cleansing, type casting, column selection, simple joins
+- **Complex Transformations**: R-Connect GDW jobs with 200 tables and complex aggregations
+- **No chaining**: Alteryx workflows are 1:1 (one file → one table), simplifying migration
+- **Manual triggers**: Most Alteryx workflows are manually triggered, not automated
+- **Staging pattern**: BTEQ follows a consistent staging → transformation → target pattern
+
+---
+
+## **Future State Architecture: Bronze → Silver → Gold Transformation Flow**
+
+### **Conceptual Mapping**
+
+```mermaid
+graph TB
+    subgraph "Landing Layer"
+        L1[S3 External Landing]
+        L2[Snowflake Internal Stage]
+    end
+    
+    subgraph "Bronze Layer - Raw Zone"
+        B1[DARE_RAW]
+        B2[ILLION_RAW]
+        B3[ACES_RAW]
+        B4[CSV_RAW]
+        B5[SAGEMAKER_RAW*]
+    end
+    
+    subgraph "Silver Layer - Curated Zone"
+        S1[DARE_CURATED]
+        S2[ILLION_CURATED]
+        S3[ACES_CURATED]
+        S4[DDM_CURATED]
+        S5[MODELS_CURATED]
+    end
+    
+    subgraph "Gold Layer - Analytical Zone"
+        G1[Business Dimensional Models]
+        G2[Aggregated Datasets]
+        G3[Analytical Views]
+    end
+    
+    subgraph "Direct Access - No Transformation"
+        D1[GDW Iceberg Tables]
+        D2[OMNIA External Tables**]
+    end
+    
+    L1 --> B2
+    L1 --> B4
+    L2 --> B3
+    
+    B1 --> S1
+    B2 --> S2
+    B3 --> S3
+    B4 --> S4
+    B5 --> S5
+    
+    S1 --> G1
+    S2 --> G1
+    S3 --> G1
+    S4 --> G1
+    S5 --> G2
+    
+    D1 --> G1
+    D2 --> G1
+    
+    G1 --> G3
+    G2 --> G3
+```
+
+**Caveats:**
+- *SAGEMAKER_RAW: Requires review and confirmation with BB technical team on integration approach
+- **OMNIA External Tables: Pending finalization from CDAO on external table access patterns
+
+---
+
+## **Transformation Migration Options: Comparison**
+
+### **Approach Overview**
+
+| **Option** | **Description** | **Core Technology** | **Migration Speed** | **Long-term Maintainability** |
+|------------|----------------|---------------------|---------------------|-------------------------------|
+| **Option 1: SnowConvert AI** | Automated conversion of Teradata scripts to Snowflake stored procedures | Snowflake Stored Procedures | Fast (automated) | Medium |
+| **Option 2: dbt** | Modern SQL-based transformation framework with version control and testing | dbt Models (SQL + YAML) | Moderate | High |
+
+**SnowConvert AI Conversion Process:**
+1. Automated code translation of BTEQ scripts and Teradata SQL to Snowflake stored procedures
+2. Syntax mapping of Teradata-specific commands (FASTLOAD, MULTILOAD) to Snowflake equivalents (COPY INTO, MERGE)
+3. Validation for syntax correctness and functional equivalence
+4. Manual refinement for performance optimization
+
+**dbt Development Process:**
+1. Transformations written as SQL SELECT statements in `.sql` files
+2. Automated dependency management using `ref()` function
+3. Built-in testing framework via YAML configuration
+4. Version control with Git for collaborative development
+5. Auto-generated lineage and documentation
+
+---
+
+### **Tool-by-Tool Migration Mapping**
+
+| **Current Tool** | **Current State** | **Option 1: SnowConvert AI** | **Option 2: dbt** | **Layer Mapping** |
+|------------------|-------------------|------------------------------|-------------------|-------------------|
+| **BTEQ Scripts** | **Tool**: BTEQ scripts; **Pattern**: Three-stage (Fastload/Multiload → staging transformations → target tables); **Transformations**: Casting, column removal, special character removal, aggregations; **Complexity**: Low to Medium | **Target**: Snowflake Stored Procedures; **Approach**: Automated conversion via SnowConvert AI; **Execution**: Called by Snowflake Tasks or external orchestrator | **Target**: dbt Models (Bronze/Silver/Gold); **Approach**: Rewrite BTEQ logic as SQL SELECT statements in layered dbt models; **Testing**: YAML-defined data quality tests; **Execution**: `dbt run` in dependency order | **Bronze**: Fastload/Multiload → `COPY INTO`; **Silver**: Staging transformations → cleansing/casting; **Gold**: Target tables → analytical models |
+| **Alteryx Workflows** | **Tool**: Alteryx workflows; **Sources**: DARE, Illion Files; **Pattern**: 1:1 workflow (one source → one table); **Transformations**: Data cleansing (trim, remove nulls), type casting, simple joins; **Trigger**: Manual execution; **Complexity**: Low to Medium | **Target**: Snowflake Stored Procedures; **Approach**: Convert Alteryx workflow logic to SQL stored procedures; **Execution**: Triggered via Snowflake Tasks | **Target**: dbt Models (Bronze/Silver/Gold); **Approach**: Extract workflow logic and translate to SQL-based dbt models; **Testing**: Data quality tests on key columns; **Documentation**: Business logic documented in YAML | **Bronze**: Raw data via repointed Alteryx or Snowpipe; **Silver**: Cleansing, casting, joining; **Gold**: Aggregations and business calculations |
+| **SQL Scripts** | **Tool**: Teradata SQL scripts; **Source**: Illion Files; **Transformations**: Clean, cast, column selection; **Execution**: Run directly in Teradata; **Complexity**: Low | **Target**: Snowflake Stored Procedures; **Approach**: Automated conversion via SnowConvert AI (direct SQL-to-SQL translation); **Execution**: Called via Snowflake Tasks or manual trigger | **Target**: dbt Models (Bronze/Silver); **Approach**: Direct translation to dbt models (minimal rewrite); **Testing**: Add data quality tests; **Benefits**: Natural fit for dbt | **Bronze**: Raw Illion data from external stages; **Silver**: Cleansing, type casting, column filtering |
+| **SSIS Packages** | **Tool**: SSIS packages; **Source**: CSV files (DDM - Direct Debit Monitoring); **Transformations**: File movement from shared folders, basic data cleansing, direct load to QPD; **Complexity**: Low | **Target**: Snowflake Stored Procedures + Snowpipe; **Approach**: File movement replaced by S3 + Snowpipe; transformation logic manually converted to stored procedures (SnowConvert AI SSIS support TBD); **Execution**: Triggered automatically on file arrival | **Target**: dbt Models + Snowpipe; **Approach**: Snowpipe handles file loading; dbt incremental models replace transformation logic; **Testing**: Data quality validation post-transformation | **Bronze**: Raw CSV data via Snowpipe; **Silver**: Cleansing (decrypt APCA names, validate DD limits, format claims data) |
+| **R-Connect (GDW 200 Jobs)** | **Tool**: R-Connect; **Source**: GDW Sandpit (200 tables); **Transformations**: Complex multi-table joins, advanced aggregations, scheduled jobs (daily/weekly/monthly); **Execution**: R-Connect orchestrates script execution, writes to Teradata QPD | **Target**: Python Stored Procedures (Snowpark) OR Posit; **Approach**: GDW accessible as Iceberg tables; standard data transformations manually converted to Python stored procedures (Snowpark); complex statistical analysis and modeling retained in R using Posit on Snowflake; **Execution**: Scheduled via Snowflake Tasks or Posit orchestration | **Target**: Not applicable for complex statistical workloads; dbt only suitable if jobs contain simple SQL-based transformations without advanced statistical analysis; **Approach**: Assessment required to determine job complexity and appropriate migration path | **Gold**: Analytical outputs, dimensional models, aggregated datasets |
+
+---
+
+### **Key Differentiators**
+
+| **Criteria** | **SnowConvert AI** | **dbt** |
+|--------------|-------------------|---------|
+| **Best For** | Quick lift-and-shift, preserving existing logic | Modernization, long-term maintainability |
+| **Version Control** | Stored procedures can be version controlled in GitHub | Native Git integration |
+| **Testing** | Manual testing required | Built-in testing framework |
+| **Documentation** | Requires separate documentation | Auto-generated lineage and docs |
+| **Learning Curve** | Minimal (similar to existing patterns) | Moderate (new framework) |
+| **Code Reusability** | Stored procedures can be used across worksheets | High (modular SQL models) |
+| **Collaboration** | Stored procedures shareable via worksheets | Git-based collaborative workflows |
+| **Data Quality** | Custom validation logic in procedures | Declarative YAML-based tests |
 
 #### 4.2.4 Consumption Layer
 
