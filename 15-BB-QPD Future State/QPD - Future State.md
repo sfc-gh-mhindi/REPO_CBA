@@ -502,19 +502,20 @@ graph LR
 
 **Recommendation:**
 
-- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption
-- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl
+- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption, and to better align with CDAO approved patterns.
+- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl, after getting the required approvals from CDAO / architecture teams.
 
 ##### Illion Data Source
 **Type**: Manual
 
 **Implementation**: Manual file upload process for Illion bureau data files
 
-Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
+- Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). 
+- Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
 
 ```mermaid
 graph LR
-    User[Business User] --> Upload[File Upload Interface]
+    User[Business User] --> Upload[File Upload Interface in Streamlit]
     Upload --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
     SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
@@ -533,7 +534,8 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
+- Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. 
+- From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
 
 ##### GDW Data Source
 **Type**: Immediately accessible (no ingestion needed)
