@@ -89,7 +89,7 @@ This document defines the target future state architecture for QPD, outlining th
 
 ### 1.3 Executive Summary
 
-The proposed solution involves migrating QPD to Snowflake Cloud Data Platform, implementing a modern ELT (Extract, Load, Transform) approach that leverages cloud-native capabilities. The transformation will retire legacy systems including Alteryx, SSIS, and R-Connect for core data movement, replacing them with Snowflake-native features, dbt for transformations, and Fivetran for data integration. This approach will deliver significant cost savings, improved performance, enhanced scalability, and enable self-service analytics capabilities.
+The proposed solution involves migrating QPD to Snowflake Cloud Data Platform with a unified AWS Glue catalog Iceberg table architecture, implementing a modern ELT (Extract, Load, Transform) approach that leverages cloud-native capabilities. All data layers (Bronze, Silver, Gold) will utilize externally managed Iceberg tables on AWS Glue catalog, providing ACID compliance, schema evolution, time-travel capabilities, and multi-engine compatibility. The transformation will retire legacy systems including Alteryx, SSIS, and R-Connect for core data movement, replacing them with Snowflake-native features, dbt for transformations writing to Iceberg tables, and Fivetran for data integration. This approach will deliver significant cost savings, improved performance, enhanced scalability, cross-platform data sharing, and enable self-service analytics capabilities.
 
 ### 1.4 Current Challenges
 
@@ -212,9 +212,9 @@ Current downstream consumers include:
 - **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
 - **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
 - **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
-- **CBA (CDAO) Alignment**: When multiple implementation options exist, recommendations are driven by alignment with CBA (CDAO) approved practices and standards. Examples include:
-  - The usage of AWS Glue catalog externally managed Iceberg tables is mandatory across all data layers
-  - Wherever possible, dbt within Snowflake is the preferred transformation pattern for consistency and maintainability
+- **CBA (CDAO) Alignment**: When multiple implementation options exist, recommendations are driven by alignment with CBA (CDAO) approved practices and standards. Key mandates include:
+  - **Iceberg Architecture**: AWS Glue catalog externally managed Iceberg tables are mandatory across all data layers (Bronze, Silver, Gold) to ensure ACID compliance, schema evolution, and multi-engine compatibility
+  - **Transformation Pattern**: dbt within Snowflake is the preferred transformation pattern, writing to Iceberg tables for consistency, version control, and maintainability
 
 ---
 
@@ -309,38 +309,36 @@ graph LR
 
 #### 4.2.1 Storage Layer
 
-The architecture implements a two-database approach:
-1. **QPD Database**: Internal usage with standard managed schemas for raw and transformed data
-2. **QPD Catalog Linked Database**: External catalog integration for gold layer data products
+The architecture implements a unified Glue catalog-based approach across all data layers:
+1. **QPD Glue Catalog Database**: All data layers (Bronze, Silver, Gold) utilize AWS Glue catalog externally managed Iceberg tables
+2. **Unified Architecture**: Consistent table format across all layers enabling seamless data lineage, ACID compliance, and cross-platform compatibility
 
 ```mermaid
 graph TB
-    subgraph "QPD Database"
-        subgraph "Landing Layer"
-            subgraph "External Landing"
-                S3[AWS S3 Bucket<br/>Automated Sources]
-            end
-            subgraph "Internal Landing"
-                SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
-            end
+    subgraph "Landing Layer"
+        subgraph "External Landing"
+            S3_Ext[AWS S3 Bucket<br/>Automated Sources]
         end
-        
+        subgraph "Internal Landing"
+            SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
+        end
+    end
+    
+    subgraph "QPD Glue Catalog Database"
         subgraph "Raw Data Zone (Bronze)"
-            Bronze[Native Snowflake Tables<br/>Schema-on-read]
+            Bronze[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Schema-on-read]
         end
         
         subgraph "Curated Data Zone (Silver)"
-            Silver[Native Snowflake Tables<br/>Cleansed & Standardized]
+            Silver[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Cleansed & Standardized]
         end
-    end
-    
-    subgraph "QPD Catalog Linked Database"
+        
         subgraph "Data Warehouse (Gold)"
-            Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog]
+            Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Business Models]
         end
     end
     
-    S3 --> Bronze
+    S3_Ext --> Bronze
     SF_Stage --> Bronze
     Bronze --> Silver
     Silver --> Gold
@@ -370,8 +368,8 @@ graph LR
         Manual[Manual Sources<br/>ACES Watchlist]
     end
     
-    subgraph "Raw Data Zone"
-        Bronze[Bronze Tables<br/>QPD Database]
+    subgraph "QPD Glue Catalog Database"
+        Bronze[Bronze Iceberg Tables<br/>Raw Zone]
     end
     
     Auto --> S3
@@ -382,20 +380,23 @@ graph LR
 
 **Raw Data Zone (Bronze):**
 - **Purpose**: Landing zone for raw, unprocessed data in original formats with schema-on-read approach for maximum flexibility and data preservation
-- **Implementation**: Schema in QPD database that receives data from both Landing Layer sublayers: external stage pointing to AWS S3 bucket for automated sources, and Snowflake internal stage for manual file submissions
-- **Table Types**: Native Snowflake tables
-- Cost-effective storage with automated lifecycle management
+- **Implementation**: Externally managed Iceberg tables in AWS Glue catalog that receive data from both Landing Layer sublayers via Snowflake external stages and internal stages. Data is loaded using COPY INTO commands targeting Iceberg table formats
+- **Table Types**: Externally managed Iceberg tables on AWS Glue catalog
+- **Benefits**: ACID compliance, time-travel capabilities, schema evolution, and cross-engine compatibility (Snowflake, Spark, Athena)
+- Cost-effective storage with S3 lifecycle policies and Iceberg table maintenance operations
 
 **Curated Data Zone (Silver):**
 - **Purpose**: Cleansed and standardized data with enforced schema and quality rules, optimized for downstream consumption with improved query performance
-- **Implementation**: Schema of native tables within QPD database for business rule applications and data enrichment processes
-- **Table Types**: Native Snowflake tables
-- Supports complex transformations and data quality validations
+- **Implementation**: Externally managed Iceberg tables within AWS Glue catalog for business rule applications and data enrichment processes. Transformations write to Iceberg tables using MERGE operations for upserts
+- **Table Types**: Externally managed Iceberg tables on AWS Glue catalog
+- **Benefits**: Partition evolution, hidden partitioning, and efficient incremental updates via Iceberg merge-on-read capabilities
+- Supports complex transformations and data quality validations with full transaction support
 
 **Data Warehouse (Gold):**
 - **Purpose**: Business-ready analytical data models optimized for specific use cases with dimensional modeling and aggregated datasets for reporting and analytics
-- **Implementation**: Resides on catalog linked database enabling external ecosystem integration and advanced analytics workflows
-- **Table Types**: Externally managed Iceberg tables on AWS Glue catalog linked database
+- **Implementation**: Externally managed Iceberg tables on AWS Glue catalog enabling external ecosystem integration and advanced analytics workflows
+- **Table Types**: Externally managed Iceberg tables on AWS Glue catalog
+- **Benefits**: Multi-engine query support, snapshot isolation for concurrent reads, and metadata-driven query optimization
 - High-performance compute resources for complex analytical workloads and cross-platform data sharing
 
 #### 4.2.2 Ingestion Layer (EL)
@@ -709,12 +710,17 @@ graph TB
 
 | **Current Tool/System** | **Snowflake Capability** | **Migration Approach** |
 |------------------------|---------------------------|------------------------|
-| Alteryx | dbt + Snowflake SQL + Python | Workflow conversion and optimization |
-| SSIS | Fivetran + Snowflake Connectors | ETL package migration to ELT patterns |
-| R-Connect | Snowflake R Integration + Notebooks | R script modernization and cloud execution |
-| Teradata QPD | Snowflake Data Warehouse | Direct migration with performance optimization |
-| SQL Scripts | Snowflake SQL + Stored Procedures | Code conversion and cloud optimization |
-| File Processing | Snowflake Stages + Tasks | Automated file ingestion and processing |
+| Alteryx | dbt + Snowflake SQL + Python | Workflow conversion and optimization targeting Iceberg tables |
+| SSIS | Fivetran + Snowflake Connectors | ETL package migration to ELT patterns writing to Iceberg tables |
+| R-Connect | Snowflake R Integration + Notebooks | R script modernization with Iceberg table integration |
+| Teradata QPD Tables | AWS Glue Catalog Iceberg Tables | Direct migration to externally managed Iceberg tables via Glue catalog |
+| SQL Scripts | Snowflake SQL + Stored Procedures | Code conversion optimized for Iceberg table operations (MERGE, COPY INTO) |
+| File Processing | Snowflake Stages + Tasks | Automated file ingestion to Iceberg tables via external stages |
+
+**Architecture Notes:**
+- All data layers (Bronze, Silver, Gold) utilize AWS Glue catalog externally managed Iceberg tables
+- Iceberg format enables ACID transactions, time-travel, schema evolution, and multi-engine compatibility
+- Snowflake queries Iceberg tables through Glue catalog integration providing unified metadata management
 
 ---
 
@@ -723,19 +729,22 @@ graph TB
 ### 5.1 Data Governance
 
 **Metadata Management:**
-- **Data Catalog**: Automated discovery and cataloging using Snowflake Information Schema
+- **Data Catalog**: Unified metadata management through AWS Glue catalog integration with Snowflake
+- **Iceberg Metadata**: Leverages Iceberg's built-in metadata tracking for table history, schema evolution, and partition information
 - **Business Glossary**: Centralized definitions and business context for data assets
-- **Data Classification**: Automated sensitive data discovery and classification
+- **Data Classification**: Automated sensitive data discovery and classification across Iceberg tables
 
 **Data Quality:**
-- **Quality Checks**: Automated data validation rules and quality scorecards
+- **Quality Checks**: Automated data validation rules and quality scorecards leveraging Iceberg's ACID properties
 - **Data Profiling**: Continuous monitoring of data distribution and anomaly detection
 - **Quality Metrics**: Business-defined KPIs for data quality measurement and reporting
+- **Time-Travel Validation**: Iceberg snapshot isolation enables point-in-time data quality audits
 
 **Lineage Tracking:**
-- **End-to-End Lineage**: Complete traceability from source systems to consumption points
-- **Impact Analysis**: Understanding of downstream effects for data model changes
+- **End-to-End Lineage**: Complete traceability from source systems to consumption points across all Iceberg table versions
+- **Impact Analysis**: Understanding of downstream effects for data model changes using Iceberg metadata
 - **Compliance Reporting**: Automated generation of lineage reports for regulatory requirements
+- **Cross-Engine Lineage**: Track data usage across Snowflake, Spark, Athena, and other engines accessing Iceberg tables
 
 ### 5.2 Monitoring & Alerting Capabilities
 
@@ -770,11 +779,11 @@ graph TB
 - **Load Frequency:** Weekly
 
 **Future State Architecture:**
-- **Ingestion:** Fivetran connector for DARE SQL Server with automated CDC
-- **Transformation:** dbt models replacing Alteryx workflows for data preparation
-- **Storage:** Snowflake tables with optimized clustering for query performance
-- **Consumption:** Tableau connected directly to Snowflake with live connectivity
-- **Benefits:** Reduced processing time, automated data quality checks, real-time insights
+- **Ingestion:** Fivetran connector for DARE SQL Server with automated CDC writing to Iceberg tables
+- **Transformation:** dbt models replacing Alteryx workflows, processing data through Bronze → Silver → Gold Iceberg table layers
+- **Storage:** AWS Glue catalog externally managed Iceberg tables with optimized partitioning and ACID compliance
+- **Consumption:** Tableau connected directly to Snowflake querying Iceberg tables with live connectivity
+- **Benefits:** Reduced processing time, automated data quality checks, real-time insights, time-travel capabilities, and cross-engine compatibility
 
 ### 6.2 Illion Bureau Data Load
 
@@ -789,11 +798,11 @@ graph TB
 - **Load Frequency:** Monthly
 
 **Future State Architecture:**
-- **Ingestion:** Snowflake External Stages with automated file detection via Snowpipe
-- **Transformation:** dbt models for data cleansing and business rule application
-- **Storage:** Snowflake tables with time-travel capabilities for audit compliance
-- **Consumption:** Enhanced Tableau dashboards with real-time refresh capabilities
-- **Benefits:** Automated processing, improved data lineage, reduced manual intervention
+- **Ingestion:** Snowflake External Stages with automated file detection via Snowpipe writing to Bronze Iceberg tables
+- **Transformation:** dbt models for data cleansing and business rule application across Silver and Gold Iceberg layers
+- **Storage:** AWS Glue catalog externally managed Iceberg tables with time-travel and snapshot isolation for audit compliance
+- **Consumption:** Enhanced Tableau dashboards with real-time refresh capabilities querying Gold Iceberg tables
+- **Benefits:** Automated processing, improved data lineage, reduced manual intervention, ACID compliance, and multi-version concurrency control
 
 ### 6.3 Direct Debit Monitoring Tool
 
@@ -807,11 +816,11 @@ graph TB
 - **Load Frequency:** Manual/periodic uploads
 
 **Future State Architecture:**
-- **Ingestion:** Snowflake External Stages with automated file processing via Tasks
-- **Transformation:** dbt models for data validation and encryption handling
-- **Storage:** Secure Snowflake tables with row-level security and audit logging
-- **Consumption:** Modernized DDMT tool with direct Snowflake connectivity or API layer
-- **Benefits:** Automated file processing, enhanced security, improved audit capabilities
+- **Ingestion:** Snowflake External Stages with automated file processing via Tasks writing to Bronze Iceberg tables
+- **Transformation:** dbt models for data validation and encryption handling across Silver Iceberg layer
+- **Storage:** Secure AWS Glue catalog Iceberg tables with row-level security, encryption, and audit logging via Iceberg snapshots
+- **Consumption:** Modernized DDMT tool with direct Snowflake connectivity querying Gold Iceberg tables or API layer
+- **Benefits:** Automated file processing, enhanced security, improved audit capabilities, immutable audit trail, and time-travel for compliance
 
 ### 6.4 Watchlist Integration
 
@@ -825,11 +834,11 @@ graph TB
 - **Load Frequency:** Weekly
 
 **Future State Architecture:**
-- **Ingestion:** Automated API integration with ACES system or secure file transfer to Snowflake stages
-- **Transformation:** dbt models for data validation, conflict resolution, and business rule application
-- **Storage:** Snowflake tables with secure access controls and complete audit trail
-- **Consumption:** Real-time dashboards and automated alerting for risk teams, API integration with CEE
-- **Benefits:** Reduced manual processing, real-time risk monitoring, enhanced compliance capabilities
+- **Ingestion:** Automated API integration with ACES system or secure file transfer to Snowflake Internal Stage writing to Bronze Iceberg tables
+- **Transformation:** dbt models for data validation, conflict resolution, and business rule application across Silver and Gold Iceberg layers
+- **Storage:** AWS Glue catalog Iceberg tables with secure access controls, complete audit trail via snapshots, and time-travel for regulatory review
+- **Consumption:** Real-time dashboards and automated alerting for risk teams querying Gold Iceberg tables, API integration with CEE
+- **Benefits:** Reduced manual processing, real-time risk monitoring, enhanced compliance capabilities, immutable audit history, and point-in-time regulatory reporting
 
 ### 6.5 Cashflow Model Output
 
@@ -843,11 +852,11 @@ graph TB
 - **Load Frequency:** Staging Tables loaded when new SageMaker outputs are available; Final Tables auto-refreshed post-staging via Glue ETL; ETL Runtime ~40 minutes per batch; Scoring Frequency: Weekly or model-triggered, aligned with retraining cycles
 
 **Future State Architecture:**
-- **ML Pipeline:** Snowflake native ML capabilities with Snowpark for model execution and scoring
-- **Data Storage:** Snowflake tables with native support for semi-structured data and time-travel capabilities
-- **Transformation:** dbt models for data processing and quantile calculations replacing Glue ETL
-- **Integration:** Direct API connectivity to Bankers Workbench eliminating complex ETL processes
-- **Benefits:** Simplified architecture, reduced latency, enhanced model monitoring, improved scalability
+- **ML Pipeline:** Snowflake native ML capabilities with Snowpark for model execution and scoring, writing results to Bronze Iceberg tables
+- **Data Storage:** AWS Glue catalog Iceberg tables with native support for semi-structured data, ACID transactions, and time-travel capabilities
+- **Transformation:** dbt models for data processing and quantile calculations replacing Glue ETL, processing through Silver and Gold Iceberg layers
+- **Integration:** Direct API connectivity to Bankers Workbench querying Gold Iceberg tables, eliminating complex ETL processes
+- **Benefits:** Simplified architecture, reduced latency, enhanced model monitoring, improved scalability, version control for model outputs, and multi-engine compatibility
 
 ### 6.6 Customer Value Management (CVM) Insights to Service Domain
 
@@ -861,11 +870,11 @@ graph TB
 - **Load Frequency:** Weekly refresh of CVM insights to ensure recency and relevance for customer interactions
 
 **Future State Architecture:**
-- **Data Sharing:** Snowflake secure data sharing capabilities eliminating complex API extractions
-- **Real-time Processing:** Snowflake Streams for real-time insight generation and updates
-- **Integration:** Direct Snowflake connectivity to Service Domain applications via native connectors
-- **Analytics:** Enhanced CVM scoring models using Snowflake's native ML functions
-- **Benefits:** Real-time insights, simplified data pipeline, improved customer experience, enhanced model feedback loops
+- **Data Sharing:** Snowflake secure data sharing of Gold Iceberg tables eliminating complex API extractions
+- **Real-time Processing:** Snowflake Streams on Iceberg tables for real-time insight generation and updates
+- **Integration:** Direct Snowflake connectivity to Service Domain applications querying Iceberg tables via native connectors
+- **Analytics:** Enhanced CVM scoring models using Snowflake's native ML functions writing to Iceberg tables
+- **Benefits:** Real-time insights, simplified data pipeline, improved customer experience, enhanced model feedback loops, cross-platform compatibility, and immutable insight versioning
 
 ### 6.7 BB Data Quality Platform
 
@@ -879,10 +888,10 @@ graph TB
 - **Load Frequency:** Daily
 
 **Future State Architecture:**
-- **Data Quality Framework:** Snowflake native data quality functions and Great Expectations integration
-- **Monitoring:** Automated data quality scoring with Snowflake Tasks and alerting capabilities
-- **Visualization:** Modern Tableau dashboards with real-time data quality metrics connected directly to Snowflake
-- **Self-Service:** Snowflake's Information Schema and Account Usage views for data steward access
-- **Benefits:** Automated quality monitoring, real-time exception detection, simplified remediation workflows, enhanced data governance
+- **Data Quality Framework:** Snowflake native data quality functions and Great Expectations integration validating Iceberg table data
+- **Monitoring:** Automated data quality scoring with Snowflake Tasks and alerting capabilities leveraging Iceberg snapshots for audit trails
+- **Visualization:** Modern Tableau dashboards with real-time data quality metrics querying Gold Iceberg tables directly
+- **Self-Service:** AWS Glue catalog metadata and Snowflake Information Schema for unified data steward access across all Iceberg tables
+- **Benefits:** Automated quality monitoring, real-time exception detection, simplified remediation workflows, enhanced data governance, point-in-time quality validation, and cross-engine data quality checks
 
 ---
