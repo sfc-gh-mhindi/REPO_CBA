@@ -502,18 +502,14 @@ graph LR
 
 ---
 
-**Recommendation:**
-
-- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption, and to better align with CDAO approved patterns.
-- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl, after getting the required approvals from CDAO / architecture teams.
+---
 
 ##### Illion Data Source
 **Type**: Manual
 
 **Implementation**: Manual file upload process for Illion bureau data files
 
-- Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). 
-- Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
+Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
 
 ```mermaid
 graph LR
@@ -522,6 +518,8 @@ graph LR
     SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
+
+---
 
 ##### ACES Data Source
 **Type**: Manual
@@ -536,18 +534,23 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-- Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. 
-- From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
+Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
+
+---
 
 ##### GDW Data Source
 **Type**: Immediately accessible (no ingestion needed)
 
 **Implementation**: As part of the greenfield initiative, GDW tables will be available as AWS Glue catalog linked externally managed Iceberg tables. QPD only needs to raise a request to access required tables. Per the HLSA design for greenfield, GDW externally managed Iceberg tables will be created in the requestor's database (QPD), pointing to the correct storage location in GDW.
 
+---
+
 ##### Omnia Data Source
 **Type**: Immediately accessible (no ingestion needed)
 
 **Implementation**: As part of the greenfield initiative, Omnia tables (OTC parquet files) will be available as external tables pointing to their current AWS S3 location. QPD only needs to raise a request to access required tables.
+
+---
 
 ##### CSV Files Data Source
 **Type**: Periodic
@@ -622,11 +625,7 @@ graph LR
 
 ---
 
-**Recommendation:**
-
-- **Short-term (Phase 1)**: Option 1 (SSIS Repointing) for rapid migration and minimal disruption
-- **Medium-term (Phase 2)**: Option 3 (S3 External Landing Direct) as the preferred CDAO-approved pattern
-- **Alternative**: Option 2 (OpenFlow Integration) if complex file processing/transformation is required before landing
+---
 
 ##### AI Models Data Source
 **Type**: Periodic
@@ -639,6 +638,31 @@ graph LR
     S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
+
+---
+
+##### Ingestion Recommendations
+
+This section provides strategic recommendations for implementing data ingestion patterns based on organizational priorities, technical complexity, and alignment with CDAO standards.
+
+**DARE Data Source - Recommended Approach:**
+
+- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption, and to better align with CDAO approved patterns.
+- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl, after getting the required approvals from CDAO / architecture teams.
+
+**CSV Files Data Source - Recommended Approach:**
+
+- **Short-term (Phase 1)**: Option 1 (SSIS Repointing) for rapid migration and minimal disruption
+- **Medium-term (Phase 2)**: Option 3 (S3 External Landing Direct) as the preferred CDAO-approved pattern
+- **Alternative**: Option 2 (OpenFlow Integration) if complex file processing/transformation is required before landing
+
+**Implementation Strategy:**
+
+The phased approach balances immediate migration needs with long-term architectural goals:
+
+1. **Phase 1 (Quick Wins)**: Repoint existing tools (Alteryx, SSIS) to minimize disruption while adopting the CDAO-approved S3 + Snowpipe pattern
+2. **Phase 2 (Consolidation)**: Transition to Snowflake-managed tools (OpenFlow) or direct S3 landing patterns to reduce technology sprawl
+3. **Ongoing**: Continuously evaluate and retire legacy tools as teams build expertise with cloud-native patterns
 
 #### 4.2.3 Transformation Layer (T)
 
