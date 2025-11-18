@@ -212,6 +212,9 @@ Current downstream consumers include:
 - **Cost Efficiency**: Optimize for cost-effective operations with usage-based pricing models
 - **Real-time Capabilities**: Support both real-time streaming and batch processing requirements
 - **Platform Unification**: Consolidate disparate tools and systems into a unified Snowflake-based platform to streamline data ingestion, transformation, and analytics capabilities
+- **CBA (CDAO) Alignment**: When multiple implementation options exist, recommendations are driven by alignment with CBA (CDAO) approved practices and standards. Examples include:
+  - The usage of AWS Glue catalog externally managed Iceberg tables is mandatory across all data layers
+  - Wherever possible, dbt within Snowflake is the preferred transformation pattern for consistency and maintainability
 
 ---
 
@@ -883,14 +886,3 @@ graph TB
 - **Benefits:** Automated quality monitoring, real-time exception detection, simplified remediation workflows, enhanced data governance
 
 ---
-
-## Document Information
-
-| **Attribute** | **Details** |
-|---------------|-------------|
-| **Document Title** | QPD Future State Architecture: Gem Outline |
-| **Version** | 1.0 |
-| **Date** | November 2024 |
-| **Target Platform** | Snowflake Cloud Data Platform |
-| **Migration Approach** | Phased ELT-First Architecture |
-
