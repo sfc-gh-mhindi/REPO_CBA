@@ -32,6 +32,7 @@
        - [Omnia Data Source](#omnia-data-source)
        - [CSV Files Data Source](#csv-files-data-source)
        - [AI Models Data Source](#ai-models-data-source)
+       - [Ingestion Recommendations](#ingestion-recommendations)
      - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t)
      - 4.2.4 [Consumption Layer](#424-consumption-layer)
      - 4.2.5 [Orchestration](#425-orchestration)
@@ -645,16 +646,15 @@ graph LR
 
 This section provides strategic recommendations for implementing data ingestion patterns based on organizational priorities, technical complexity, and alignment with CDAO standards.
 
-**DARE Data Source - Recommended Approach:**
-
-- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption, and to better align with CDAO approved patterns.
-- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl, after getting the required approvals from CDAO / architecture teams.
-
-**CSV Files Data Source - Recommended Approach:**
-
-- **Short-term (Phase 1)**: Option 1 (SSIS Repointing) for rapid migration and minimal disruption
-- **Medium-term (Phase 2)**: Option 3 (S3 External Landing Direct) as the preferred CDAO-approved pattern
-- **Alternative**: Option 2 (OpenFlow Integration) if complex file processing/transformation is required before landing
+| **Data Source** | **Options** | **Recommendation** | **Justification** |
+|-----------------|-------------|-------------------|-------------------|
+| **DARE Data Source** | • **Option 1**: Alteryx Repointing to AWS S3 → Snowpipe → Raw<br/>• **Option 2**: OpenFlow Integration to AWS S3 → Snowpipe → Raw | **Short-term (Phase 1)**: Option 1 (Alteryx Repointing)<br/><br/>**Long-term (Phase 2)**: Option 2 (OpenFlow Integration) | **Phase 1**: Minimal implementation time, no learning curve, aligns with CDAO-approved S3 + Snowpipe pattern<br/><br/>**Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, requires CDAO/architecture approval |
+| **CSV Files Data Source** | • **Option 1**: SSIS Repointing to AWS S3 → Snowpipe → Raw<br/>• **Option 2**: OpenFlow Integration to AWS S3 → Snowpipe → Raw<br/>• **Option 3**: Direct S3 External Landing → Snowpipe → Raw | **Short-term (Phase 1)**: Option 1 (SSIS Repointing)<br/><br/>**Medium-term (Phase 2)**: Option 3 (S3 External Landing Direct)<br/><br/>**Alternative**: Option 2 (OpenFlow) | **Phase 1**: Minimal implementation time, no learning curve for existing teams<br/><br/>**Phase 2**: CDAO-approved pattern, simplest architecture, minimizes technology count<br/><br/>**Alternative**: Use when complex file processing/transformation is required before landing |
+| **Illion Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw | **Recommended**: Manual upload interface (Streamlit) | Manual monthly bureau files require user-driven uploads; Snowpipe auto-ingest provides automation after upload |
+| **ACES Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw | **Recommended**: Streamlit application with Snowpipe | Manual monthly watchlist curation requires user interface; Snowpipe ensures automated loading post-submission |
+| **AI Models Data Source** | • SageMaker → AWS S3 → Snowpipe → Raw | **Recommended**: Direct S3 write with Snowpipe | Aligns with CDAO pattern; SageMaker natively writes to S3; Snowpipe provides automated ingestion |
+| **GDW Data Source** | • Glue Catalog Linked Iceberg Tables (No ingestion) | **Recommended**: Direct access via catalog linkage | No ingestion required; tables immediately accessible as externally managed Iceberg tables through Glue catalog |
+| **Omnia Data Source** | • External Tables pointing to AWS S3 (No ingestion) | **Recommended**: Direct access via external tables | No ingestion required; OTC parquet files accessible directly from current AWS S3 location |
 
 **Implementation Strategy:**
 
