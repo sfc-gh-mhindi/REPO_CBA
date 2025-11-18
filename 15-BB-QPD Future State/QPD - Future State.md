@@ -469,6 +469,16 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
+**Pros:**
+- Minimal implementation time due to repointing existing workflows
+- No learning curve required for teams already familiar with Alteryx
+
+**Cons:**
+- Doesn't address the challenge of multiple technologies in the target state
+- Continues dependency on third-party tool licensing and maintenance
+
+---
+
 **Option 2: OpenFlow Integration**
 
 Leverage OpenFlow (managed by Snowflake) to extract data from DARE and write to AWS S3 External Landing, with Snowpipe auto-ingest loading into Snowflake QPD Raw Iceberg tables.
@@ -481,24 +491,16 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-**Pros and Cons:**
+**Pros:**
+- Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
+- Consolidates data movement into Snowflake-native ecosystem
 
-- **Option 1 (Alteryx Repointing)**
-  - **Pros:**
-    - Minimal implementation time due to repointing existing workflows
-    - No learning curve required for teams already familiar with Alteryx
-  - **Cons:**
-    - Doesn't address the challenge of multiple technologies in the target state
-    - Continues dependency on third-party tool licensing and maintenance
+**Cons:**
+- Requires learning curve (specifically Apache NiFi)
+- Higher implementation time and cost
+- Requires testing and validation
 
-- **Option 2 (OpenFlow Integration)**
-  - **Pros:**
-    - Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
-    - Consolidates data movement into Snowflake-native ecosystem
-  - **Cons:**
-    - Requires learning curve (specifically Apache NiFi)
-    - Higher implementation time and cost
-    - Requires testing and validation
+---
 
 **Recommendation:**
 
@@ -564,6 +566,16 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
+**Pros:**
+- Minimal implementation time due to repointing existing packages
+- No learning curve required for teams already familiar with SSIS
+
+**Cons:**
+- Doesn't address the challenge of multiple technologies in the target state
+- Continues dependency on Windows-based infrastructure and SQL Server licensing
+
+---
+
 **Option 2: OpenFlow Integration**
 
 Leverage OpenFlow (managed by Snowflake) to process and move CSV files to AWS S3 External Landing, with Snowpipe auto-ingest loading into Snowflake QPD Raw Iceberg tables.
@@ -576,6 +588,17 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
+**Pros:**
+- Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
+- Consolidates data movement into Snowflake-native ecosystem
+
+**Cons:**
+- Requires learning curve (specifically Apache NiFi)
+- Higher implementation time and cost
+- Requires testing and validation
+
+---
+
 **Option 3: S3 External Landing Direct**
 
 Configure source systems or file transfer processes to write CSV files directly to AWS S3 External Landing, with Snowpipe auto-ingest automatically loading into Snowflake QPD Raw Iceberg tables.
@@ -587,34 +610,17 @@ graph LR
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-**Pros and Cons:**
+**Pros:**
+- Minimizes the number of technologies in the target state
+- Approved pattern by CDAO for cloud-native ingestion
+- Simplest architecture with fewest components
 
-- **Option 1 (SSIS Repointing)**
-  - **Pros:**
-    - Minimal implementation time due to repointing existing packages
-    - No learning curve required for teams already familiar with SSIS
-  - **Cons:**
-    - Doesn't address the challenge of multiple technologies in the target state
-    - Continues dependency on Windows-based infrastructure and SQL Server licensing
+**Cons:**
+- Requires modification of source systems or file transfer processes
+- Higher implementation time and cost
+- Requires testing and validation
 
-- **Option 2 (OpenFlow Integration)**
-  - **Pros:**
-    - Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
-    - Consolidates data movement into Snowflake-native ecosystem
-  - **Cons:**
-    - Requires learning curve (specifically Apache NiFi)
-    - Higher implementation time and cost
-    - Requires testing and validation
-
-- **Option 3 (S3 External Landing Direct)**
-  - **Pros:**
-    - Minimizes the number of technologies in the target state
-    - Approved pattern by CDAO for cloud-native ingestion
-    - Simplest architecture with fewest components
-  - **Cons:**
-    - Requires modification of source systems or file transfer processes
-    - Higher implementation time and cost
-    - Requires testing and validation
+---
 
 **Recommendation:**
 
@@ -777,21 +783,13 @@ graph TB
 
 #### 4.2.4 Consumption Layer
 
-**Tableau/Reporting:**
-- Direct connectivity to Snowflake with native optimization and caching
-- Self-service analytics capabilities with governed data access
-- Real-time dashboard updates and interactive exploration
-
-**APIs:**
-- **Snowflake SQL API**: Direct database connectivity for application integration
-- **REST API Gateway**: Service layer for external application access with proper authentication and rate limiting
-- **GraphQL Endpoints**: Flexible data querying for modern application architectures
-
-**AI Models/Data Science:**
-- **Snowflake Notebooks**: Integrated Jupyter-style environment for data science workflows
-- **Hex/External Notebooks**: Integration with external data science platforms
-- **MLOps Pipeline**: Automated model training, validation, and deployment workflows
-- **Feature Store**: Centralized repository for ML features with versioning and lineage
+| **Consumer** | **Consumption Methods** | **Recommended Method** |
+|--------------|------------------------|------------------------|
+| **Tableau/Reporting** | • Direct Snowflake connectivity with native optimization and caching<br/>• Self-service analytics capabilities with governed data access<br/>• Real-time dashboard updates and interactive exploration | Direct Snowflake connectivity querying Gold Iceberg tables with live connectivity and materialized views for performance optimization |
+| **APIs** | • **Snowflake SQL API**: Direct database connectivity for application integration<br/>• **REST API Gateway**: Service layer for external application access with proper authentication and rate limiting<br/>• **GraphQL Endpoints**: Flexible data querying for modern application architectures | Snowflake SQL API for direct access to Gold Iceberg tables, with REST API Gateway for external applications requiring additional security controls |
+| **AI Models/Data Science** | • **Snowflake Notebooks**: Integrated Jupyter-style environment for data science workflows<br/>• **Hex/External Notebooks**: Integration with external data science platforms<br/>• **MLOps Pipeline**: Automated model training, validation, and deployment workflows<br/>• **Feature Store**: Centralized repository for ML features with versioning and lineage | Snowflake Notebooks for integrated development, with Feature Store built on Gold Iceberg tables for model serving and MLOps pipelines for automated workflows |
+| **Analytical Reporting** | • Direct SQL queries against Gold Iceberg tables<br/>• Scheduled report generation via Snowflake Tasks<br/>• Export capabilities to various formats (PDF, Excel, CSV) | Direct SQL queries with scheduled Tasks for automated report generation and distribution |
+| **R-Connect Analytics** | • Snowflake R Integration for statistical analysis<br/>• Posit Workbench for collaborative R development<br/>• Direct table access via ODBC/JDBC connectors | Snowflake R Integration or Posit Workbench connecting directly to Gold Iceberg tables for advanced statistical analysis |
 
 #### 4.2.5 Orchestration
 
