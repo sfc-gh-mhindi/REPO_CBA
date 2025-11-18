@@ -429,17 +429,21 @@ graph TB
     end
     
     subgraph "Target Layers"
-        Landing[AWS S3 Landing Layer]
+        S3_Landing[AWS S3 External Landing]
+        Internal_Landing[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe[Snowpipe with Auto-Ingest]
         Raw[Snowflake QPD Raw Layer]
         Direct[Direct Access<br/>No Ingestion Required]
     end
     
-    DARE --> Raw
-    Illion --> Landing
-    CSV --> Landing
-    AI --> Raw
-    ACES --> Raw
-    Landing --> Raw
+    DARE --> S3_Landing
+    Illion --> S3_Landing
+    CSV --> S3_Landing
+    AI --> S3_Landing
+    ACES --> Internal_Landing
+    S3_Landing --> Snowpipe
+    Internal_Landing --> Snowpipe
+    Snowpipe --> Raw
     GDW --> Direct
     Omnia --> Direct
 ```
@@ -450,29 +454,64 @@ graph TB
 **Ingestion Options**:
 
 **Option 1: Alteryx Repointing**
+
+Repoint existing Alteryx workflows to write output to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
+
 ```mermaid
 graph LR
     DARE[DARE SQL Database] --> Alteryx[Alteryx Workflow]
-    Alteryx --> SF_Raw[Snowflake QPD Raw Layer]
+    Alteryx --> S3_Landing[AWS S3 External Landing]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
 **Option 2: OpenFlow Integration**
+
+Leverage OpenFlow (managed by Snowflake) to extract data from DARE and write to AWS S3 External Landing, with Snowpipe auto-ingest loading into Snowflake QPD Raw Iceberg tables.
+
 ```mermaid
 graph LR
     DARE[DARE Azure SQL] --> OpenFlow[OpenFlow ETL]
-    OpenFlow --> SF_Raw[Snowflake QPD Raw Layer]
+    OpenFlow --> S3_Landing[AWS S3 External Landing]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
+
+**Pros and Cons:**
+
+- **Option 1 (Alteryx Repointing)**
+  - **Pros:**
+    - Minimal implementation time due to repointing existing workflows
+    - No learning curve required for teams already familiar with Alteryx
+  - **Cons:**
+    - Doesn't address the challenge of multiple technologies in the target state
+    - Continues dependency on third-party tool licensing and maintenance
+
+- **Option 2 (OpenFlow Integration)**
+  - **Pros:**
+    - Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
+    - Consolidates data movement into Snowflake-native ecosystem
+  - **Cons:**
+    - Requires learning curve (specifically Apache NiFi)
+    - Higher implementation time and cost
+    - Requires testing and validation
+
+**Recommendation:**
+
+- **Short-term (Phase 1)**: Option 1 (Alteryx Repointing) for rapid migration and minimal disruption
+- **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl
 
 ##### Illion Data Source
 **Type**: Periodic
 
-**Ingestion Approach**: Repoint Alteryx to write to AWS S3 External Landing layer, then copy to Snowflake QPD raw layer
+**Ingestion Approach**: Repoint Alteryx to write to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
 
 ```mermaid
 graph LR
     Illion[Illion Files] --> Alteryx[Alteryx Workflow]
     Alteryx --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> SF_Raw[Snowflake QPD Raw Layer]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
 ##### ACES Data Source
@@ -484,11 +523,11 @@ graph LR
 graph LR
     User[Business User] --> Streamlit[Streamlit UI App]
     Streamlit --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
-    SF_Internal --> Snowpipe[Snowflake Pipe Objects]
+    SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowflake Pipe objects detect when a file has been added and automatically copy it into the Snowflake QPD Raw Layer table for subsequent processing.
+Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
 
 ##### GDW Data Source
 **Type**: Immediately accessible (no ingestion needed)
@@ -506,36 +545,85 @@ Upon file upload and submission through the Streamlit interface, files are autom
 **Ingestion Options**:
 
 **Option 1: SSIS Repointing**
+
+Repoint existing SSIS packages to write CSV file outputs to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
+
 ```mermaid
 graph LR
     CSV[CSV Files] --> SSIS[SSIS Package]
     SSIS --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> SF_Raw[Snowflake QPD Raw Layer]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
 **Option 2: OpenFlow Integration**
+
+Leverage OpenFlow (managed by Snowflake) to process and move CSV files to AWS S3 External Landing, with Snowpipe auto-ingest loading into Snowflake QPD Raw Iceberg tables.
+
 ```mermaid
 graph LR
     CSV[CSV Files Location] --> OpenFlow[OpenFlow ETL]
     OpenFlow --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> SF_Raw[Snowflake QPD Raw Layer]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
-**Option 3: S3 External Landing**
+**Option 3: S3 External Landing Direct**
+
+Configure source systems or file transfer processes to write CSV files directly to AWS S3 External Landing, with Snowpipe auto-ingest automatically loading into Snowflake QPD Raw Iceberg tables.
+
 ```mermaid
 graph LR
     CSV[CSV Files] --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> SF_Raw[Snowflake QPD Raw Layer]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
+
+**Pros and Cons:**
+
+- **Option 1 (SSIS Repointing)**
+  - **Pros:**
+    - Minimal implementation time due to repointing existing packages
+    - No learning curve required for teams already familiar with SSIS
+  - **Cons:**
+    - Doesn't address the challenge of multiple technologies in the target state
+    - Continues dependency on Windows-based infrastructure and SQL Server licensing
+
+- **Option 2 (OpenFlow Integration)**
+  - **Pros:**
+    - Minimizes the number of technologies in the target state (OpenFlow is managed by Snowflake)
+    - Consolidates data movement into Snowflake-native ecosystem
+  - **Cons:**
+    - Requires learning curve (specifically Apache NiFi)
+    - Higher implementation time and cost
+    - Requires testing and validation
+
+- **Option 3 (S3 External Landing Direct)**
+  - **Pros:**
+    - Minimizes the number of technologies in the target state
+    - Approved pattern by CDAO for cloud-native ingestion
+    - Simplest architecture with fewest components
+  - **Cons:**
+    - Requires modification of source systems or file transfer processes
+    - Higher implementation time and cost
+    - Requires testing and validation
+
+**Recommendation:**
+
+- **Short-term (Phase 1)**: Option 1 (SSIS Repointing) for rapid migration and minimal disruption
+- **Medium-term (Phase 2)**: Option 3 (S3 External Landing Direct) as the preferred CDAO-approved pattern
+- **Alternative**: Option 2 (OpenFlow Integration) if complex file processing/transformation is required before landing
 
 ##### AI Models Data Source
 **Type**: Periodic
 
-**Implementation**: Repoint AWS SageMaker output to write directly to Snowflake QPD raw layer instead of Teradata
+**Implementation**: Repoint AWS SageMaker output to write to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads model results into Snowflake QPD Raw Iceberg tables.
 
 ```mermaid
 graph LR
-    SageMaker[AWS SageMaker] --> SF_Raw[Snowflake QPD Raw Layer]
+    SageMaker[AWS SageMaker] --> S3_Landing[AWS S3 External Landing]
+    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
 #### 4.2.3 Transformation Layer (T)
