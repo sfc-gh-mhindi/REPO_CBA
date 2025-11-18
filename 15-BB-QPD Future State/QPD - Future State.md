@@ -401,6 +401,10 @@ graph LR
 
 #### 4.2.2 Ingestion Layer (EL)
 
+**CDAO Approved Ingestion Pattern:**
+
+The approved ingestion pattern from CDAO follows a standardized approach: load files to be ingested into an AWS S3 bucket (external landing), then use Snowpipe with auto-ingest to automatically copy data into the target Iceberg table. This pattern ensures consistency, scalability, and automated data ingestion across all data sources.
+
 The ingestion layer supports three different types of data ingestion requirements:
 - **Manual**: User-driven data uploads requiring human intervention
 - **Periodic**: Scheduled data ingestion on regular intervals (daily, weekly, monthly)
@@ -413,13 +417,13 @@ graph TB
     subgraph "Data Sources & Ingestion Methods"
         subgraph "Periodic Sources"
             DARE[DARE SQL Database<br/>→ Alteryx Repointing]
-            Illion[Illion Files<br/>→ Alteryx Repointing]
             CSV[CSV Files<br/>→ SSIS Repointing]
             AI[AI Models SageMaker<br/>→ Direct Repointing]
         end
         
         subgraph "Manual Sources"
             ACES[ACES Watchlist<br/>→ Streamlit UI App]
+            Illion[Illion Files<br/>→ Manual Upload]
         end
         
         subgraph "Immediately Accessible"
@@ -437,10 +441,10 @@ graph TB
     end
     
     DARE --> S3_Landing
-    Illion --> S3_Landing
     CSV --> S3_Landing
     AI --> S3_Landing
     ACES --> Internal_Landing
+    Illion --> Internal_Landing
     S3_Landing --> Snowpipe
     Internal_Landing --> Snowpipe
     Snowpipe --> Raw
@@ -502,15 +506,17 @@ graph LR
 - **Long-term (Phase 2)**: Option 2 (OpenFlow Integration) to align with platform consolidation strategy and reduce technology sprawl
 
 ##### Illion Data Source
-**Type**: Periodic
+**Type**: Manual
 
-**Ingestion Approach**: Repoint Alteryx to write to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
+**Implementation**: Manual file upload process for Illion bureau data files
+
+Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
 
 ```mermaid
 graph LR
-    Illion[Illion Files] --> Alteryx[Alteryx Workflow]
-    Alteryx --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
+    User[Business User] --> Upload[File Upload Interface]
+    Upload --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
+    SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
     Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
 ```
 
