@@ -1231,19 +1231,26 @@ The migration approach varies by tool type, with automation options available fo
 
 ### 4.3 Detailed Component Mapping
 
-| **Current Tool/System** | **Snowflake Capability** | **Migration Approach** |
-|------------------------|---------------------------|------------------------|
-| Alteryx | dbt + Snowflake SQL + Python | Workflow conversion and optimization targeting Iceberg tables |
-| SSIS | Fivetran + Snowflake Connectors | ETL package migration to ELT patterns writing to Iceberg tables |
-| R-Connect | Snowflake R Integration + Notebooks | R script modernization with Iceberg table integration |
-| Teradata QPD Tables | AWS Glue Catalog Iceberg Tables | Direct migration to externally managed Iceberg tables via Glue catalog |
-| SQL Scripts | Snowflake SQL + Stored Procedures | Code conversion optimized for Iceberg table operations (MERGE, COPY INTO) |
-| File Processing | Snowflake Stages + Tasks | Automated file ingestion to Iceberg tables via external stages |
+| **Current Tool/System** | **Recommended Ingestion** | **Recommended Transformation** | **Migration Approach** |
+|------------------------|---------------------------|-------------------------------|------------------------|
+| **DARE Data Source (via Alteryx)** | **Phase 1**: Alteryx Repointing → AWS S3 → Snowpipe<br/>**Phase 2**: OpenFlow → AWS S3 → Snowpipe | **Phase 1**: Keep Alteryx transformations as-is (repointed to S3)<br/>**Phase 2**: dbt Models | **Ingestion**: Manual configuration change to write to S3 bucket; configure Snowpipe auto-ingest<br/>**Transformation**: Phase 1 - No migration; Phase 2 - Manual rewrite to dbt models |
+| **CSV Files Data Source (via SSIS)** | **Phase 1**: SSIS Repointing → AWS S3 → Snowpipe<br/>**Phase 2**: Direct S3 External Landing → Snowpipe | **Phase 1**: Keep SSIS transformations as-is (repointed to S3)<br/>**Phase 2**: dbt Models | **Ingestion**: Manual configuration change to write to S3 bucket; configure Snowpipe auto-ingest<br/>**Transformation**: Phase 1 - No migration; Phase 2 - SnowConvert AI to dbt models or manual rewrite |
+| **Illion Data Source** | Manual file upload via Streamlit → Snowflake Internal Stage → Snowpipe | dbt Models for cleansing and business rules | **Ingestion**: Build Streamlit UI for manual uploads; configure Snowpipe on Internal Stage<br/>**Transformation**: Manual rewrite to dbt models |
+| **ACES Data Source** | Manual file upload via Streamlit → Snowflake Internal Stage → Snowpipe | dbt Models for validation and conflict resolution | **Ingestion**: Build Streamlit UI for manual uploads; configure Snowpipe on Internal Stage<br/>**Transformation**: Manual rewrite to dbt models |
+| **AI Models Data Source (SageMaker)** | SageMaker → AWS S3 External Landing → Snowpipe | dbt Models for quantile calculations and business logic | **Ingestion**: Repoint SageMaker output to S3; configure Snowpipe auto-ingest<br/>**Transformation**: Manual rewrite to dbt models replacing Glue ETL |
+| **GDW Data Source** | Direct access via AWS Glue Catalog Linked Iceberg Tables (no ingestion) | dbt Models for aggregations and business logic | **Ingestion**: Request table access via catalog linkage<br/>**Transformation**: dbt models access source Iceberg tables directly |
+| **Omnia Data Source** | Direct access via External Tables pointing to AWS S3 (no ingestion) | dbt Models for aggregations and business logic | **Ingestion**: Request table access via external table linkage<br/>**Transformation**: dbt models access external tables directly |
+| **BTEQ Scripts** | N/A (transformation only) | **Phase 1**: Snowflake SQL Stored Procedures<br/>**Phase 2**: dbt Models | **Phase 1**: Automated conversion via SnowConvert AI; validate and deploy<br/>**Phase 2**: Automated conversion via GDW POC Tooling to dbt models |
+| **SQL Scripts (Teradata)** | N/A (transformation only) | **Phase 1**: Snowflake SQL Stored Procedures<br/>**Phase 2**: dbt Models | **Phase 1**: Automated conversion via SnowConvert AI<br/>**Phase 2**: Automated conversion via GDW POC Tooling to dbt models |
+| **R-Connect Jobs** | N/A (transformation only) | **Phase 1**: Snowflake SQL/Python (Snowpark)<br/>**Phase 2**: dbt Models<br/>**Alternative**: Posit native app on Snowflake | **Phase 1**: Manual rewrite to Snowflake SQL/Python; access GDW/Omnia Iceberg tables directly<br/>**Phase 2**: Manual rewrite to dbt models<br/>**Alternative**: Migrate R scripts to Posit environment |
+| **Teradata QPD Tables** | N/A (storage migration) | N/A (storage migration) | Direct migration to AWS Glue Catalog externally managed Iceberg tables; data copy from Teradata to S3/Iceberg format |
 
 **Architecture Notes:**
 - All data layers (Bronze, Silver, Gold) utilize AWS Glue catalog externally managed Iceberg tables
 - Iceberg format enables ACID transactions, time-travel, schema evolution, and multi-engine compatibility
 - Snowflake queries Iceberg tables through Glue catalog integration providing unified metadata management
+- Phased approach balances immediate migration needs (Phase 1) with long-term modernization goals (Phase 2)
+- Tools marked as "transformation only" focus on processing data already ingested into Snowflake
 
 ---
 
