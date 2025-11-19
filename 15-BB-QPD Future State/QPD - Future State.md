@@ -1301,12 +1301,29 @@ The migration approach varies by tool type, with automation options available fo
 - **Output:** Tableau dashboards for merchant migration and mobile user analysis
 - **Load Frequency:** Weekly
 
-**Future State Architecture:**
-- **Ingestion:** Fivetran connector for DARE SQL Server with automated CDC writing to Iceberg tables
-- **Transformation:** dbt models replacing Alteryx workflows, processing data through Bronze → Silver → Gold Iceberg table layers
-- **Storage:** AWS Glue catalog externally managed Iceberg tables with optimized partitioning and ACID compliance
-- **Consumption:** Tableau connected directly to Snowflake querying Iceberg tables with live connectivity
-- **Benefits:** Reduced processing time, automated data quality checks, real-time insights, time-travel capabilities, and cross-engine compatibility
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | DARE SQL Server (merchant migration data, mobile user transactional data) |
+| **Ingestion** | Fivetran connector for DARE SQL Server with automated CDC (Change Data Capture) |
+| **Storage** | • **Bronze Layer**: Raw DARE data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Cleansed and validated transactional data in Iceberg tables<br/>• **Gold Layer**: Business-ready dimensional models for reporting in Iceberg tables |
+| **Transformation** | dbt models replacing Alteryx workflows:<br/>• Bronze → Silver: Data cleansing, type casting, validation<br/>• Silver → Gold: Business logic, aggregations, dimensional modeling |
+| **Target Tables** | • `DARE_RAW` (Bronze)<br/>• `DARE_CURATED` (Silver)<br/>• `MERCHANT_MIGRATION_FACT`, `MOBILE_USER_DIM` (Gold) |
+| **Benefits** | • Reduced processing time with automated CDC<br/>• Automated data quality checks via dbt tests<br/>• Real-time insights with live Tableau connectivity<br/>• Time-travel capabilities for historical analysis<br/>• Cross-engine compatibility for multiple analytics tools<br/>• ACID compliance ensuring data consistency |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    Source[DARE SQL Server] --> Fivetran[Fivetran CDC Connector]
+    Fivetran --> Bronze[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
+    Bronze --> dbt_silver[dbt Models<br/>Cleansing & Validation]
+    dbt_silver --> Silver[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>Business Logic]
+    dbt_gold --> Gold[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
+    Gold --> Tableau[Tableau Dashboards<br/>Live Connectivity]
+```
 
 ### 6.2 Illion Bureau Data Load
 
@@ -1320,12 +1337,31 @@ The migration approach varies by tool type, with automation options available fo
 - **Size Estimate:** ~79,985 to 89,023 records per month
 - **Load Frequency:** Monthly
 
-**Future State Architecture:**
-- **Ingestion:** Snowflake External Stages with automated file detection via Snowpipe writing to Bronze Iceberg tables
-- **Transformation:** dbt models for data cleansing and business rule application across Silver and Gold Iceberg layers
-- **Storage:** AWS Glue catalog externally managed Iceberg tables with time-travel and snapshot isolation for audit compliance
-- **Consumption:** Enhanced Tableau dashboards with real-time refresh capabilities querying Gold Iceberg tables
-- **Benefits:** Automated processing, improved data lineage, reduced manual intervention, ACID compliance, and multi-version concurrency control
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | Illion credit bureau files (monthly extracts, ~90K records per month) |
+| **Ingestion** | Manual file upload via Streamlit interface → Snowflake Internal Stage → Snowpipe with auto-ingest |
+| **Storage** | • **Bronze Layer**: Raw Illion bureau data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Cleansed and standardized credit bureau data in Iceberg tables<br/>• **Gold Layer**: Credit risk analytical models and aggregations in Iceberg tables |
+| **Transformation** | dbt models replacing SQL + Alteryx:<br/>• Bronze → Silver: Data cleansing, validation, standardization<br/>• Silver → Gold: Credit risk calculations, bureau-level aggregations, regulatory reporting models |
+| **Target Tables** | • `ILLION_RAW` (Bronze)<br/>• `ILLION_CURATED` (Silver)<br/>• `CREDIT_RISK_FACT`, `BUREAU_INSIGHTS_AGG` (Gold) |
+| **Benefits** | • Automated processing with Snowpipe auto-ingest<br/>• Improved data lineage via Iceberg metadata<br/>• Reduced manual intervention through Streamlit interface<br/>• ACID compliance for regulatory requirements<br/>• Multi-version concurrency control<br/>• Time-travel and snapshot isolation for audit compliance<br/>• Point-in-time reporting for regulatory review |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    Source[Illion Bureau Files] --> Streamlit[Streamlit Upload Interface]
+    Streamlit --> Internal[Snowflake Internal Stage<br/>Landing Layer]
+    Internal --> Snowpipe[Snowpipe<br/>Auto-Ingest]
+    Snowpipe --> Bronze[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
+    Bronze --> dbt_silver[dbt Models<br/>Cleansing & Standardization]
+    dbt_silver --> Silver[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>Credit Risk Calculations]
+    dbt_gold --> Gold[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
+    Gold --> Tableau[Tableau Dashboards<br/>Credit Risk Insights]
+```
 
 ### 6.3 Direct Debit Monitoring Tool
 
@@ -1338,12 +1374,32 @@ The migration approach varies by tool type, with automation options available fo
 - **Output:** DDMT for monitoring and annual review support
 - **Load Frequency:** Manual/periodic uploads
 
-**Future State Architecture:**
-- **Ingestion:** Snowflake External Stages with automated file processing via Tasks writing to Bronze Iceberg tables
-- **Transformation:** dbt models for data validation and encryption handling across Silver Iceberg layer
-- **Storage:** Secure AWS Glue catalog Iceberg tables with row-level security, encryption, and audit logging via Iceberg snapshots
-- **Consumption:** Modernized DDMT tool with direct Snowflake connectivity querying Gold Iceberg tables or API layer
-- **Benefits:** Automated file processing, enhanced security, improved audit capabilities, immutable audit trail, and time-travel for compliance
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | CSV files from shared folders (claims data, encrypted APCA names, CommBiz DD limits) |
+| **Ingestion** | SSIS repointing → AWS S3 External Landing → Snowpipe with auto-ingest |
+| **Storage** | • **Bronze Layer**: Raw CSV data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Validated and decrypted APCA names, validated DD limits in Iceberg tables<br/>• **Gold Layer**: Business-ready direct debit monitoring datasets in Iceberg tables |
+| **Transformation** | dbt models replacing SSIS transformation logic:<br/>• Bronze → Silver: Data validation, APCA name decryption, DD limit validation, claims data formatting<br/>• Silver → Gold: Direct debit utilization calculations, breach identification, annual review aggregations |
+| **Target Tables** | • `CSV_RAW` (Bronze)<br/>• `DDM_CURATED` (Silver)<br/>• `DD_UTILIZATION_FACT`, `DD_BREACH_MONITOR` (Gold) |
+| **Benefits** | • Automated file processing via Snowpipe<br/>• Enhanced security with row-level security and encryption<br/>• Improved audit capabilities via Iceberg snapshots<br/>• Immutable audit trail for compliance<br/>• Time-travel for historical breach analysis<br/>• Modernized DDMT tool with direct Snowflake connectivity<br/>• API layer option for secure data access |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    Source[CSV Files<br/>Shared Folders] --> SSIS[SSIS Package<br/>Repointed]
+    SSIS --> S3[AWS S3 External Landing]
+    S3 --> Snowpipe[Snowpipe<br/>Auto-Ingest]
+    Snowpipe --> Bronze[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
+    Bronze --> dbt_silver[dbt Models<br/>Validation & Decryption]
+    dbt_silver --> Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>Utilization & Breach Calc]
+    dbt_gold --> Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
+    Gold --> DDMT[DDMT Tool<br/>Direct Snowflake Connectivity]
+    Gold --> API[API Layer<br/>Secure Access]
+```
 
 ### 6.4 Watchlist Integration
 
@@ -1356,12 +1412,33 @@ The migration approach varies by tool type, with automation options available fo
 - **Output:** Monthly Watchlist Reports for credit risk teams and business units to monitor flagged borrowers, trigger escalations to Group Credit Structuring (GCS), and support regulatory and internal audit requirements
 - **Load Frequency:** Weekly
 
-**Future State Architecture:**
-- **Ingestion:** Automated API integration with ACES system or secure file transfer to Snowflake Internal Stage writing to Bronze Iceberg tables
-- **Transformation:** dbt models for data validation, conflict resolution, and business rule application across Silver and Gold Iceberg layers
-- **Storage:** AWS Glue catalog Iceberg tables with secure access controls, complete audit trail via snapshots, and time-travel for regulatory review
-- **Consumption:** Real-time dashboards and automated alerting for risk teams querying Gold Iceberg tables, API integration with CEE
-- **Benefits:** Reduced manual processing, real-time risk monitoring, enhanced compliance capabilities, immutable audit history, and point-in-time regulatory reporting
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | ACES Watchlist entries (manually curated by business units, submitted weekly) |
+| **Ingestion** | Manual file upload via Streamlit interface → Snowflake Internal Stage → Snowpipe with auto-ingest |
+| **Storage** | • **Bronze Layer**: Raw ACES watchlist data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Validated watchlist with conflict resolution in Iceberg tables<br/>• **Gold Layer**: Consolidated watchlist reports and risk classification models in Iceberg tables |
+| **Transformation** | dbt models for watchlist processing:<br/>• Bronze → Silver: Data validation, conflict resolution, duplicate checking, business rule application<br/>• Silver → Gold: Risk classification, borrower flagging logic, GCS escalation triggers, audit reporting |
+| **Target Tables** | • `ACES_RAW` (Bronze)<br/>• `ACES_CURATED` (Silver)<br/>• `WATCHLIST_CONSOLIDATED`, `RISK_CLASSIFICATION_FACT` (Gold) |
+| **Benefits** | • Reduced manual processing via Streamlit interface<br/>• Real-time risk monitoring with automated alerting<br/>• Enhanced compliance capabilities<br/>• Immutable audit history via Iceberg snapshots<br/>• Point-in-time regulatory reporting with time-travel<br/>• API integration with Customer Experience Engine (CEE)<br/>• Complete audit trail for regulatory review<br/>• Secure access controls on Iceberg tables |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    Source[ACES Watchlist<br/>Business Units] --> Streamlit[Streamlit Upload Interface<br/>BB Data Office]
+    Streamlit --> Internal[Snowflake Internal Stage<br/>Landing Layer]
+    Internal --> Snowpipe[Snowpipe<br/>Auto-Ingest]
+    Snowpipe --> Bronze[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
+    Bronze --> dbt_silver[dbt Models<br/>Validation & Conflict Resolution]
+    dbt_silver --> Silver[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>Risk Classification]
+    dbt_gold --> Gold[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
+    Gold --> Dashboards[Real-time Dashboards<br/>Risk Teams]
+    Gold --> Alerts[Automated Alerting<br/>GCS Escalations]
+    Gold --> CEE[Customer Experience Engine<br/>API Integration]
+```
 
 ### 6.5 Cashflow Model Output
 
@@ -1374,12 +1451,32 @@ The migration approach varies by tool type, with automation options available fo
 - **Enables:** Cashflow shortfall alerts, Predictive advisory & Integration into Bankers Workbench for customer engagement
 - **Load Frequency:** Staging Tables loaded when new SageMaker outputs are available; Final Tables auto-refreshed post-staging via Glue ETL; ETL Runtime ~40 minutes per batch; Scoring Frequency: Weekly or model-triggered, aligned with retraining cycles
 
-**Future State Architecture:**
-- **ML Pipeline:** Snowflake native ML capabilities with Snowpark for model execution and scoring, writing results to Bronze Iceberg tables
-- **Data Storage:** AWS Glue catalog Iceberg tables with native support for semi-structured data, ACID transactions, and time-travel capabilities
-- **Transformation:** dbt models for data processing and quantile calculations replacing Glue ETL, processing through Silver and Gold Iceberg layers
-- **Integration:** Direct API connectivity to Bankers Workbench querying Gold Iceberg tables, eliminating complex ETL processes
-- **Benefits:** Simplified architecture, reduced latency, enhanced model monitoring, improved scalability, version control for model outputs, and multi-engine compatibility
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | AWS SageMaker inference outputs (credit and debit cashflow forecast models with quantile predictions) |
+| **Ingestion** | SageMaker output → AWS S3 External Landing → Snowpipe with auto-ingest |
+| **Storage** | • **Bronze Layer**: Raw SageMaker inference results in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Processed cashflow forecasts with quantile calculations in Iceberg tables<br/>• **Gold Layer**: Business-ready cashflow predictions and alerts in Iceberg tables |
+| **Transformation** | dbt models replacing AWS Glue ETL:<br/>• Bronze → Silver: Data processing, quantile calculations (10%, 50%, 90%), forecast structuring<br/>• Silver → Gold: Cashflow shortfall detection, predictive advisory logic, BWB integration format |
+| **Target Tables** | • `SAGEMAKER_OUTPUT_RAW` (Bronze)<br/>• `INFERENCE_CURATED` (Silver)<br/>• `CASHFLOW_FORECAST_FACT`, `CASHFLOW_SHORTFALL_ALERT` (Gold) |
+| **Benefits** | • Simplified architecture eliminating complex Glue ETL<br/>• Reduced latency (~40 min → near real-time)<br/>• Enhanced model monitoring with Snowpark ML<br/>• Improved scalability with Snowflake compute<br/>• Version control for model outputs via Iceberg snapshots<br/>• Multi-engine compatibility for ML tools<br/>• Direct API connectivity to Bankers Workbench<br/>• Native support for semi-structured data<br/>• ACID transactions for model results |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    Source[AWS SageMaker<br/>Cashflow Models] --> S3[AWS S3 External Landing<br/>Inference Outputs]
+    S3 --> Snowpipe[Snowpipe<br/>Auto-Ingest]
+    Snowpipe --> Bronze[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
+    Bronze --> dbt_silver[dbt Models<br/>Quantile Calculations]
+    dbt_silver --> Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>Shortfall Detection]
+    dbt_gold --> Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
+    Gold --> BWB[Bankers Workbench<br/>Direct API]
+    Gold --> Alerts[Cashflow Shortfall Alerts]
+    Gold --> Advisory[Predictive Advisory]
+```
 
 ### 6.6 Customer Value Management (CVM) Insights to Service Domain
 
@@ -1392,12 +1489,31 @@ The migration approach varies by tool type, with automation options available fo
 - **Output:** Top 20 CVM insights, historical engagement patterns, and payaway behaviour used by bankers to drive customer conversations and engagement strategies
 - **Load Frequency:** Weekly refresh of CVM insights to ensure recency and relevance for customer interactions
 
-**Future State Architecture:**
-- **Data Sharing:** Snowflake secure data sharing of Gold Iceberg tables eliminating complex API extractions
-- **Real-time Processing:** Snowflake Streams on Iceberg tables for real-time insight generation and updates
-- **Integration:** Direct Snowflake connectivity to Service Domain applications querying Iceberg tables via native connectors
-- **Analytics:** Enhanced CVM scoring models using Snowflake's native ML functions writing to Iceberg tables
-- **Benefits:** Real-time insights, simplified data pipeline, improved customer experience, enhanced model feedback loops, cross-platform compatibility, and immutable insight versioning
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | QPD analytical models (customer engagement data, payaway patterns, predicted needs from GDW/Omnia Iceberg tables) |
+| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg tables (no ingestion required) |
+| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg tables)<br/>• **Silver Layer**: Curated customer engagement data in Iceberg tables<br/>• **Gold Layer**: CVM insights, Top 20 recommendations, engagement scores in Iceberg tables |
+| **Transformation** | dbt models for CVM insight generation:<br/>• Silver: Customer data aggregation, engagement pattern analysis<br/>• Gold: CVM scoring models, Top 20 insight generation, payaway behavior analytics, engagement strategies |
+| **Target Tables** | • `CUSTOMER_ENGAGEMENT_CURATED` (Silver)<br/>• `CVM_INSIGHTS_FACT`, `CVM_TOP20_RECOMMENDATIONS`, `ENGAGEMENT_SCORE` (Gold) |
+| **Benefits** | • Real-time insights via Snowflake Streams on Iceberg tables<br/>• Simplified data pipeline eliminating complex API layer<br/>• Improved customer experience with live insights<br/>• Enhanced model feedback loops<br/>• Cross-platform compatibility<br/>• Immutable insight versioning via Iceberg snapshots<br/>• Snowflake secure data sharing to Service Domain<br/>• Direct Snowflake connectivity to BWB<br/>• Enhanced CVM scoring with Snowflake ML functions |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    GDW[GDW Iceberg Tables<br/>Customer Data] --> Silver_transform[dbt Models<br/>Customer Aggregation]
+    Omnia[Omnia Iceberg Tables<br/>Engagement Data] --> Silver_transform
+    Silver_transform --> Silver[Silver Layer<br/>CUSTOMER_ENGAGEMENT_CURATED<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>CVM Scoring]
+    dbt_gold --> Gold[Gold Layer<br/>CVM_INSIGHTS_FACT<br/>CVM_TOP20_RECOMMENDATIONS<br/>Iceberg Tables]
+    Gold --> Streams[Snowflake Streams<br/>Real-time Updates]
+    Streams --> BWB[Bankers Workbench<br/>Direct Connectivity]
+    Gold --> DataShare[Snowflake Secure<br/>Data Sharing]
+    DataShare --> ServiceDomain[Service Domain<br/>Applications]
+```
 
 ### 6.7 BB Data Quality Platform
 
@@ -1410,11 +1526,30 @@ The migration approach varies by tool type, with automation options available fo
 - **Output:** DQ Exception records with metadata and context, Email notifications to RMs and Data Stewards, Dashboards with RAG status, Exception counts & Drill-down capabilities, R-Shiny portal for remediation with row-level security
 - **Load Frequency:** Daily
 
-**Future State Architecture:**
-- **Data Quality Framework:** Snowflake native data quality functions and Great Expectations integration validating Iceberg table data
-- **Monitoring:** Automated data quality scoring with Snowflake Tasks and alerting capabilities leveraging Iceberg snapshots for audit trails
-- **Visualization:** Modern Tableau dashboards with real-time data quality metrics querying Gold Iceberg tables directly
-- **Self-Service:** AWS Glue catalog metadata and Snowflake Information Schema for unified data steward access across all Iceberg tables
-- **Benefits:** Automated quality monitoring, real-time exception detection, simplified remediation workflows, enhanced data governance, point-in-time quality validation, and cross-engine data quality checks
+**Future State:**
+
+| **Component** | **Description** |
+|---------------|-----------------|
+| **Data Sources** | GDW Iceberg tables (1 table) and Omnia Iceberg tables (2 tables) via AWS Glue catalog |
+| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg tables (no ingestion required) |
+| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg tables)<br/>• **Silver Layer**: Data quality validation results and exception metadata in Iceberg tables<br/>• **Gold Layer**: DQ exception aggregations, RAG status summaries, remediation tracking in Iceberg tables |
+| **Transformation** | dbt models with Great Expectations integration:<br/>• Silver: Data quality rule execution, exception detection, metadata capture<br/>• Gold: DQ scoring, RAG status calculation, exception aggregation, drill-down views, remediation workflow tracking |
+| **Target Tables** | • `DQ_VALIDATION_RESULTS` (Silver)<br/>• `DQ_EXCEPTIONS_AGG`, `DQ_RAG_STATUS`, `DQ_REMEDIATION_TRACKER` (Gold) |
+| **Benefits** | • Automated quality monitoring with Snowflake Tasks<br/>• Real-time exception detection via Snowflake Streams<br/>• Simplified remediation workflows with modern UI<br/>• Enhanced data governance across all Iceberg tables<br/>• Point-in-time quality validation via time-travel<br/>• Cross-engine data quality checks<br/>• Self-service access via AWS Glue catalog metadata<br/>• Unified data steward interface via Snowflake Information Schema<br/>• Audit trails via Iceberg snapshots<br/>• Streamlit portal replacing R-Shiny for remediation |
+
+**Use Case Data Flow Diagram:**
+
+```mermaid
+graph LR
+    GDW[GDW Iceberg Tables] --> DQ_Rules[dbt Models<br/>Great Expectations<br/>Quality Rules]
+    Omnia[Omnia Iceberg Tables] --> DQ_Rules
+    DQ_Rules --> Silver[Silver Layer<br/>DQ_VALIDATION_RESULTS<br/>Iceberg Tables]
+    Silver --> dbt_gold[dbt Models<br/>DQ Scoring & Aggregation]
+    dbt_gold --> Gold[Gold Layer<br/>DQ_EXCEPTIONS_AGG<br/>DQ_RAG_STATUS<br/>Iceberg Tables]
+    Gold --> Tableau[Tableau Dashboards<br/>RAG Status & Drill-down]
+    Gold --> Alerts[Email Alerts<br/>Data Stewards & RMs]
+    Gold --> Streamlit[Streamlit Portal<br/>Remediation & Self-Service]
+    Gold --> Tasks[Snowflake Tasks<br/>Automated Monitoring]
+```
 
 ---
