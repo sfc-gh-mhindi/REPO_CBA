@@ -1486,19 +1486,116 @@ graph LR
 
 **Use Case Data Flow Diagram:**
 
+**Phase 1: Snowflake Stored Procedures/Notebooks**
+
 ```mermaid
 graph LR
-    Source[AWS SageMaker<br/>Cashflow Models] --> Glue[AWS Glue ETL]
-    Glue --> S3[AWS S3 External Landing<br/>Inference Outputs]
-    S3 --> Snowpipe[Snowpipe<br/>Auto-Ingest]
-    Snowpipe --> Bronze[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
-    Bronze --> Transform_Phase1[Phase 1: Snowflake<br/>Stored Procedures/Notebooks<br/>Quantile Calculations]
-    Transform_Phase1 --> Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
-    Silver --> Transform_Phase1_Gold[Phase 1: Snowflake<br/>Stored Procedures/Notebooks<br/>Shortfall Detection]
-    Transform_Phase1_Gold --> Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
-    Gold --> BWB[Bankers Workbench<br/>Direct API]
-    Gold --> Alerts[Cashflow Shortfall Alerts]
-    Gold --> Advisory[Predictive Advisory]
+    subgraph AWS["AWS Environment"]
+        direction LR
+        Source[AWS SageMaker<br/>Cashflow Models]
+        Glue[AWS Glue ETL]
+        S3[AWS S3 External Landing<br/>Inference Outputs]
+        
+        Source --> Glue
+        Glue --> S3
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Snowpipe[Snowpipe<br/>Auto-Ingest]
+        Bronze[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
+        Transform_SP[Snowflake Stored Procedures<br/>or Notebooks<br/>Quantile Calculations]
+        Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
+        Transform_SP_Gold[Snowflake Stored Procedures<br/>or Notebooks<br/>Shortfall Detection]
+        Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
+        
+        Snowpipe --> Bronze
+        Bronze --> Transform_SP
+        Transform_SP --> Silver
+        Silver --> Transform_SP_Gold
+        Transform_SP_Gold --> Gold
+    end
+    
+    subgraph Consumption["Consumption Layer"]
+        direction TB
+        BWB[Bankers Workbench<br/>Direct API]
+        Alerts[Cashflow Shortfall Alerts]
+        Advisory[Predictive Advisory]
+    end
+    
+    S3 --> Snowpipe
+    Gold --> BWB
+    Gold --> Alerts
+    Gold --> Advisory
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Source fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Glue fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+```
+
+**Phase 2: dbt Models**
+
+```mermaid
+graph LR
+    subgraph AWS["AWS Environment"]
+        direction LR
+        Source2[AWS SageMaker<br/>Cashflow Models]
+        Glue2[AWS Glue ETL]
+        S3_2[AWS S3 External Landing<br/>Inference Outputs]
+        
+        Source2 --> Glue2
+        Glue2 --> S3_2
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Snowpipe2[Snowpipe<br/>Auto-Ingest]
+        Bronze2[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
+        dbt_silver[dbt Models<br/>Quantile Calculations]
+        Silver2[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
+        dbt_gold[dbt Models<br/>Shortfall Detection]
+        Gold2[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
+        
+        Snowpipe2 --> Bronze2
+        Bronze2 --> dbt_silver
+        dbt_silver --> Silver2
+        Silver2 --> dbt_gold
+        dbt_gold --> Gold2
+    end
+    
+    subgraph Consumption2["Consumption Layer"]
+        direction TB
+        BWB2[Bankers Workbench<br/>Direct API]
+        Alerts2[Cashflow Shortfall Alerts]
+        Advisory2[Predictive Advisory]
+    end
+    
+    S3_2 --> Snowpipe2
+    Gold2 --> BWB2
+    Gold2 --> Alerts2
+    Gold2 --> Advisory2
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Glue2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ### 6.6 Customer Value Management (CVM) Insights to Service Domain
