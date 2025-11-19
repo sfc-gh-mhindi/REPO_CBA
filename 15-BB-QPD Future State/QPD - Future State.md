@@ -356,19 +356,17 @@ graph TB
 - Provides secure, scalable file storage with lifecycle management policies and flexible ingestion capabilities
 - While staging data into a Landing Layer is not an explicit technical requirement, this document recommends it as a **best practice** for the following reasons:
 
-**Advantages of Landing Layer:**
-- **Data Audit Trail**: Preserves original source files for compliance, troubleshooting, and data lineage verification
-- **Reprocessing Capability**: Enables reloading data into Bronze tables without re-extracting from source systems in case of failures or data quality issues
-- **Decoupling**: Separates data extraction from data loading, allowing ingestion processes to run independently of transformation processes
-- **Source System Protection**: Reduces load on source systems by minimizing repeated extractions
-- **Error Recovery**: Facilitates quick recovery from pipeline failures without impacting source systems
-- **Data Retention**: Supports flexible retention policies with S3 lifecycle rules (e.g., archive to Glacier for long-term storage)
-- **Performance**: Enables parallel processing and batch optimization strategies
-- **Cost Efficiency**: Leverages cost-effective S3 storage for staging before committing to Iceberg table storage
-
-**Alternative Approach:**
-
-If the Business Banking team determines that staging data in the Landing Layer does not provide sufficient value for their specific use cases, the Landing Layer can be **removed** from the architecture. In this scenario, ingestion processes would be modified to write directly to target Snowflake Bronze Iceberg tables, simplifying the data flow while maintaining functionality. This decision should be made based on operational requirements, data governance needs, and cost-benefit analysis.
+- **Advantages of Landing Layer:**
+  - **Data Audit Trail**: Preserves original source files for compliance, troubleshooting, and data lineage verification
+  - **Reprocessing Capability**: Enables reloading data into Bronze tables without re-extracting from source systems in case of failures or data quality issues
+  - **Decoupling**: Separates data extraction from data loading, allowing ingestion processes to run independently of transformation processes
+  - **Source System Protection**: Reduces load on source systems by minimizing repeated extractions
+  - **Error Recovery**: Facilitates quick recovery from pipeline failures without impacting source systems
+  - **Data Retention**: Supports flexible retention policies with S3 lifecycle rules (e.g., archive to Glacier for long-term storage)
+  - **Performance**: Enables parallel processing and batch optimization strategies
+  - **Cost Efficiency**: Leverages cost-effective S3 storage for staging before committing to Iceberg table storage
+- **Alternative Approach:**
+  - If the Business Banking team determines that staging data in the Landing Layer does not provide sufficient value for their specific use cases, the Landing Layer can be **removed** from the architecture. In this scenario, ingestion processes would be modified to write directly to target Snowflake Bronze Iceberg tables, simplifying the data flow while maintaining functionality. This decision should be made based on operational requirements, data governance needs, and cost-benefit analysis.
 
 
 ```mermaid
