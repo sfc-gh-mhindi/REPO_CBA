@@ -431,7 +431,7 @@ The selection of appropriate ingestion methodology for each data source depends 
 
 ```mermaid
 graph TB
-    subgraph "Data Sources & Ingestion Methods"
+    subgraph Sources["Data Sources & Ingestion Methods"]
         subgraph "Periodic Sources"
             DARE[DARE SQL Database<br/>→ Alteryx Repointing]
             CSV[CSV Files<br/>→ SSIS Repointing]
@@ -449,8 +449,11 @@ graph TB
         end
     end
     
-    subgraph "Target Layers"
+    subgraph AWS["AWS Environment"]
         S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
         Internal_Landing[Snowflake Internal Stage<br/>Landing Layer]
         Snowpipe[Snowpipe with Auto-Ingest]
         Raw[Snowflake QPD Raw Layer]
@@ -467,6 +470,15 @@ graph TB
     Snowpipe --> Raw
     GDW --> Direct
     Omnia --> Direct
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Sources fill:#e0e0e0,stroke:#666,stroke-width:2px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Internal_Landing fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Direct fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ##### DARE Data Source
@@ -480,10 +492,29 @@ Repoint existing Alteryx workflows to write output to AWS S3 External Landing la
 
 ```mermaid
 graph LR
-    DARE[DARE SQL Database] --> Alteryx[Alteryx Workflow]
-    Alteryx --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    DARE[DARE SQL Database]
+    
+    subgraph AWS["AWS Environment"]
+        Alteryx[Alteryx Workflow]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    DARE --> Alteryx
+    Alteryx --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Alteryx fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 **Pros:**
@@ -502,10 +533,29 @@ Leverage OpenFlow (managed by Snowflake) to extract data from DARE and write to 
 
 ```mermaid
 graph LR
-    DARE[DARE Azure SQL] --> OpenFlow[OpenFlow ETL]
-    OpenFlow --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    DARE[DARE Azure SQL]
+    
+    subgraph AWS["AWS Environment"]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        OpenFlow[OpenFlow ETL]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    DARE --> OpenFlow
+    OpenFlow --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style OpenFlow fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 **Pros:**
@@ -528,10 +578,25 @@ Business users receive monthly Illion bureau data files and manually upload them
 
 ```mermaid
 graph LR
-    User[Business User] --> Upload[File Upload Interface in Streamlit]
-    Upload --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
-    SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    User[Business User]
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Upload[File Upload Interface in Streamlit]
+        SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    User --> Upload
+    Upload --> SF_Internal
+    SF_Internal --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Upload fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ---
@@ -543,10 +608,25 @@ graph LR
 
 ```mermaid
 graph LR
-    User[Business User] --> Streamlit[Streamlit UI App]
-    Streamlit --> SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
-    SF_Internal --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    User[Business User]
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Streamlit[Streamlit UI App]
+        SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    User --> Streamlit
+    Streamlit --> SF_Internal
+    SF_Internal --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
@@ -578,10 +658,29 @@ Repoint existing SSIS packages to write CSV file outputs to AWS S3 External Land
 
 ```mermaid
 graph LR
-    CSV[CSV Files] --> SSIS[SSIS Package]
-    SSIS --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    CSV[CSV Files]
+    
+    subgraph AWS["AWS Environment"]
+        SSIS[SSIS Package]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    CSV --> SSIS
+    SSIS --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style SSIS fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 **Pros:**
@@ -600,10 +699,29 @@ Leverage OpenFlow (managed by Snowflake) to process and move CSV files to AWS S3
 
 ```mermaid
 graph LR
-    CSV[CSV Files Location] --> OpenFlow[OpenFlow ETL]
-    OpenFlow --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    CSV[CSV Files Location]
+    
+    subgraph AWS["AWS Environment"]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        OpenFlow[OpenFlow ETL]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    CSV --> OpenFlow
+    OpenFlow --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style OpenFlow fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 **Pros:**
@@ -623,9 +741,26 @@ Configure source systems or file transfer processes to write CSV files directly 
 
 ```mermaid
 graph LR
-    CSV[CSV Files] --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    CSV[CSV Files]
+    
+    subgraph AWS["AWS Environment"]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    CSV --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 **Pros:**
@@ -648,9 +783,26 @@ graph LR
 
 ```mermaid
 graph LR
-    SageMaker[AWS SageMaker] --> S3_Landing[AWS S3 External Landing]
-    S3_Landing --> Snowpipe[Snowpipe with Auto-Ingest]
-    Snowpipe --> SF_Raw[Snowflake QPD Raw Layer]
+    subgraph AWS["AWS Environment"]
+        SageMaker[AWS SageMaker]
+        S3_Landing[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        Snowpipe[Snowpipe with Auto-Ingest]
+        SF_Raw[Snowflake QPD Raw Layer]
+    end
+    
+    SageMaker --> S3_Landing
+    S3_Landing --> Snowpipe
+    Snowpipe --> SF_Raw
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style SageMaker fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ---
