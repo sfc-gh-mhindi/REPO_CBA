@@ -33,6 +33,7 @@
        - [CSV Files Data Source](#csv-files-data-source)
        - [AI Models Data Source](#ai-models-data-source)
        - [Ingestion Recommendations](#ingestion-recommendations)
+       - [Migration Approach](#migration-approach)
      - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t)
      - 4.2.4 [Consumption Layer](#424-consumption-layer)
      - 4.2.5 [Orchestration](#425-orchestration)
@@ -660,6 +661,163 @@ The phased approach balances immediate migration needs with long-term architectu
 1. **Phase 1 (Quick Wins)**: Repoint existing tools (Alteryx, SSIS) to minimize disruption while adopting the CDAO-approved S3 + Snowpipe pattern
 2. **Phase 2 (Consolidation)**: Transition to Snowflake-managed tools (OpenFlow) or direct S3 landing patterns to reduce technology sprawl
 3. **Ongoing**: Continuously evaluate and retire legacy tools as teams build expertise with cloud-native patterns
+
+---
+
+##### Migration Approach
+
+The migration from current state ingestion patterns to the Snowflake target state follows a straightforward repointing approach. Most data sources require minimal migration effort, primarily involving configuration changes rather than code rewrites.
+
+---
+
+## **Migration Strategy Overview**
+
+The ingestion migration approach is designed for minimal disruption with low complexity across all data sources. The table below summarizes the migration effort required for each data source:
+
+| **Data Source** | **Migration Method** | **Complexity** | **Migration Effort** |
+|-----------------|---------------------|----------------|---------------------|
+| **DARE Data Source** | Configuration Repointing | Low | Manual configuration change to write to S3 bucket instead of Teradata |
+| **CSV Files Data Source** | Configuration Repointing | Low | Manual configuration change to write to S3 bucket instead of Teradata |
+| **Illion Data Source** | New Interface Development | Low-Medium | Build Streamlit UI for manual file uploads |
+| **ACES Data Source** | New Interface Development | Low-Medium | Build Streamlit UI for manual file uploads |
+| **AI Models Data Source** | Configuration Repointing | Low | Manual configuration change to write to S3 bucket instead of Teradata |
+| **GDW Data Source** | No Migration Required | None | Tables readily available via Glue catalog linkage |
+| **Omnia Data Source** | No Migration Required | None | Tables readily available via external table linkage |
+
+---
+
+## **Data Source-by-Data Source Migration Approach**
+
+### **1. DARE Data Source**
+
+**Migration Method**: Configuration Repointing (Alteryx)
+
+**Steps**:
+1. **Workflow Identification**: Identify all Alteryx workflows writing DARE data to Teradata
+2. **Configuration Update**: Update Alteryx workflow output destinations to target AWS S3 bucket location
+3. **Snowpipe Setup**: Configure Snowpipe with auto-ingest on the target S3 bucket
+4. **Testing**: Validate data lands in S3 and automatically loads to Snowflake Raw Iceberg tables
+5. **Cutover**: Switch production workflows to new S3 destination
+
+**Complexity**: Low
+
+**Migration Effort**: Minimal - only configuration changes required; no code rewrite necessary
+
+---
+
+### **2. CSV Files Data Source**
+
+**Migration Method**: Configuration Repointing (SSIS)
+
+**Steps**:
+1. **Package Identification**: Identify all SSIS packages writing CSV data to Teradata
+2. **Configuration Update**: Update SSIS package destinations to target AWS S3 bucket location
+3. **Snowpipe Setup**: Configure Snowpipe with auto-ingest on the target S3 bucket
+4. **Testing**: Validate data lands in S3 and automatically loads to Snowflake Raw Iceberg tables
+5. **Cutover**: Switch production packages to new S3 destination
+
+**Complexity**: Low
+
+**Migration Effort**: Minimal - only configuration changes required; no code rewrite necessary
+
+---
+
+### **3. Illion Data Source**
+
+**Migration Method**: New Interface Development (Streamlit)
+
+**Steps**:
+1. **Requirements Gathering**: Document manual file upload requirements with business users
+2. **Streamlit Development**: Build Streamlit application with file upload interface
+3. **Internal Stage Setup**: Configure Snowflake Internal Stage as landing zone
+4. **Snowpipe Setup**: Configure Snowpipe with auto-ingest on Internal Stage
+5. **User Training**: Train business users on new upload interface
+6. **Go-Live**: Deploy Streamlit application and transition from legacy process
+
+**Complexity**: Low to Medium
+
+**Migration Effort**: Requires new interface development but no data migration
+
+---
+
+### **4. ACES Data Source**
+
+**Migration Method**: New Interface Development (Streamlit)
+
+**Steps**:
+1. **Requirements Gathering**: Document watchlist file upload requirements with BB Data Office
+2. **Streamlit Development**: Build Streamlit application with file upload and validation interface
+3. **Internal Stage Setup**: Configure Snowflake Internal Stage as landing zone
+4. **Snowpipe Setup**: Configure Snowpipe with auto-ingest on Internal Stage
+5. **User Training**: Train BB Data Office team on new upload interface
+6. **Go-Live**: Deploy Streamlit application and transition from manual loading process
+
+**Complexity**: Low to Medium
+
+**Migration Effort**: Requires new interface development but no data migration
+
+---
+
+### **5. AI Models Data Source**
+
+**Migration Method**: Configuration Repointing (SageMaker)
+
+**Steps**:
+1. **Model Identification**: Identify all SageMaker models writing outputs to Teradata
+2. **Configuration Update**: Update SageMaker output destinations to target AWS S3 bucket location
+3. **Snowpipe Setup**: Configure Snowpipe with auto-ingest on the target S3 bucket
+4. **Testing**: Validate model outputs land in S3 and automatically load to Snowflake Raw Iceberg tables
+5. **Cutover**: Switch production models to new S3 destination
+
+**Complexity**: Low
+
+**Migration Effort**: Minimal - only configuration changes required; no code rewrite necessary
+
+---
+
+### **6. GDW Data Source**
+
+**Migration Method**: No Migration Required
+
+**Approach**: As part of the greenfield initiative, GDW tables will be readily available as AWS Glue catalog linked externally managed Iceberg tables. QPD only needs to raise a request to access required tables.
+
+**Complexity**: None
+
+**Migration Effort**: None - tables immediately accessible via catalog linkage
+
+---
+
+### **7. Omnia Data Source**
+
+**Migration Method**: No Migration Required
+
+**Approach**: As part of the greenfield initiative, Omnia tables (OTC parquet files) will be readily available as external tables pointing to their current AWS S3 location. QPD only needs to raise a request to access required tables.
+
+**Complexity**: None
+
+**Migration Effort**: None - tables immediately accessible via external table linkage
+
+---
+
+## **Migration Timeline and Dependencies**
+
+**Phase 1: Quick Wins (Weeks 1-4)**
+- DARE, CSV Files, AI Models: Repoint to S3 (can be done in parallel)
+- GDW & Omnia: Request table access (immediate)
+
+**Phase 2: Interface Development (Weeks 4-8)**
+- Illion & ACES: Develop and deploy Streamlit applications
+
+**Key Dependencies:**
+- AWS S3 bucket provisioning and access setup
+- Snowpipe configuration and testing
+- Snowflake Internal Stage setup for manual uploads
+- GDW/Omnia catalog linkage approvals
+
+**Risk Mitigation:**
+- Run parallel testing for all repointed sources before cutover
+- Maintain fallback to Teradata during initial migration period
+- Conduct user acceptance testing for Streamlit applications before go-live
 
 #### 4.2.3 Transformation Layer (T)
 
