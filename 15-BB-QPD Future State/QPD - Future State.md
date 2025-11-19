@@ -951,9 +951,9 @@ The future state architecture provides two transformation technology options, ea
 | **Current Tool** | **Current State** | **Target State Technology** |
 |------------------|-------------------|----------------------------|
 | **BTEQ Scripts** | Three-stage process: Fastload/Multiload → staging transformations → target tables; <br>**Complexity**: Low-Medium | **Option 1**: Snowflake SQL<br>**Option 2**: dbt Models |
-| **Alteryx Workflows** | Post-ingestion transformation workflows; 1:1 pattern; <br>**Complexity**: Low-Medium | **Option 1**: Keep as is (Alteryx transformations unchanged, repointed to S3)<br>**Option 2**: Snowflake SQL<br>**Option 3**: dbt Models |
+| **Alteryx Workflows** | Post-ingestion transformation workflows; 1:1 pattern; <br>**Complexity**: Low-Medium | **Option 1**: Keep as is (Alteryx transformations unchanged)<br>**Option 2**: Snowflake SQL<br>**Option 3**: dbt Models |
 | **SQL Scripts** | Teradata SQL for Illion Files; Clean, cast, column selection; <br>**Complexity**: Low | **Option 1**: Snowflake SQL<br>**Option 2**: dbt Models |
-| **SSIS Packages** | CSV file movement and basic cleansing for DDM; <br>**Complexity**: Low | **Option 1**: Keep as is (SSIS transformations unchanged, repointed to S3)<br>**Option 2**: Snowflake SQL<br>**Option 3**: dbt Models |
+| **SSIS Packages** | CSV file movement and basic cleansing for DDM; <br>**Complexity**: Low | **Option 1**: Keep as is (SSIS transformations unchanged)<br>**Option 2**: Snowflake SQL<br>**Option 3**: dbt Models |
 | **R-Connect Jobs** | Data transformations from GDW & OMNIA; Multi-table joins, aggregations; ~200 jobs; <br>**Complexity**: Medium | **Option 1**: Posit native app on Snowflake (transformations unchanged)<br>**Option 2**: Snowflake SQL/Python (Snowpark)<br>**Option 3**: dbt Models |
 
 ---
@@ -982,10 +982,10 @@ This section provides strategic recommendations for implementing transformation 
 | **Transformation Tool** | **Options** | **Recommendation** | **Justification** |
 |-------------------------|-------------|-------------------|-------------------|
 | **BTEQ Scripts** | • **Option 1**: Snowflake SQL Stored Procedures<br/>• **Option 2**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time via SnowConvert AI automation, no learning curve, immediate migration capability<br/>• **Phase 2**: Aligns with CDAO standards (GDW POC pattern), native version control, testing, and collaboration through dbt framework |
-| **Alteryx Workflows** | • **Option 1**: Keep as is (repointed to S3)<br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is (repointed to S3)<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve, leverages existing Alteryx expertise<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
+| **Alteryx Workflows** | • **Option 1**: Keep as is <br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is< br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve, leverages existing Alteryx expertise<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
 | **SQL Scripts** | • **Option 1**: Snowflake SQL Stored Procedures<br/>• **Option 2**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time via SnowConvert AI automation, straightforward SQL-to-SQL migration<br/>• **Phase 2**: Aligns with CDAO standards, native version control, automated testing, and documentation through dbt |
-| **SSIS Packages** | • **Option 1**: Keep as is (repointed to S3)<br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is (repointed to S3)<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve for existing teams, maintains DDM file processing workflows<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
-| **R-Connect Jobs** | • **Option 1**: Posit native app on Snowflake<br/>• **Option 2**: Snowflake SQL/Python (Snowpark)<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL/Python<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, leverages native Snowflake capabilities for complex transformations and aggregations<br/>• **Phase 2**: Aligns with CDAO standards for standard SQL transformations; retain Posit (Option 1) for complex statistical logic requiring R |
+| **SSIS Packages** | • **Option 1**: Keep as is <br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve for existing teams, maintains DDM file processing workflows<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
+| **R-Connect Jobs** | • **Option 1**: Posit native app on Snowflake<br/>• **Option 2**: Snowflake SQL/Python (Snowpark)<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL/Python<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, leverages native Snowflake capabilities for complex transformations and aggregations<br/>• **Phase 2**: Aligns with CDAO standards for standard SQL transformations;|
 
 **Implementation Strategy:**
 
@@ -1222,12 +1222,27 @@ The migration approach varies by tool type, with automation options available fo
 
 #### 4.2.5 Orchestration
 
-**Snowflake Tasks:**
-- Scheduled job execution for automated data pipeline operations
-- Native task scheduling for data ingestion, transformation, and quality checks
-- Task dependency management for complex workflow orchestration
-- Automated retry mechanisms and error handling
-- Resource optimization through intelligent task scheduling
+**Snowpipe (Auto-Ingest):**
+- Automatic file detection and ingestion from AWS S3 buckets (external landing zone)
+- Automatic file detection and ingestion from Snowflake internal stages (manual uploads)
+- Continuous data loading into QPD Raw Layer (Bronze) upon new file arrival
+- No manual intervention required for ingestion once configured
+
+**Snowflake Tasks (Post-Ingestion Transformation):**
+- Parent tasks triggered automatically upon Snowpipe ingestion completion
+- Child tasks orchestrate multi-step transformations (Raw → Curated → Analytical layers)
+- Task dependency management ensures proper execution order (Bronze → Silver → Gold)
+- Automated retry mechanisms and error handling for failed transformations
+
+**Architecture Pattern (Per Data Source):**
+
+Each data source follows the same orchestration pattern:
+1. **Ingestion**: Dedicated Snowpipe for each data source 
+2. **Transformation Trigger**: Dedicated parent task per data source that triggers upon Snowpipe completion
+3. **Transformation Flow**: Child tasks execute layered transformations (Bronze → Silver → Gold)
+4. **Consistency**: Same architectural pattern applied across all data sources for maintainability
+
+**Note**: Each data source maintains its own ingestion pipeline and transformation task triggers, ensuring isolated, traceable, and independently manageable data flows.
 
 ### 4.3 Detailed Component Mapping
 
