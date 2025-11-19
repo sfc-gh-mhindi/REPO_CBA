@@ -1477,24 +1477,25 @@ graph LR
 
 | **Component** | **Description** |
 |---------------|-----------------|
-| **Data Sources** | AWS SageMaker inference outputs (credit and debit cashflow forecast models with quantile predictions) |
-| **Ingestion** | SageMaker output → AWS S3 External Landing → Snowpipe with auto-ingest |
+| **Data Sources** | AWS SageMaker inference outputs (credit and debit cashflow forecast models with quantile predictions). Glue ETL loads the data into the AWS S3 External Landing |
+| **Ingestion** | SageMaker output → Glue ETL → AWS S3 External Landing → Snowpipe with auto-ingest |
 | **Storage** | • **Bronze Layer**: Raw SageMaker inference results in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Processed cashflow forecasts with quantile calculations in Iceberg tables<br/>• **Gold Layer**: Business-ready cashflow predictions and alerts in Iceberg tables |
-| **Transformation** | dbt models replacing AWS Glue ETL:<br/>• Bronze → Silver: Data processing, quantile calculations (10%, 50%, 90%), forecast structuring<br/>• Silver → Gold: Cashflow shortfall detection, predictive advisory logic, BWB integration format |
+| **Transformation** | **Phase 1**: Snowflake stored procedures or Snowflake notebooks:<br/>• Bronze → Silver: Data processing, quantile calculations (10%, 50%, 90%), forecast structuring<br/>• Silver → Gold: Cashflow shortfall detection, predictive advisory logic, BWB integration format<br/>**Phase 2**: dbt models for long-term standardization |
 | **Target Tables** | • `SAGEMAKER_OUTPUT_RAW` (Bronze)<br/>• `INFERENCE_CURATED` (Silver)<br/>• `CASHFLOW_FORECAST_FACT`, `CASHFLOW_SHORTFALL_ALERT` (Gold) |
-| **Benefits** | • Simplified architecture eliminating complex Glue ETL<br/>• Reduced latency (~40 min → near real-time)<br/>• Enhanced model monitoring with Snowpark ML<br/>• Improved scalability with Snowflake compute<br/>• Version control for model outputs via Iceberg snapshots<br/>• Multi-engine compatibility for ML tools<br/>• Direct API connectivity to Bankers Workbench<br/>• Native support for semi-structured data<br/>• ACID transactions for model results |
+| **Benefits** | • Phased migration approach minimizing disruption<br/>• Reduced latency with Snowflake compute<br/>• Enhanced model monitoring with Snowpark ML<br/>• Improved scalability with Snowflake compute<br/>• Version control for model outputs via Iceberg snapshots<br/>• Multi-engine compatibility for ML tools<br/>• Direct API connectivity to Bankers Workbench<br/>• Native support for semi-structured data<br/>• ACID transactions for model results<br/>• Phase 2 alignment with CDAO dbt standards |
 
 **Use Case Data Flow Diagram:**
 
 ```mermaid
 graph LR
-    Source[AWS SageMaker<br/>Cashflow Models] --> S3[AWS S3 External Landing<br/>Inference Outputs]
+    Source[AWS SageMaker<br/>Cashflow Models] --> Glue[AWS Glue ETL]
+    Glue --> S3[AWS S3 External Landing<br/>Inference Outputs]
     S3 --> Snowpipe[Snowpipe<br/>Auto-Ingest]
     Snowpipe --> Bronze[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
-    Bronze --> dbt_silver[dbt Models<br/>Quantile Calculations]
-    dbt_silver --> Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
-    Silver --> dbt_gold[dbt Models<br/>Shortfall Detection]
-    dbt_gold --> Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
+    Bronze --> Transform_Phase1[Phase 1: Snowflake<br/>Stored Procedures/Notebooks<br/>Quantile Calculations]
+    Transform_Phase1 --> Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
+    Silver --> Transform_Phase1_Gold[Phase 1: Snowflake<br/>Stored Procedures/Notebooks<br/>Shortfall Detection]
+    Transform_Phase1_Gold --> Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
     Gold --> BWB[Bankers Workbench<br/>Direct API]
     Gold --> Alerts[Cashflow Shortfall Alerts]
     Gold --> Advisory[Predictive Advisory]
