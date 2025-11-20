@@ -1409,7 +1409,7 @@ Each data source follows the same orchestration pattern:
 | **Omnia Data Source** | Direct access via External Tables pointing to AWS S3 (no ingestion) | dbt Models for aggregations and business logic | **Ingestion**: Request table access via external table linkage<br/>**Transformation**: dbt models access external tables directly |
 | **BTEQ Scripts** | N/A (transformation only) | **Phase 1**: Snowflake SQL Stored Procedures<br/>**Phase 2**: dbt Models | **Phase 1**: Automated conversion via SnowConvert AI; validate and deploy<br/>**Phase 2**: Automated conversion via GDW POC Tooling to dbt models |
 | **SQL Scripts (Teradata)** | N/A (transformation only) | **Phase 1**: Snowflake SQL Stored Procedures<br/>**Phase 2**: dbt Models | **Phase 1**: Automated conversion via SnowConvert AI<br/>**Phase 2**: Automated conversion via GDW POC Tooling to dbt models |
-| **R-Connect Jobs** | N/A (transformation only) | **Phase 1**: Snowflake SQL/Python (Snowpark)<br/>**Phase 2**: dbt Models<br/>**Alternative**: Posit native app on Snowflake | **Phase 1**: Manual rewrite to Snowflake SQL/Python; access GDW/Omnia Iceberg tables directly<br/>**Phase 2**: Manual rewrite to dbt models<br/>**Alternative**: Migrate R scripts to Posit environment |
+| **R-Connect Jobs** | N/A (transformation only) | **Phase 1**: Snowflake SQL/Python (Snowpark)<br/>**Phase 2**: dbt Models<br/>**Alternative**: Posit native app on Snowflake | **Phase 1**: Manual rewrite to Snowflake SQL/Python; access GDW Iceberg and Omnia External tables directly<br/>**Phase 2**: Manual rewrite to dbt models<br/>**Alternative**: Migrate R scripts to Posit environment |
 | **Teradata QPD Tables** | N/A (storage migration) | N/A (storage migration) | Direct migration to AWS Glue Catalog externally managed Iceberg tables; data copy from Teradata to S3/Iceberg format |
 
 **Architecture Notes:**
@@ -1646,8 +1646,9 @@ graph LR
 | **Storage** | • **Bronze Layer**: Raw SageMaker inference results in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Processed cashflow forecasts with quantile calculations in Iceberg tables<br/>• **Gold Layer**: Business-ready cashflow predictions and alerts in Iceberg tables |
 | **Transformation** | **Phase 1**: Snowflake stored procedures or Snowflake notebooks:<br/>• Bronze → Silver: Data processing, quantile calculations (10%, 50%, 90%), forecast structuring<br/>• Silver → Gold: Cashflow shortfall detection, predictive advisory logic, BWB integration format<br/>**Phase 2**: dbt models for long-term standardization |
 | **Target Tables** | • `SAGEMAKER_OUTPUT_RAW` (Bronze)<br/>• `INFERENCE_CURATED` (Silver)<br/>• `CASHFLOW_FORECAST_FACT`, `CASHFLOW_SHORTFALL_ALERT` (Gold) |
-| **Orchestration** | • **Task: `T_CASHFLOW_INGEST`** - Monitors AWS S3 External Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_CASHFLOW_TRANSFORM`** - Triggered by `T_CASHFLOW_INGEST`, runs transformations (Phase 1: Stored Procedures/Notebooks; Phase 2: dbt models) for Bronze → Silver → Gold transformation<br/>• **Alert: `ALERT_CASHFLOW_SHORTFALL`** - Scheduled Snowflake Alert monitors Gold Layer tables (`CASHFLOW_SHORTFALL_ALERT`) for cashflow shortfalls and sends email notifications via `SYSTEM$SEND_EMAIL` function |
-| **Consumption** | • **Bankers Workbench (BWB)**: REST API endpoints provide direct access to Gold Layer Iceberg tables with authentication and rate limiting<br/>• **Cashflow Shortfall Alerts**: Snowflake Tasks trigger alert notifications to bankers and relationship managers when cashflow shortfalls are detected<br/>• **Predictive Advisory**: BWB consumes quantile predictions (10%, 50%, 90%) via API for personalized customer conversations |
+| **Orchestration** | • **Task: `T_CASHFLOW_INGEST`** - Monitors AWS S3 External Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_CASHFLOW_TRANSFORM`** - Triggered by `T_CASHFLOW_INGEST`, runs transformations (Phase 1: Stored Procedures/Notebooks; Phase 2: dbt models) for Bronze → Silver → Gold transformation |
+| **Monitoring & Alerting** | • **Alert: `ALERT_CASHFLOW_SHORTFALL`** - Scheduled Snowflake Alert monitors Gold Layer tables (`CASHFLOW_SHORTFALL_ALERT`) for cashflow shortfalls and sends email notifications via `SYSTEM$SEND_EMAIL` function to bankers and relationship managers |
+| **Consumption** | • **Bankers Workbench (BWB)**: REST API endpoints provide direct access to Gold Layer Iceberg tables with authentication and rate limiting<br/>• **Cashflow Shortfall Alerts**: Snowflake Alert triggers email notifications to bankers and relationship managers when cashflow shortfalls are detected<br/>• **Predictive Advisory**: BWB consumes quantile predictions (10%, 50%, 90%) via API for personalized customer conversations |
 | **Assumptions** | • AWS Glue ETL can successfully write SageMaker outputs to S3 External Landing<br/>• Phase 1 stored procedures/notebooks can achieve equivalent or better performance than current Teradata implementation (~40 min runtime)<br/>• BWB API integration can handle real-time data access with acceptable latency<br/>• Phase 2 dbt migration can be completed within planned timeline without business disruption. |
 | **Supporting URLs** | • [Sending Email Notifications in Snowflake](https://docs.snowflake.com/en/user-guide/notifications/email-notifications#label-create-email-notification-integration)<br/>• [Creating an Alert on a Schedule](https://docs.snowflake.com/en/user-guide/alerts#creating-an-alert-on-a-schedule) |
 | **Benefits** | • Phased migration approach minimizing disruption<br/>• Reduced latency with Snowflake compute<br/>• Enhanced model monitoring with Snowpark ML<br/>• Improved scalability with Snowflake compute<br/>• Version control for model outputs via Iceberg snapshots<br/>• Multi-engine compatibility for ML tools<br/>• Direct API connectivity to Bankers Workbench<br/>• Native support for semi-structured data<br/>• ACID transactions for model results<br/>• Phase 2 alignment with CDAO dbt standards |
@@ -1781,27 +1782,30 @@ graph LR
 
 | **Component** | **Description** |
 |---------------|-----------------|
-| **Data Sources** | QPD analytical models (customer engagement data, payaway patterns, predicted needs from GDW/Omnia Iceberg tables) |
-| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg tables (no ingestion required) |
-| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg tables)<br/>• **Silver Layer**: Curated customer engagement data in Iceberg tables<br/>• **Gold Layer**: CVM insights, Top 20 recommendations, engagement scores in Iceberg tables |
-| **Transformation** | dbt models for CVM insight generation:<br/>• Silver: Customer data aggregation, engagement pattern analysis<br/>• Gold: CVM scoring models, Top 20 insight generation, payaway behavior analytics, engagement strategies |
+| **Data Sources** | QPD analytical models (customer engagement data, payaway patterns, predicted needs from GDW Iceberg and Omnia External tables) |
+| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg/External tables (no ingestion required) |
+| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg/External tables)<br/>• **Silver Layer**: Curated customer engagement data in Iceberg tables<br/>• **Gold Layer**: CVM insights, Top 20 recommendations, engagement scores in Iceberg tables |
+| **Transformation** | **Option 1**: Snowflake notebooks for customer data aggregation, engagement pattern analysis, CVM scoring models, and Top 20 insight generation<br/>**Option 2**: dbt models for CVM insight generation:<br/>• Silver: Customer data aggregation, engagement pattern analysis<br/>• Gold: CVM scoring models, Top 20 insight generation, payaway behavior analytics, engagement strategies |
 | **Target Tables** | • `CUSTOMER_ENGAGEMENT_CURATED` (Silver)<br/>• `CVM_INSIGHTS_FACT`, `CVM_TOP20_RECOMMENDATIONS`, `ENGAGEMENT_SCORE` (Gold) |
-| **Orchestration** | • **Task: `T_CVM_TRANSFORM`** - Triggered by Snowflake Streams detecting data changes in GDW/Omnia Iceberg tables, runs dbt models for Silver and Gold layer transformations, and syncs to BWB and Service Domain |
-| **Consumption** | • **Bankers Workbench (BWB)**: Direct Snowflake connectivity via native connector, consuming real-time CVM insights from Gold Layer through Snowflake Streams<br/>• **Service Domain Applications**: Snowflake Secure Data Sharing for real-time access to shared Gold Layer Iceberg tables without data duplication |
-| **Assumptions** | • GDW and Omnia Iceberg tables are readily accessible via AWS Glue catalog linkage<br/>• Snowflake Streams can effectively track incremental changes for real-time insight generation<br/>• BWB can be modified to support direct Snowflake connectivity<br/>• Weekly refresh frequency meets Service Domain requirements<br/>• Secure Data Sharing provides sufficient performance for Service Domain consumption patterns |
-| **Benefits** | • Real-time insights via Snowflake Streams on Iceberg tables<br/>• Simplified data pipeline eliminating complex API layer<br/>• Improved customer experience with live insights<br/>• Enhanced model feedback loops<br/>• Cross-platform compatibility<br/>• Immutable insight versioning via Iceberg snapshots<br/>• Snowflake secure data sharing to Service Domain<br/>• Direct Snowflake connectivity to BWB<br/>• Enhanced CVM scoring with Snowflake ML functions |
+| **Orchestration** | • **Task: `T_CVM_TRANSFORM`** - Scheduled to run every Monday at 2AM, executes transformation logic (Option 1: Snowflake notebooks or Option 2: dbt models) for Silver and Gold layer transformations |
+| **Monitoring & Alerting** | • Task execution status can be monitored via Snowsight or queried using Snowflake system tables (`TASK_HISTORY` function and `TASK_HISTORY` view) for run history, failures, and performance metrics |
+| **Consumption** | • **Bankers Workbench (BWB)**: API layer extracts CVM insights from Snowflake Gold Layer Iceberg tables and loads into Aurora DB; BWB consumes data from Aurora DB downstream<br/>• **Service Domain Applications**: If Service Domain is onboarded into Snowflake CDL, CVM tables can be made readily available via the same AWS Glue catalog linkage process used for GDW Iceberg and Omnia External tables within QPD service domain |
+| **Assumptions** | • GDW Iceberg and Omnia External tables are readily accessible via AWS Glue catalog linkage<br/>• API layer feeding into Aurora DB can be modified to support direct Snowflake connectivity<br/>• Weekly refresh frequency meets Service Domain requirements |
+| **Supporting URLs** | • [Monitoring Task Executions](https://docs.snowflake.com/en/user-guide/tasks-monitor)<br/>• [Tasks in Snowsight](https://docs.snowflake.com/en/user-guide/ui-snowsight-tasks)<br/>• [TASK_HISTORY Function Examples](https://docs.snowflake.com/en/sql-reference/functions/task_history#examples) |
+| **Benefits** | • Real-time insights via Snowflake Streams on Iceberg tables<br/>• Simplified data pipeline with centralized CVM processing in Snowflake<br/>• Improved customer experience with live insights<br/>• Enhanced model feedback loops<br/>• Cross-platform compatibility<br/>• Immutable insight versioning via Iceberg snapshots<br/>• Snowflake secure data sharing to Service Domain<br/>• Streamlined API layer connectivity to Aurora DB<br/>• Enhanced CVM scoring with Snowflake ML functions |
 
 **Use Case Data Flow Diagram:**
 
 ```mermaid
 graph LR
-    GDW[GDW Iceberg Tables<br/>Customer Data] --> Silver_transform[dbt Models<br/>Customer Aggregation]
-    Omnia[Omnia Iceberg Tables<br/>Engagement Data] --> Silver_transform
+    GDW[GDW Iceberg Tables<br/>Customer Data] --> Silver_transform[dbt Models/Notebooks<br/>Customer Aggregation]
+    Omnia[Omnia External Tables<br/>Engagement Data] --> Silver_transform
     Silver_transform --> Silver[Silver Layer<br/>CUSTOMER_ENGAGEMENT_CURATED<br/>Iceberg Tables]
-    Silver --> dbt_gold[dbt Models<br/>CVM Scoring]
+    Silver --> dbt_gold[dbt Models/Notebooks<br/>CVM Scoring]
     dbt_gold --> Gold[Gold Layer<br/>CVM_INSIGHTS_FACT<br/>CVM_TOP20_RECOMMENDATIONS<br/>Iceberg Tables]
-    Gold --> Streams[Snowflake Streams<br/>Real-time Updates]
-    Streams --> BWB[Bankers Workbench<br/>Direct Connectivity]
+    Gold --> API[API Layer<br/>Extract & Load]
+    API --> Aurora[Aurora DB]
+    Aurora --> BWB[Bankers Workbench<br/>Downstream Consumer]
     Gold --> DataShare[Snowflake Secure<br/>Data Sharing]
     DataShare --> ServiceDomain[Service Domain<br/>Applications]
 ```
@@ -1821,14 +1825,14 @@ graph LR
 
 | **Component** | **Description** |
 |---------------|-----------------|
-| **Data Sources** | GDW Iceberg tables (1 table) and Omnia Iceberg tables (2 tables) via AWS Glue catalog |
-| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg tables (no ingestion required) |
-| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg tables)<br/>• **Silver Layer**: Data quality validation results and exception metadata in Iceberg tables<br/>• **Gold Layer**: DQ exception aggregations, RAG status summaries, remediation tracking in Iceberg tables |
+| **Data Sources** | GDW Iceberg tables (1 table) and Omnia External tables (2 tables) via AWS Glue catalog |
+| **Ingestion** | Direct access to GDW and Omnia via AWS Glue catalog linked Iceberg/External tables (no ingestion required) |
+| **Storage** | • **Bronze Layer**: Not applicable (direct access to source Iceberg/External tables)<br/>• **Silver Layer**: Data quality validation results and exception metadata in Iceberg tables<br/>• **Gold Layer**: DQ exception aggregations, RAG status summaries, remediation tracking in Iceberg tables |
 | **Transformation** | dbt models with Great Expectations integration:<br/>• Silver: Data quality rule execution, exception detection, metadata capture<br/>• Gold: DQ scoring, RAG status calculation, exception aggregation, drill-down views, remediation workflow tracking |
 | **Target Tables** | • `DQ_VALIDATION_RESULTS` (Silver)<br/>• `DQ_EXCEPTIONS_AGG`, `DQ_RAG_STATUS`, `DQ_REMEDIATION_TRACKER` (Gold) |
-| **Orchestration** | • **Task: `T_DQ_TRANSFORM`** - Triggered daily or by data changes in GDW/Omnia Iceberg tables, runs dbt models with Great Expectations for data quality validation, exception detection, RAG status calculation, and email alerting |
+| **Orchestration** | • **Task: `T_DQ_TRANSFORM`** - Triggered daily or by data changes in GDW Iceberg and Omnia External tables, runs dbt models with Great Expectations for data quality validation, exception detection, RAG status calculation, and email alerting |
 | **Consumption** | • **Tableau Dashboards**: Live connectivity to Gold Layer Iceberg tables with materialized views for RAG status visualization, exception counts, and drill-down capabilities<br/>• **Email Alerts**: SMTP integration via Snowflake Tasks triggers notifications to Data Stewards and RMs when exceptions are detected<br/>• **Streamlit Portal**: Native Snowflake integration for self-service data quality assessment, exception remediation workflows, and row-level security<br/>• **Automated Monitoring**: Continuous monitoring via Snowflake Tasks executes daily data quality checks and maintains audit trails |
-| **Assumptions** | • GDW and Omnia Iceberg tables (3 tables total) are accessible via AWS Glue catalog<br/>• Great Expectations framework can be integrated with dbt for data quality validation<br/>• Data quality rules can be codified and maintained in YAML configuration<br/>• Streamlit can effectively replace R-Shiny functionality with improved user experience<br/>• Daily data quality checks are sufficient for business requirements<br/>• Data Stewards and RMs are willing to adopt new Streamlit-based remediation portal |
+| **Assumptions** | • GDW Iceberg and Omnia External tables (3 tables total) are accessible via AWS Glue catalog<br/>• Great Expectations framework can be integrated with dbt for data quality validation<br/>• Data quality rules can be codified and maintained in YAML configuration<br/>• Streamlit can effectively replace R-Shiny functionality with improved user experience<br/>• Daily data quality checks are sufficient for business requirements<br/>• Data Stewards and RMs are willing to adopt new Streamlit-based remediation portal |
 | **Benefits** | • Automated quality monitoring with Snowflake Tasks<br/>• Real-time exception detection via Snowflake Streams<br/>• Simplified remediation workflows with modern UI<br/>• Enhanced data governance across all Iceberg tables<br/>• Point-in-time quality validation via time-travel<br/>• Cross-engine data quality checks<br/>• Self-service access via AWS Glue catalog metadata<br/>• Unified data steward interface via Snowflake Information Schema<br/>• Audit trails via Iceberg snapshots<br/>• Streamlit portal replacing R-Shiny for remediation |
 
 **Use Case Data Flow Diagram:**
@@ -1836,7 +1840,7 @@ graph LR
 ```mermaid
 graph LR
     GDW[GDW Iceberg Tables] --> DQ_Rules[dbt Models<br/>Great Expectations<br/>Quality Rules]
-    Omnia[Omnia Iceberg Tables] --> DQ_Rules
+    Omnia[Omnia External Tables] --> DQ_Rules
     DQ_Rules --> Silver[Silver Layer<br/>DQ_VALIDATION_RESULTS<br/>Iceberg Tables]
     Silver --> dbt_gold[dbt Models<br/>DQ Scoring & Aggregation]
     dbt_gold --> Gold[Gold Layer<br/>DQ_EXCEPTIONS_AGG<br/>DQ_RAG_STATUS<br/>Iceberg Tables]
