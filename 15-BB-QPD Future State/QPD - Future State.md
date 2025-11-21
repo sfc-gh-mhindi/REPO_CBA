@@ -313,35 +313,31 @@ The architecture implements a two-database approach to support both catalog-link
 
 ```mermaid
 graph TB
-    subgraph "Landing Layer"
-        subgraph "External Landing"
+        subgraph "Landing Layer"
+            subgraph "External Landing"
             S3_Ext[AWS S3 Bucket<br/>Automated Sources]
-        end
-        subgraph "Internal Landing"
-            SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
-        end
-    end
-    
-    subgraph Databases["QPD Databases"]
-        direction LR
-        subgraph "QPD Glue Catalog Database"
-            direction TB
-            subgraph "Raw Data Zone (Bronze)"
-                Bronze[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Schema-on-read]
             end
-            
-            subgraph "Curated Data Zone (Silver)"
-                Silver[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Cleansed & Standardized]
-            end
-            
-            subgraph "Data Warehouse (Gold)"
-                Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Business Models]
+            subgraph "Internal Landing"
+                SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
             end
         end
         
-        subgraph "QPD Native Database"
-            Native[Native Snowflake Objects<br/>Transient Tables<br/>Temporary Tables<br/>Views<br/>Native Tables]
+    subgraph "QPD Glue Catalog Database"
+        subgraph "Raw Data Zone (Bronze)"
+            Bronze[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Schema-on-read]
         end
+        
+        subgraph "Curated Data Zone (Silver)"
+            Silver[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Cleansed & Standardized]
+    end
+    
+        subgraph "Data Warehouse (Gold)"
+            Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Business Models]
+        end
+    end
+    
+    subgraph "QPD Native Database"
+        Native[Native Snowflake Objects<br/>Transient Tables<br/>Temporary Tables<br/>Views<br/>Native Tables]
     end
     
     S3_Ext --> Bronze
