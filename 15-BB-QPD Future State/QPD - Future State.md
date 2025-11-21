@@ -1288,23 +1288,24 @@ Each data source follows the same orchestration pattern:
 | **Component** | **Description** |
 |---------------|-----------------|
 | **Data Sources** | DARE SQL Server (merchant migration data, mobile user transactional data) |
-| **Ingestion** | Alteryx Repointing → AWS S3 External Landing → Snowpipe with auto-ingest |
+| **Ingestion** | **Phase 1**: Alteryx Repointing → AWS S3 External Landing → Snowpipe with auto-ingest<br/>**Phase 2**: OpenFlow Integration → AWS S3 External Landing → Snowpipe with auto-ingest |
 | **Storage** | • **Bronze Layer**: Raw DARE data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Cleansed and validated transactional data in Iceberg tables<br/>• **Gold Layer**: Business-ready dimensional models for reporting in Iceberg tables |
-| **Transformation** | dbt models replacing Alteryx workflows:<br/>• Bronze → Silver: Data cleansing, type casting, validation<br/>• Silver → Gold: Business logic, aggregations, dimensional modeling |
+| **Transformation** | **Phase 1**: Alteryx workflows (repointed to S3, transformations unchanged):<br/>• Alteryx handles data cleansing, type casting, joins, and validation<br/>• Output written to S3, then auto-ingested via Snowpipe to Bronze<br/>• Snowflake Tasks propagate data from Bronze → Silver → Gold<br/>**Phase 2**: dbt models replacing Alteryx workflows:<br/>• Bronze → Silver: Data cleansing, type casting, validation<br/>• Silver → Gold: Business logic, aggregations, dimensional modeling |
+| **Orchestration** | • Snowpipe auto-ingest loads files into Bronze layer<br/>• Parent Task triggered automatically upon Snowpipe completion<br/>• Child Tasks execute layered transformations (Bronze → Silver → Gold)<br/>• Task dependency management ensures proper execution order |
+| **Consumption** | • Direct Snowflake connectivity for Tableau dashboards<br/>• Live connectivity querying Gold Iceberg tables<br/>• Real-time dashboard updates and interactive exploration |
 | **Target Tables** | • `DARE_RAW` (Bronze)<br/>• `DARE_CURATED` (Silver)<br/>• `MERCHANT_MIGRATION_FACT`, `MOBILE_USER_DIM` (Gold) |
-| **Orchestration** | • **Task: `T_DARE_INGEST`** - Monitors AWS S3 External Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_DARE_TRANSFORM`** - Triggered by `T_DARE_INGEST`, runs dbt models for Bronze → Silver → Gold transformation |
-| **Consumption** | Tableau Dashboards connect via direct Snowflake connector with live query mode to Gold Layer Iceberg tables (`MERCHANT_MIGRATION_FACT`, `MOBILE_USER_DIM`). Queries execute in real-time against current data. |
-| **Assumptions** | • Alteryx workflows can be successfully repointed to write to AWS S3 without major refactoring<br/>• Weekly refresh frequency is acceptable for business requirements<br/>• Tableau users have appropriate Snowflake role-based access to Gold layer tables<br/>• Network connectivity between Tableau and Snowflake is stable and performant |
-| **Benefits** | • Minimal disruption with Alteryx repointing approach<br/>• Automated ingestion via Snowpipe auto-ingest<br/>• Automated orchestration via Snowflake Tasks<br/>• Automated data quality checks via dbt tests<br/>• Real-time insights with live Tableau connectivity<br/>• Time-travel capabilities for historical analysis<br/>• Cross-engine compatibility for multiple analytics tools<br/>• ACID compliance ensuring data consistency |
+| **Benefits** | • Phased migration approach minimizing disruption<br/>• Automated ingestion via Snowpipe auto-ingest<br/>• Automated orchestration via Snowflake Tasks<br/>• Reduced technology sprawl through consolidation into Snowflake ecosystem<br/>• Automated data quality checks via dbt tests (Phase 2)<br/>• Native version control and collaboration through dbt framework (Phase 2)<br/>• Real-time insights with live Tableau connectivity<br/>• Time-travel capabilities for historical analysis via Iceberg snapshots<br/>• Cross-engine compatibility for multiple analytics tools<br/>• ACID compliance ensuring data consistency |
 
 **Use Case Data Flow Diagram:**
+
+**Phase 1: Alteryx Repointing**
 
 ```mermaid
 graph LR
     subgraph AWS["AWS Environment"]
         direction LR
         Source[DARE SQL Server]
-        Alteryx[Alteryx Workflows]
+        Alteryx[Alteryx Workflows<br/>Transformation Logic]
         S3[AWS S3 External Landing]
         
         Source --> Alteryx
@@ -1315,16 +1316,16 @@ graph LR
         direction LR
         Snowpipe[Snowpipe<br/>Auto-Ingest]
         Bronze[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Cleansing & Validation]
+        Tasks_Silver[Snowflake Tasks<br/>Data Propagation]
         Silver[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Business Logic]
+        Tasks_Gold[Snowflake Tasks<br/>Data Propagation]
         Gold[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
         
         Snowpipe --> Bronze
-        Bronze --> dbt_silver
-        dbt_silver --> Silver
-        Silver --> dbt_gold
-        dbt_gold --> Gold
+        Bronze --> Tasks_Silver
+        Tasks_Silver --> Silver
+        Silver --> Tasks_Gold
+        Tasks_Gold --> Gold
     end
     
     subgraph Consumption["Consumption Layer"]
@@ -1343,11 +1344,65 @@ graph LR
     style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
     style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Tasks_Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Tasks_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+```
+
+**Phase 2: dbt Models**
+
+```mermaid
+graph LR
+    subgraph AWS["AWS Environment"]
+        direction LR
+        Source2[DARE SQL Server]
+        S3_2[AWS S3 External Landing]
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        OpenFlow[OpenFlow Integration]
+        Snowpipe2[Snowpipe<br/>Auto-Ingest]
+        Bronze2[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
+        dbt_silver[dbt Models<br/>Cleansing & Validation]
+        Silver[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
+        dbt_gold[dbt Models<br/>Business Logic]
+        Gold[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
+        
+        OpenFlow --> Snowpipe2
+        Snowpipe2 --> Bronze2
+        Bronze2 --> dbt_silver
+        dbt_silver --> Silver
+        Silver --> dbt_gold
+        dbt_gold --> Gold
+    end
+    
+    subgraph Consumption2["Consumption Layer"]
+        direction TB
+        Tableau2[Tableau Dashboards<br/>Live Connectivity]
+    end
+    
+    Source2 --> OpenFlow
+    OpenFlow --> S3_2
+    S3_2 --> Snowpipe2
+    Gold --> Tableau2
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style OpenFlow fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
+
+---
 
 ### 5.2 Illion Bureau Data Load
 
@@ -1368,27 +1423,103 @@ graph LR
 | **Data Sources** | Illion credit bureau files (monthly extracts, ~90K records per month) |
 | **Ingestion** | Manual file upload via Streamlit interface → Snowflake Internal Stage → Snowpipe with auto-ingest |
 | **Storage** | • **Bronze Layer**: Raw Illion bureau data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Cleansed and standardized credit bureau data in Iceberg tables<br/>• **Gold Layer**: Credit risk analytical models and aggregations in Iceberg tables |
-| **Transformation** | dbt models replacing SQL + Alteryx:<br/>• Bronze → Silver: Data cleansing, validation, standardization<br/>• Silver → Gold: Credit risk calculations, bureau-level aggregations, regulatory reporting models |
+| **Transformation** | **Phase 1**: Snowflake SQL Stored Procedures (converted via SnowConvert AI):<br/>• Bronze → Silver: Data cleansing, validation, standardization<br/>• Silver → Gold: Credit risk calculations, bureau-level aggregations, regulatory reporting models<br/>**Phase 2**: dbt models replacing SQL scripts (converted via GDW POC Tooling):<br/>• Bronze → Silver: Data cleansing with built-in testing<br/>• Silver → Gold: Credit risk calculations with auto-generated documentation |
+| **Orchestration** | • Snowpipe auto-ingest loads files into Bronze layer<br/>• Parent Task triggered automatically upon Snowpipe completion<br/>• Child Tasks execute layered transformations (Bronze → Silver → Gold)<br/>• Task dependency management ensures proper execution order |
+| **Consumption** | • Direct Snowflake connectivity for Tableau dashboards<br/>• Live connectivity querying Gold Iceberg tables<br/>• Real-time dashboard updates and interactive exploration |
 | **Target Tables** | • `ILLION_RAW` (Bronze)<br/>• `ILLION_CURATED` (Silver)<br/>• `CREDIT_RISK_FACT`, `BUREAU_INSIGHTS_AGG` (Gold) |
-| **Orchestration** | • **Task: `T_ILLION_INGEST`** - Monitors Snowflake Internal Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_ILLION_TRANSFORM`** - Triggered by `T_ILLION_INGEST`, runs dbt models for Bronze → Silver → Gold transformation |
-| **Consumption** | Tableau Dashboards connect via direct Snowflake connector with live query mode to Gold Layer Iceberg tables (`CREDIT_RISK_FACT`, `BUREAU_INSIGHTS_AGG`). Supports real-time credit risk insights and bureau-level reporting with time-travel for audit compliance. |
-| **Assumptions** | • Business users can successfully upload Illion files through Streamlit interface<br/>• Monthly upload frequency (90K records) is manageable through manual process<br/>• Data quality of uploaded files meets minimum standards for processing<br/>• Regulatory reporting requirements are met through point-in-time snapshot capabilities |
-| **Benefits** | • Automated processing with Snowpipe auto-ingest<br/>• Improved data lineage via Iceberg metadata<br/>• Reduced manual intervention through Streamlit interface<br/>• ACID compliance for regulatory requirements<br/>• Multi-version concurrency control<br/>• Time-travel and snapshot isolation for audit compliance<br/>• Point-in-time reporting for regulatory review |
+| **Benefits** | • Phased migration approach minimizing disruption<br/>• Automated processing with Snowpipe auto-ingest<br/>• Automated orchestration via Snowflake Tasks<br/>• Reduced manual intervention through Streamlit interface<br/>• Automated data quality checks via dbt tests (Phase 2)<br/>• Native version control and collaboration through dbt framework (Phase 2)<br/>• Improved data lineage via Iceberg metadata<br/>• ACID compliance for regulatory requirements<br/>• Time-travel and snapshot isolation for audit compliance<br/>• Point-in-time reporting for regulatory review |
 
 **Use Case Data Flow Diagram:**
 
+**Phase 1: Snowflake SQL Stored Procedures**
+
 ```mermaid
 graph LR
-    Source[Illion Bureau Files] --> Streamlit[Streamlit Upload Interface]
-    Streamlit --> Internal[Snowflake Internal Stage<br/>Landing Layer]
-    Internal --> Snowpipe[Snowpipe<br/>Auto-Ingest]
-    Snowpipe --> Bronze[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
-    Bronze --> dbt_silver[dbt Models<br/>Cleansing & Standardization]
-    dbt_silver --> Silver[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
-    Silver --> dbt_gold[dbt Models<br/>Credit Risk Calculations]
-    dbt_gold --> Gold[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
-    Gold --> Tableau[Tableau Dashboards<br/>Credit Risk Insights]
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Streamlit[Streamlit Upload Interface]
+        Internal[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe[Snowpipe<br/>Auto-Ingest]
+        Bronze[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
+        Transform_SP[Snowflake SQL<br/>Stored Procedures<br/>Cleansing & Validation]
+        Silver[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
+        Transform_SP_Gold[Snowflake SQL<br/>Stored Procedures<br/>Credit Risk Calculations]
+        Gold[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
+        
+        Streamlit --> Internal
+        Internal --> Snowpipe
+        Snowpipe --> Bronze
+        Bronze --> Transform_SP
+        Transform_SP --> Silver
+        Silver --> Transform_SP_Gold
+        Transform_SP_Gold --> Gold
+    end
+    
+    subgraph Consumption["Consumption Layer"]
+        direction TB
+        Tableau[Tableau Dashboards<br/>Credit Risk Insights]
+    end
+    
+    Source[Illion Bureau Files] --> Streamlit
+    Gold --> Tableau
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
+
+**Phase 2: dbt Models**
+
+```mermaid
+graph LR
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Streamlit2[Streamlit Upload Interface]
+        Internal2[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe2[Snowpipe<br/>Auto-Ingest]
+        Bronze2[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
+        dbt_silver[dbt Models<br/>Cleansing & Standardization]
+        Silver2[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
+        dbt_gold[dbt Models<br/>Credit Risk Calculations]
+        Gold2[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
+        
+        Streamlit2 --> Internal2
+        Internal2 --> Snowpipe2
+        Snowpipe2 --> Bronze2
+        Bronze2 --> dbt_silver
+        dbt_silver --> Silver2
+        Silver2 --> dbt_gold
+        dbt_gold --> Gold2
+    end
+    
+    subgraph Consumption2["Consumption Layer"]
+        direction TB
+        Tableau2[Tableau Dashboards<br/>Credit Risk Insights]
+    end
+    
+    Source2[Illion Bureau Files] --> Streamlit2
+    Gold2 --> Tableau2
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Streamlit2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Internal2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+```
+
+---
 
 ### 5.3 Direct Debit Monitoring Tool
 
@@ -1408,28 +1539,119 @@ graph LR
 | **Data Sources** | CSV files from shared folders (claims data, encrypted APCA names, CommBiz DD limits) |
 | **Ingestion** | SSIS repointing → AWS S3 External Landing → Snowpipe with auto-ingest |
 | **Storage** | • **Bronze Layer**: Raw CSV data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Validated and decrypted APCA names, validated DD limits in Iceberg tables<br/>• **Gold Layer**: Business-ready direct debit monitoring datasets in Iceberg tables |
-| **Transformation** | dbt models replacing SSIS transformation logic:<br/>• Bronze → Silver: Data validation, APCA name decryption, DD limit validation, claims data formatting<br/>• Silver → Gold: Direct debit utilization calculations, breach identification, annual review aggregations |
+| **Transformation** | **Phase 1**: SSIS packages (repointed to S3, transformations unchanged):<br/>• SSIS handles data validation, APCA name decryption, DD limit validation, claims data formatting<br/>• Output written to S3, then auto-ingested via Snowpipe to Bronze<br/>• Snowflake Tasks propagate data from Bronze → Silver → Gold<br/>**Phase 2**: dbt models replacing SSIS transformation logic (converted via SnowConvert AI):<br/>• Bronze → Silver: Data validation, APCA name decryption, DD limit validation with built-in testing<br/>• Silver → Gold: Direct debit utilization calculations, breach identification, annual review aggregations |
+| **Orchestration** | • Snowpipe auto-ingest loads files into Bronze layer<br/>• Parent Task triggered automatically upon Snowpipe completion<br/>• Child Tasks execute layered transformations (Bronze → Silver → Gold)<br/>• Task dependency management ensures proper execution order |
+| **Consumption** | • DDMT tool repointed to query Snowflake Gold tables directly<br/>• **Note**: Better consumption methodology may be available but requires deeper understanding of DDMT tool architecture |
 | **Target Tables** | • `CSV_RAW` (Bronze)<br/>• `DDM_CURATED` (Silver)<br/>• `DD_UTILIZATION_FACT`, `DD_BREACH_MONITOR` (Gold) |
-| **Orchestration** | • **Task: `T_DDM_INGEST`** - Monitors AWS S3 External Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_DDM_TRANSFORM`** - Triggered by `T_DDM_INGEST`, runs dbt models for Bronze → Silver → Gold transformation and breach alerting |
-| **Consumption** | • **DDMT Tool**: Modernized tool connects directly to Snowflake via native connector, querying Gold Layer Iceberg tables (`DD_UTILIZATION_FACT`, `DD_BREACH_MONITOR`) with row-level security<br/>• **API Layer**: Optional REST API Gateway provides secure endpoints for external applications with authentication, rate limiting, and audit logging |
-| **Assumptions** | • SSIS packages can be successfully repointed to write to AWS S3 without major refactoring<br/>• Encryption keys for APCA name decryption are available in Snowflake environment<br/>• DDMT tool can be modernized to support direct Snowflake connectivity<br/>• Frontline teams have appropriate training and access to use modernized DDMT interface |
-| **Benefits** | • Automated file processing via Snowpipe<br/>• Enhanced security with row-level security and encryption<br/>• Improved audit capabilities via Iceberg snapshots<br/>• Immutable audit trail for compliance<br/>• Time-travel for historical breach analysis<br/>• Modernized DDMT tool with direct Snowflake connectivity<br/>• API layer option for secure data access |
+| **Benefits** | • Phased migration approach minimizing disruption<br/>• Automated file processing via Snowpipe<br/>• Automated orchestration via Snowflake Tasks<br/>• Enhanced security with row-level security and encryption<br/>• Automated data quality checks via dbt tests (Phase 2)<br/>• Native version control and collaboration through dbt framework (Phase 2)<br/>• Improved audit capabilities via Iceberg snapshots<br/>• Immutable audit trail for compliance<br/>• Time-travel for historical breach analysis<br/>• Modernized DDMT tool with direct Snowflake connectivity |
 
 **Use Case Data Flow Diagram:**
 
+**Phase 1: SSIS Repointing**
+
 ```mermaid
 graph LR
-    Source[CSV Files<br/>Shared Folders] --> SSIS[SSIS Package<br/>Repointed]
-    SSIS --> S3[AWS S3 External Landing]
-    S3 --> Snowpipe[Snowpipe<br/>Auto-Ingest]
-    Snowpipe --> Bronze[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
-    Bronze --> dbt_silver[dbt Models<br/>Validation & Decryption]
-    dbt_silver --> Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
-    Silver --> dbt_gold[dbt Models<br/>Utilization & Breach Calc]
-    dbt_gold --> Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
-    Gold --> DDMT[DDMT Tool<br/>Direct Snowflake Connectivity]
-    Gold --> API[API Layer<br/>Secure Access]
+    subgraph AWS["AWS Environment"]
+        direction LR
+        Source[CSV Files<br/>Shared Folders]
+        SSIS[SSIS Package<br/>Transformation Logic]
+        S3[AWS S3 External Landing]
+        
+        Source --> SSIS
+        SSIS --> S3
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Snowpipe[Snowpipe<br/>Auto-Ingest]
+        Bronze[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
+        Tasks_Silver[Snowflake Tasks<br/>Data Propagation]
+        Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
+        Tasks_Gold[Snowflake Tasks<br/>Data Propagation]
+        Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
+        
+        Snowpipe --> Bronze
+        Bronze --> Tasks_Silver
+        Tasks_Silver --> Silver
+        Silver --> Tasks_Gold
+        Tasks_Gold --> Gold
+    end
+    
+    subgraph Consumption["Consumption Layer"]
+        direction TB
+        DDMT[DDMT Tool<br/>Queries Gold Tables Directly]
+    end
+    
+    S3 --> Snowpipe
+    Gold --> DDMT
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Source fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style SSIS fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Tasks_Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Tasks_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
+
+**Phase 2: dbt Models**
+
+```mermaid
+graph LR
+    subgraph AWS["AWS Environment"]
+        direction LR
+        Source2[CSV Files<br/>Shared Folders]
+        SSIS2[SSIS Package<br/>File Movement Only]
+        S3_2[AWS S3 External Landing]
+        
+        Source2 --> SSIS2
+        SSIS2 --> S3_2
+    end
+    
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Snowpipe2[Snowpipe<br/>Auto-Ingest]
+        Bronze2[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
+        dbt_silver[dbt Models<br/>Validation & Decryption]
+        Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
+        dbt_gold[dbt Models<br/>Utilization & Breach Calc]
+        Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
+        
+        Snowpipe2 --> Bronze2
+        Bronze2 --> dbt_silver
+        dbt_silver --> Silver
+        Silver --> dbt_gold
+        dbt_gold --> Gold
+    end
+    
+    subgraph Consumption2["Consumption Layer"]
+        direction TB
+        DDMT2[DDMT Tool<br/>Reads from Snowflake via ODBC/JDBC]
+    end
+    
+    S3_2 --> Snowpipe2
+    Gold --> DDMT2
+    
+    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style SSIS2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+```
+
+---
 
 ### 5.4 Watchlist Integration
 
@@ -1449,28 +1671,100 @@ graph LR
 | **Data Sources** | ACES Watchlist entries (manually curated by business units, submitted weekly) |
 | **Ingestion** | Manual file upload via Streamlit interface → Snowflake Internal Stage → Snowpipe with auto-ingest |
 | **Storage** | • **Bronze Layer**: Raw ACES watchlist data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Validated watchlist with conflict resolution in Iceberg tables<br/>• **Gold Layer**: Consolidated watchlist reports and risk classification models in Iceberg tables |
-| **Transformation** | dbt models for watchlist processing:<br/>• Bronze → Silver: Data validation, conflict resolution, duplicate checking, business rule application<br/>• Silver → Gold: Risk classification, borrower flagging logic, GCS escalation triggers, audit reporting |
+| **Transformation** | **Phase 1**: Snowflake SQL Stored Procedures (converted via SnowConvert AI):<br/>• Bronze → Silver: Data validation, conflict resolution, duplicate checking, business rule application<br/>• Silver → Gold: Risk classification, borrower flagging logic, GCS escalation triggers, audit reporting<br/>**Phase 2**: dbt models for watchlist processing (converted via GDW POC Tooling):<br/>• Bronze → Silver: Data validation, conflict resolution with built-in testing<br/>• Silver → Gold: Risk classification with auto-generated documentation |
+| **Orchestration** | • Snowpipe auto-ingest loads files into Bronze layer<br/>• Parent Task triggered automatically upon Snowpipe completion<br/>• Child Tasks execute layered transformations (Bronze → Silver → Gold)<br/>• Task dependency management ensures proper execution order |
+| **Consumption** | • Analysts query Gold tables directly for ad-hoc watchlist analysis<br/>• Teams use flag columns in Gold tables to identify GCS escalation requirements<br/>• Direct Snowflake connectivity for querying and analysis |
 | **Target Tables** | • `ACES_RAW` (Bronze)<br/>• `ACES_CURATED` (Silver)<br/>• `WATCHLIST_CONSOLIDATED`, `RISK_CLASSIFICATION_FACT` (Gold) |
-| **Orchestration** | • **Task: `T_ACES_INGEST`** - Monitors Snowflake Internal Stage for new file arrivals and executes Snowpipe to load data to Bronze Layer<br/>• **Task: `T_ACES_TRANSFORM`** - Triggered by `T_ACES_INGEST`, runs dbt models for Bronze → Silver → Gold transformation, risk alerting, and CEE sync |
-| **Consumption** | • **Real-time Dashboards**: Tableau or Power BI connects directly to Gold Layer Iceberg tables for risk team monitoring<br/>• **Automated Alerting**: Snowflake Tasks trigger notifications to risk teams and GCS when high-risk borrowers are identified<br/>• **Customer Experience Engine (CEE)**: RESTful API endpoints push watchlist data from Gold Layer with authentication and audit logging |
-| **Assumptions** | • BB Data Office can successfully use Streamlit interface for weekly watchlist file uploads<br/>• Business rules for conflict resolution and risk classification are well-documented and can be codified in dbt<br/>• API integration with CEE system can be established with appropriate security controls<br/>• Weekly load frequency meets business requirements for watchlist monitoring |
-| **Benefits** | • Reduced manual processing via Streamlit interface<br/>• Real-time risk monitoring with automated alerting<br/>• Enhanced compliance capabilities<br/>• Immutable audit history via Iceberg snapshots<br/>• Point-in-time regulatory reporting with time-travel<br/>• API integration with Customer Experience Engine (CEE)<br/>• Complete audit trail for regulatory review<br/>• Secure access controls on Iceberg tables |
+| **Benefits** | • Phased migration approach minimizing disruption<br/>• Reduced manual processing via Streamlit interface<br/>• Automated ingestion via Snowpipe auto-ingest<br/>• Automated orchestration via Snowflake Tasks<br/>• Automated data quality checks via dbt tests (Phase 2)<br/>• Native version control and collaboration through dbt framework (Phase 2)<br/>• Enhanced compliance capabilities<br/>• Immutable audit history via Iceberg snapshots<br/>• Point-in-time regulatory reporting with time-travel<br/>• Direct query access for ad-hoc analysis<br/>• Complete audit trail for regulatory review<br/>• Secure access controls on Iceberg tables |
 
 **Use Case Data Flow Diagram:**
 
+**Phase 1: Snowflake SQL Stored Procedures**
+
 ```mermaid
 graph LR
-    Source[ACES Watchlist<br/>Business Units] --> Streamlit[Streamlit Upload Interface<br/>BB Data Office]
-    Streamlit --> Internal[Snowflake Internal Stage<br/>Landing Layer]
-    Internal --> Snowpipe[Snowpipe<br/>Auto-Ingest]
-    Snowpipe --> Bronze[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
-    Bronze --> dbt_silver[dbt Models<br/>Validation & Conflict Resolution]
-    dbt_silver --> Silver[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
-    Silver --> dbt_gold[dbt Models<br/>Risk Classification]
-    dbt_gold --> Gold[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
-    Gold --> Dashboards[Real-time Dashboards<br/>Risk Teams]
-    Gold --> Alerts[Automated Alerting<br/>GCS Escalations]
-    Gold --> CEE[Customer Experience Engine<br/>API Integration]
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Streamlit[Streamlit Upload Interface<br/>BB Data Office]
+        Internal[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe[Snowpipe<br/>Auto-Ingest]
+        Bronze[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
+        Transform_SP[Snowflake SQL<br/>Stored Procedures<br/>Validation & Conflict Resolution]
+        Silver[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
+        Transform_SP_Gold[Snowflake SQL<br/>Stored Procedures<br/>Risk Classification]
+        Gold[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
+        
+        Streamlit --> Internal
+        Internal --> Snowpipe
+        Snowpipe --> Bronze
+        Bronze --> Transform_SP
+        Transform_SP --> Silver
+        Silver --> Transform_SP_Gold
+        Transform_SP_Gold --> Gold
+    end
+    
+    subgraph Consumption["Consumption Layer"]
+        direction TB
+        Analysis[Analysts & Teams<br/>Ad-hoc Querying & GCS Escalation]
+    end
+    
+    Source[ACES Watchlist<br/>Business Units] --> Streamlit
+    Gold --> Analysis
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+```
+
+**Phase 2: dbt Models**
+
+```mermaid
+graph LR
+    subgraph Snowflake["Snowflake Environment"]
+        direction LR
+        Streamlit2[Streamlit Upload Interface<br/>BB Data Office]
+        Internal2[Snowflake Internal Stage<br/>Landing Layer]
+        Snowpipe2[Snowpipe<br/>Auto-Ingest]
+        Bronze2[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
+        dbt_silver[dbt Models<br/>Validation & Conflict Resolution]
+        Silver2[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
+        dbt_gold[dbt Models<br/>Risk Classification]
+        Gold2[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
+        
+        Streamlit2 --> Internal2
+        Internal2 --> Snowpipe2
+        Snowpipe2 --> Bronze2
+        Bronze2 --> dbt_silver
+        dbt_silver --> Silver2
+        Silver2 --> dbt_gold
+        dbt_gold --> Gold2
+    end
+    
+    subgraph Consumption2["Consumption Layer"]
+        direction TB
+        Analysis2[Analysts & Teams<br/>Ad-hoc Querying & GCS Escalation]
+    end
+    
+    Source2[ACES Watchlist<br/>Business Units] --> Streamlit2
+    Gold2 --> Analysis2
+    
+    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
+    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
+    style Streamlit2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Internal2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ### 5.5 Cashflow Model Output
