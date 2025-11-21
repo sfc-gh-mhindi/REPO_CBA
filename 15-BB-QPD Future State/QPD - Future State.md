@@ -1288,7 +1288,7 @@ Each data source follows the same orchestration pattern:
 | **Component** | **Description** |
 |---------------|-----------------|
 | **Data Sources** | DARE SQL Server (merchant migration data, mobile user transactional data) |
-| **Ingestion** | **Phase 1**: Alteryx Repointing → AWS S3 External Landing → Snowpipe with auto-ingest<br/>**Phase 2**: OpenFlow Integration → AWS S3 External Landing → Snowpipe with auto-ingest |
+| **Ingestion** | Alteryx Repointing → AWS S3 External Landing → Snowpipe with auto-ingest
 | **Storage** | • **Bronze Layer**: Raw DARE data in AWS Glue catalog Iceberg tables<br/>• **Silver Layer**: Cleansed and validated transactional data in Iceberg tables<br/>• **Gold Layer**: Business-ready dimensional models for reporting in Iceberg tables |
 | **Transformation** | **Phase 1**: Alteryx workflows (repointed to S3, transformations unchanged):<br/>• Alteryx handles data cleansing, type casting, joins, and validation<br/>• Output written to S3, then auto-ingested via Snowpipe to Bronze<br/>• Snowflake Tasks propagate data from Bronze → Silver → Gold<br/>**Phase 2**: dbt models replacing Alteryx workflows:<br/>• Bronze → Silver: Data cleansing, type casting, validation<br/>• Silver → Gold: Business logic, aggregations, dimensional modeling |
 | **Orchestration** | • Snowpipe auto-ingest loads files into Bronze layer<br/>• Parent Task triggered automatically upon Snowpipe completion<br/>• Child Tasks execute layered transformations (Bronze → Silver → Gold)<br/>• Task dependency management ensures proper execution order |
@@ -1357,25 +1357,27 @@ graph LR
     subgraph AWS["AWS Environment"]
         direction LR
         Source2[DARE SQL Server]
+        Alteryx2[Alteryx Workflows]
         S3_2[AWS S3 External Landing]
+        
+        Source2 --> Alteryx2
+        Alteryx2 --> S3_2
     end
     
     subgraph Snowflake["Snowflake Environment"]
         direction LR
-        OpenFlow[OpenFlow Integration]
         Snowpipe2[Snowpipe<br/>Auto-Ingest]
         Bronze2[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
         dbt_silver[dbt Models<br/>Cleansing & Validation]
-        Silver[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
+        Silver2[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
         dbt_gold[dbt Models<br/>Business Logic]
-        Gold[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
+        Gold2[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
         
-        OpenFlow --> Snowpipe2
         Snowpipe2 --> Bronze2
         Bronze2 --> dbt_silver
-        dbt_silver --> Silver
-        Silver --> dbt_gold
-        dbt_gold --> Gold
+        dbt_silver --> Silver2
+        Silver2 --> dbt_gold
+        dbt_gold --> Gold2
     end
     
     subgraph Consumption2["Consumption Layer"]
@@ -1383,23 +1385,21 @@ graph LR
         Tableau2[Tableau Dashboards<br/>Live Connectivity]
     end
     
-    Source2 --> OpenFlow
-    OpenFlow --> S3_2
     S3_2 --> Snowpipe2
-    Gold --> Tableau2
+    Gold2 --> Tableau2
     
     style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
     style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
     style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
     style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
+    style Alteryx2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
     style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style OpenFlow fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
     style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
+    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
 ```
 
 ---
