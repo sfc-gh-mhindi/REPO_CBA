@@ -306,21 +306,22 @@ graph LR
 
 #### 4.2.1 Storage Layer
 
-The architecture implements a unified Glue catalog-based approach across all data layers:
-1. **QPD Glue Catalog Database**: All data layers (Bronze, Silver, Gold) utilize AWS Glue catalog externally managed Iceberg tables
-2. **Unified Architecture**: Consistent table format across all layers enabling seamless data lineage, ACID compliance, and cross-platform compatibility
+The architecture implements a two-database approach to support both catalog-linked and native Snowflake objects:
+1. **QPD Glue Catalog Database**: All data layers (Bronze, Silver, Gold) utilize AWS Glue catalog externally managed Iceberg tables for production data pipelines
+2. **QPD Native Database**: Supports non-catalog linked objects including transient tables, temporary tables, views, native Snowflake tables, and development/test objects
+3. **Hybrid Architecture**: Combines the benefits of Iceberg's ACID compliance and cross-platform compatibility with Snowflake's native performance for operational workloads
 
 ```mermaid
 graph TB
-        subgraph "Landing Layer"
-            subgraph "External Landing"
+    subgraph "Landing Layer"
+        subgraph "External Landing"
             S3_Ext[AWS S3 Bucket<br/>Automated Sources]
-            end
-            subgraph "Internal Landing"
-                SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
-            end
         end
-        
+        subgraph "Internal Landing"
+            SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
+        end
+    end
+    
     subgraph "QPD Glue Catalog Database"
         subgraph "Raw Data Zone (Bronze)"
             Bronze[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Schema-on-read]
@@ -328,17 +329,24 @@ graph TB
         
         subgraph "Curated Data Zone (Silver)"
             Silver[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Cleansed & Standardized]
-    end
-    
+        end
+        
         subgraph "Data Warehouse (Gold)"
             Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Business Models]
         end
+    end
+    
+    subgraph "QPD Native Database"
+        Native[Native Snowflake Objects<br/>Transient Tables<br/>Temporary Tables<br/>Views<br/>Native Tables]
     end
     
     S3_Ext --> Bronze
     SF_Stage --> Bronze
     Bronze --> Silver
     Silver --> Gold
+    Bronze -.-> Native
+    Silver -.-> Native
+    Gold -.-> Native
 ```
 
 **Landing Layer:**
@@ -365,6 +373,11 @@ graph TB
 
 ```mermaid
 graph LR
+    subgraph "Data Sources"
+        Auto[Automated Sources<br/>Illion, DARE, etc.]
+        Manual[Manual Sources<br/>ACES Watchlist]
+    end
+    
     subgraph "Landing Layer"
         subgraph "External Landing"
             S3[AWS S3 Bucket]
@@ -374,19 +387,19 @@ graph LR
         end
     end
     
-    subgraph "Data Sources"
-        Auto[Automated Sources<br/>Illion, DARE, etc.]
-        Manual[Manual Sources<br/>ACES Watchlist]
-    end
-    
     subgraph "QPD Glue Catalog Database"
         Bronze[Bronze Iceberg Tables<br/>Raw Zone]
+    end
+    
+    subgraph "QPD Native Database"
+        Native[Native Snowflake Objects<br/>Transient/Temp Tables<br/>Views]
     end
     
     Auto --> S3
     Manual --> SF_Stage
     S3 --> Bronze
     SF_Stage --> Bronze
+    Bronze -.-> Native
 ```
 
 **Raw Data Zone (Bronze):**
@@ -409,6 +422,17 @@ graph LR
 - **Table Types**: Externally managed Iceberg tables on AWS Glue catalog
 - **Benefits**: Multi-engine query support, snapshot isolation for concurrent reads, and metadata-driven query optimization
 - High-performance compute resources for complex analytical workloads and cross-platform data sharing
+
+**QPD Native Database:**
+- **Purpose**: Supports operational and development workloads requiring native Snowflake functionality not available with Iceberg tables
+- **Implementation**: Standard Snowflake database containing native tables, transient tables, temporary tables, views, materialized views, and other Snowflake-native objects
+- **Table Types**: 
+  - **Transient Tables**: For staging and intermediate processing without Fail-safe overhead
+  - **Temporary Tables**: Session-specific tables for temporary data processing
+  - **Views**: Logical views referencing both Iceberg and native tables
+  - **Native Snowflake Tables**: For objects requiring features not yet available in Iceberg (e.g., clustering keys, search optimization)
+- **Use Cases**: Development environments, temporary staging areas, view layers, objects requiring Snowflake-specific features, and operational tables with high-frequency updates
+- **Benefits**: Full Snowflake native feature support, automatic clustering, search optimization service, and optimized for Snowflake-specific workloads
 
 #### 4.2.2 Ingestion Layer (EL)
 
