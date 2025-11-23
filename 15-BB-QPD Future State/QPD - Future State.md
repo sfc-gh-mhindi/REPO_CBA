@@ -104,6 +104,9 @@ The existing architecture faces several critical challenges:
 
 ### 2.1 Current Architecture Diagram
 
+![Current State Architecture](2.1%20-%20Current%20State%20Arch%20-%202.1%20CSA.png)
+
+<!-- Original Mermaid Diagram (Commented Out)
 ```mermaid
 graph TB
     subgraph "Data Sources"
@@ -155,6 +158,7 @@ graph TB
     L --> P
     L --> Q
 ```
+-->
 
 ### 2.2 Data Sources Analysis
 
