@@ -638,13 +638,13 @@ This section provides strategic recommendations for implementing data ingestion 
 
 | **Data Source** | **Options** | **Recommendation** | **Justification** |
 |-----------------|-------------|-------------------|-------------------|
-| **DARE Data Source** | • Alteryx Repointing to AWS S3 → Snowpipe → Raw | • **Recommended**: Alteryx Repointing | • Minimal implementation time, no learning curve, aligns with CDAO-approved S3 + Snowpipe pattern |
-| **CSV Files Data Source** | • SSIS Repointing to AWS S3 → Snowpipe → Raw | • **Recommended**: SSIS Repointing | • Minimal implementation time, no learning curve for existing teams, aligns with CDAO-approved S3 + Snowpipe pattern |
-| **Illion Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw | • **Recommended**: Manual upload interface (Streamlit) | • Manual monthly bureau files require user-driven uploads<br/>• Snowpipe auto-ingest provides automation after upload |
-| **ACES Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw | • **Recommended**: Streamlit application with Snowpipe | • Manual monthly watchlist curation requires user interface<br/>• Snowpipe ensures automated loading post-submission |
+| **DARE Data Source** | • Alteryx Repointing to AWS S3 → Snowpipe → Raw<br/>• Ingest from DARE into Snowflake via a new ingestion tool such as SSIS, Openflow, etc | • **Recommended**: Alteryx Repointing | • Minimal implementation time, no learning curve, aligns with CDAO-approved S3 + Snowpipe pattern |
+| **CSV Files Data Source** | • SSIS Repointing to AWS S3 → Snowpipe → Raw<br/>• Ingest from the source of the CSV files into Snowflake via a new ingestion tool such as SSIS, Openflow, etc | • **Recommended**: SSIS Repointing | • Minimal implementation time, no learning curve for existing teams, aligns with CDAO-approved S3 + Snowpipe pattern |
+| **Illion Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw<br/>• Manually place the files in S3 bucket or in target Snowflake tables | • **Recommended**: Manual upload interface (Streamlit) | • Manual monthly bureau files require user-driven uploads<br/>• Snowpipe auto-ingest provides automation after upload |
+| **ACES Data Source** | • Manual file upload via Streamlit → Internal Stage → Snowpipe → Raw<br/>• Manually place the files in S3 bucket or in target Snowflake tables | • **Recommended**: Streamlit application with Snowpipe | • Manual monthly watchlist curation requires user interface<br/>• Snowpipe ensures automated loading post-submission |
 | **AI Models Data Source** | • SageMaker → AWS S3 → Snowpipe → Raw | • **Recommended**: Direct S3 write with Snowpipe | • Aligns with CDAO pattern<br/>• SageMaker natively writes to S3<br/>• Snowpipe provides automated ingestion |
-| **GDW Data Source** | • Glue Catalog Linked Iceberg Tables (No ingestion) | • **Recommended**: Direct access via catalog linkage | • No ingestion required<br/>• Tables immediately accessible as externally managed Iceberg tables through Glue catalog |
-| **Omnia Data Source** | • External Tables pointing to AWS S3 (No ingestion) | • **Recommended**: Direct access via external tables | • No ingestion required<br/>• OTC parquet files accessible directly from current AWS S3 location |
+| **GDW Data Source** | • Glue Catalog Linked Iceberg Tables (No ingestion)<br/>• Ingest via an ingestion tool | • **Recommended**: Direct access via catalog linkage | • No ingestion required<br/>• Tables immediately accessible as externally managed Iceberg tables through Glue catalog |
+| **Omnia Data Source** | • External Tables pointing to AWS S3 (No ingestion)<br/>• Ingest via an ingestion tool | • **Recommended**: Direct access via external tables | • No ingestion required<br/>• OTC parquet files accessible directly from current AWS S3 location |
 
 **Implementation Strategy:**
 
