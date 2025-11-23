@@ -105,6 +105,7 @@ The existing architecture faces several critical challenges:
 ### 2.1 Current Architecture Diagram
 
 ![Current State Architecture](2.1%20-%20Current%20State%20Arch%20-%202.1%20CSA.png)
+![Current State Architecture](diagrams/2.1_Current State Arch.png)
 
 <!-- Original Mermaid Diagram (Commented Out)
 ```mermaid
