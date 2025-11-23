@@ -112,8 +112,8 @@ The existing architecture faces several critical challenges:
 | **Data Source** | **Format** | **Transformation Tool** |
 |-----------------|------------|-------------------------|
 | SQL Database (DARE) | Relational | Alteryx |
-| Illion Files | [Format] | Alteryx + SQL Scripts |
-| ACES Watchlist Entries | [Format] | SQL Scripts |
+| Illion Files | CSV | Alteryx + SQL Scripts |
+| ACES Watchlist Entries | CSV | SQL Scripts |
 | CSV Files | CSV | SSIS |
 | Teradata (GDW) | Relational | R-Connect |
 | Parquet Files (Omnia) | Parquet | R-Connect |
@@ -958,7 +958,7 @@ This section provides strategic recommendations for implementing transformation 
 | **Transformation Tool** | **Options** | **Recommendation** | **Justification** |
 |-------------------------|-------------|-------------------|-------------------|
 | **BTEQ Scripts** | • **Option 1**: Snowflake SQL Stored Procedures<br/>• **Option 2**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time via SnowConvert AI automation, no learning curve, immediate migration capability<br/>• **Phase 2**: Aligns with CDAO standards (GDW POC pattern), native version control, testing, and collaboration through dbt framework |
-| **Alteryx Workflows** | • **Option 1**: Keep as is <br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is< br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve, leverages existing Alteryx expertise<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
+| **Alteryx Workflows** | • **Option 1**: Keep as is <br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is <br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve, leverages existing Alteryx expertise<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
 | **SQL Scripts** | • **Option 1**: Snowflake SQL Stored Procedures<br/>• **Option 2**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time via SnowConvert AI automation, straightforward SQL-to-SQL migration<br/>• **Phase 2**: Aligns with CDAO standards, native version control, automated testing, and documentation through dbt |
 | **SSIS Packages** | • **Option 1**: Keep as is <br/>• **Option 2**: Snowflake SQL<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Keep as is<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, no learning curve for existing teams, maintains DDM file processing workflows<br/>• **Phase 2**: Consolidates into Snowflake-managed ecosystem, reduces technology sprawl, aligns with CDAO dbt standards |
 | **R-Connect Jobs** | • **Option 1**: Posit native app on Snowflake<br/>• **Option 2**: Snowflake SQL/Python (Snowpark)<br/>• **Option 3**: dbt Models | • **Short-term (Phase 1)**: Snowflake SQL/Python<br/>• **Long-term (Phase 2)**: dbt Models | • **Phase 1**: Minimal implementation time, leverages native Snowflake capabilities for complex transformations and aggregations<br/>• **Phase 2**: Aligns with CDAO standards for standard SQL transformations;|
