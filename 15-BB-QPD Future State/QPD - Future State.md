@@ -106,59 +106,6 @@ The existing architecture faces several critical challenges:
 
 ![Current State Architecture](diagrams/2.1_CurrentStateArch.png)
 
-<!-- Original Mermaid Diagram (Commented Out)
-```mermaid
-graph TB
-    subgraph "Data Sources"
-        A[SQL Database - DARE]
-        B[Illion Files]
-        C[ACES Watchlist Entries]
-        D[CSV Files]
-        E[Teradata - GDW]
-        F[Parquet Files - Omnia]
-        G[AI Models - Sagemaker]
-    end
-    
-    subgraph "Transformation Layer"
-        H[Alteryx]
-        I[SQL Scripts]
-        J[SSIS]
-        K[R-Connect]
-    end
-    
-    subgraph "Target"
-        L[Teradata QPD]
-    end
-    
-    subgraph "Consumption"
-        M[Tableau Dashboards]
-        N[APIs]
-        O[R-Connect Analytics]
-        P[Analytical Reporting]
-        Q[AI Models]
-    end
-    
-    A --> H
-    B --> H
-    B --> I
-    C --> I
-    D --> J
-    E --> K
-    F --> K
-    G --> L
-    
-    H --> L
-    I --> L
-    J --> L
-    K --> L
-    
-    L --> M
-    L --> N
-    L --> O
-    L --> P
-    L --> Q
-```
--->
 
 ### 2.2 Data Sources Analysis
 
