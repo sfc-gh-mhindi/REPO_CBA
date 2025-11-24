@@ -172,6 +172,7 @@ Current downstream consumers include:
 ![Future State Conceptual Architecture](diagrams/4.1_ConceptualArchitecture.png)
 
 ### 4.2 Detailed Architecture Components
+![Detailed Architecture Components](diagrams/4.2_DetailedArchitecture.png)
 
 #### 4.2.1 Storage Layer
 
@@ -741,64 +742,7 @@ Based on discovery, the current transformation landscape can be categorized by c
 
 ### **Conceptual Mapping**
 
-```mermaid
-graph TB
-    subgraph "Landing Layer"
-        L1[S3 External Landing]
-        L2[Snowflake Internal Stage]
-    end
-    
-    subgraph "Bronze Layer - Raw Zone"
-        B1[DARE_RAW]
-        B2[ILLION_RAW]
-        B3[ACES_RAW]
-        B4[CSV_RAW]
-        B5[SAGEMAKER_OUTPUT_RAW*]
-    end
-    
-    subgraph "Silver Layer - Curated Zone"
-        S1[DARE_CURATED]
-        S2[ILLION_CURATED]
-        S3[ACES_CURATED]
-        S4[DDM_CURATED]
-        S5[INFERENCE_CURATED]
-    end
-    
-    subgraph "Gold Layer - Analytical Zone"
-        G1[Business Dimensional Models]
-        G2[Aggregated Datasets]
-        G3[Analytical Views]
-    end
-    
-    subgraph "Direct Access - No Transformation"
-        D1[GDW Iceberg Tables]
-        D2[OMNIA External Tables**]
-    end
-    
-    L1 --> B1
-    L1 --> B4
-    L1 --> B5
-    L2 --> B2
-    L2 --> B3
-    
-    B1 --> S1
-    B2 --> S2
-    B3 --> S3
-    B4 --> S4
-    B5 --> S5
-    
-    S1 --> G1
-    S2 --> G1
-    S3 --> G1
-    S4 --> G1
-    S5 --> G2
-    
-    D1 --> G1
-    D2 --> G1
-    
-    G1 --> G3
-    G2 --> G3
-```
+![Transformation Conceptual Architecture](diagrams/4.2.3_TransformationConceptual.png)
 
 **Caveats:**
 - *SAGEMAKER_OUTPUT_RAW: SageMaker Studio inference output in table format (inference results + upstream data from SageMaker Studio)
