@@ -212,13 +212,8 @@ graph LR
         Manual[Manual Sources<br/>ACES Watchlist]
     end
     
-    subgraph "Landing Layer"
-        subgraph "External Landing"
-            S3[AWS S3 Bucket]
-        end
-        subgraph "Internal Landing" 
-            SF_Stage[Snowflake Internal Stage]
-        end
+    subgraph "Ingestion"
+        Ingest[Direct Ingestion<br/>to Bronze]
     end
     
     subgraph "QPD Glue Catalog Database"
@@ -229,10 +224,9 @@ graph LR
         Native[Native Snowflake Objects<br/>Transient/Temp Tables<br/>Views]
     end
     
-    Auto --> S3
-    Manual --> SF_Stage
-    S3 --> Bronze
-    SF_Stage --> Bronze
+    Auto --> Ingest
+    Manual --> Ingest
+    Ingest --> Bronze
     Bronze -.-> Native
 ```
 
