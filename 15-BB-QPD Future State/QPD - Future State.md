@@ -799,7 +799,7 @@ The phased approach balances immediate migration needs with long-term architectu
 
 ---
 
-#### 4.2.3.2 Migration Approach
+#### Migration Approach
 
 The migration from current state transformation tools to the Snowflake target state follows a phased approach, with migration complexity varying by tool type.
 
