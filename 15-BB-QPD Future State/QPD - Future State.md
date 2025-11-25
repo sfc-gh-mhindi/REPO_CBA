@@ -181,43 +181,7 @@ The architecture implements a two-database approach to support both catalog-link
 2. **QPD Native Database**: Supports non-catalog linked objects including transient tables, temporary tables, views, native Snowflake tables, and development/test objects
 3. **Hybrid Architecture**: Combines the benefits of Iceberg's ACID compliance and cross-platform compatibility with Snowflake's native performance for operational workloads
 
-```mermaid
-graph TB
-        subgraph "Landing Layer"
-            subgraph "External Landing"
-            S3_Ext[AWS S3 Bucket<br/>Automated Sources]
-            end
-            subgraph "Internal Landing"
-                SF_Stage[Snowflake Internal Stage<br/>Manual Sources]
-            end
-        end
-        
-    subgraph "QPD Glue Catalog Database"
-        subgraph "Raw Data Zone (Bronze)"
-            Bronze[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Schema-on-read]
-        end
-        
-        subgraph "Curated Data Zone (Silver)"
-            Silver[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Cleansed & Standardized]
-    end
-    
-        subgraph "Data Warehouse (Gold)"
-            Gold[Externally Managed Iceberg Tables<br/>AWS Glue Catalog<br/>Business Models]
-        end
-    end
-    
-    subgraph "QPD Native Database"
-        Native[Native Snowflake Objects<br/>Transient Tables<br/>Temporary Tables<br/>Views<br/>Native Tables]
-    end
-    
-    S3_Ext --> Bronze
-    SF_Stage --> Bronze
-    Bronze --> Silver
-    Silver --> Gold
-    Bronze -.-> Native
-    Silver -.-> Native
-    Gold -.-> Native
-```
+![Storage Layer](diagrams/4.2.1_StorageLayer.png)
 
 **Landing Layer:**
 - **Purpose**: Landing zone for data sources to push data files to QPD for ingestion
