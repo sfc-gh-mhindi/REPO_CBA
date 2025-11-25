@@ -34,8 +34,8 @@
        - [AI Models Data Source](#ai-models-data-source)
        - [Ingestion Recommendations](#ingestion-recommendations)
        - [Migration Approach](#migration-approach)
-     - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t---target-state)
-       - 4.2.3.2 [Migration Approach](#4232-migration-approach)
+    - 4.2.3 [Transformation Layer (T)](#423-transformation-layer-t---target-state)
+      - [Migration Approach](#migration-approach)
      - 4.2.4 [Consumption Layer](#424-consumption-layer)
      - 4.2.5 [Orchestration](#425-orchestration)
    - 4.3 [Detailed Component Mapping](#43-detailed-component-mapping)
@@ -799,7 +799,7 @@ The phased approach balances immediate migration needs with long-term architectu
 
 ---
 
-#### Migration Approach
+##### Migration Approach
 
 The migration from current state transformation tools to the Snowflake target state follows a phased approach, with migration complexity varying by tool type.
 
