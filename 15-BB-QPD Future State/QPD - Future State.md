@@ -1,4 +1,4 @@
-# QPD Future State Architecture: Gem Outline
+# QPD Future State Architecture:
 ## Snowflake-Based Data Platform Transformation
 
 ---
