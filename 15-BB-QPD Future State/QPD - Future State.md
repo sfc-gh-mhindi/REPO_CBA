@@ -234,6 +234,13 @@ graph LR
     S3 --> Bronze
     SF_Stage --> Bronze
     Bronze -.-> Native
+    
+    style Data Sources fill:#edf5ff
+    style Landing Layer fill:#edf5ff
+    style External Landing fill:#edf5ff
+    style Internal Landing fill:#edf5ff
+    style QPD Glue Catalog Database fill:#edf5ff
+    style QPD Native Database fill:#edf5ff
 ```
 
 **Raw Data Zone (Bronze):**
