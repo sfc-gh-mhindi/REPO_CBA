@@ -205,30 +205,7 @@ The architecture implements a two-database approach to support both catalog-link
   - If the Business Banking team determines that staging data in the Landing Layer does not provide sufficient value for their specific use cases, the Landing Layer can be **removed** from the architecture. In this scenario, ingestion processes would be modified to write directly to target Snowflake Bronze Iceberg tables, simplifying the data flow while maintaining functionality. This decision should be made based on operational requirements, data governance needs, and cost-benefit analysis.
 
 
-```mermaid
-graph LR
-    subgraph "Data Sources"
-        Auto[Automated Sources<br/>Illion, DARE, etc.]
-        Manual[Manual Sources<br/>ACES Watchlist]
-    end
-    
-    subgraph "Ingestion"
-        Ingest[Direct Ingestion<br/>to Bronze]
-    end
-    
-    subgraph "QPD Glue Catalog Database"
-        Bronze[Bronze Iceberg Tables<br/>Raw Zone]
-    end
-    
-    subgraph "QPD Native Database"
-        Native[Native Snowflake Objects<br/>Transient/Temp Tables<br/>Views]
-    end
-    
-    Auto --> Ingest
-    Manual --> Ingest
-    Ingest --> Bronze
-    Bronze -.-> Native
-```
+![Without Landing Layer](diagrams/Diagramwithoutlandinglayer.png)
 
 **Raw Data Zone (Bronze):**
 - **Purpose**: Landing zone for raw, unprocessed data in original formats with schema-on-read approach for maximum flexibility and data preservation
@@ -275,57 +252,7 @@ The ingestion layer supports three different types of data ingestion requirement
 
 The selection of appropriate ingestion methodology for each data source depends on several key factors including the nature of the data source, the variety of data types it contains, and its specific periodicity requirements. Different sources require tailored approaches to ensure optimal performance, reliability, and alignment with business requirements.
 
-```mermaid
-graph TB
-    subgraph Sources["Data Sources & Ingestion Methods"]
-        subgraph "Periodic Sources"
-            DARE[DARE SQL Database<br/>→ Alteryx Repointing]
-            CSV[CSV Files<br/>→ SSIS Repointing]
-            AI[AI Models SageMaker<br/>→ Direct Repointing]
-        end
-        
-        subgraph "Manual Sources"
-            ACES[ACES Watchlist<br/>→ Streamlit UI App]
-            Illion[Illion Files<br/>→ Streamlit UI App]
-        end
-        
-        subgraph "Immediately Accessible"
-            GDW[GDW Tables<br/>→ Glue Catalog Linked]
-            Omnia[Omnia Parquet<br/>→ External Tables]
-        end
-    end
-    
-    subgraph AWS["AWS Environment"]
-        S3_Landing[AWS S3 External Landing]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Internal_Landing[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        Raw[Snowflake QPD Raw Layer]
-        Direct[Direct Access<br/>No Ingestion Required]
-    end
-    
-    DARE --> S3_Landing
-    CSV --> S3_Landing
-    AI --> S3_Landing
-    ACES --> Internal_Landing
-    Illion --> Internal_Landing
-    S3_Landing --> Snowpipe
-    Internal_Landing --> Snowpipe
-    Snowpipe --> Raw
-    GDW --> Direct
-    Omnia --> Direct
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Sources fill:#e0e0e0,stroke:#666,stroke-width:2px,color:#000
-    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Internal_Landing fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Direct fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/4.2.2IngestionLayerEL.png)
 
 ##### DARE Data Source
 **Type**: Periodic
@@ -334,32 +261,8 @@ graph TB
 
 Repoint existing Alteryx workflows to write output to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
 
-```mermaid
-graph LR
-    DARE[DARE SQL Database]
-    
-    subgraph AWS["AWS Environment"]
-        Alteryx[Alteryx Workflow]
-        S3_Landing[AWS S3 External Landing]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        SF_Raw[Snowflake QPD Raw Layer]
-    end
-    
-    DARE --> Alteryx
-    Alteryx --> S3_Landing
-    S3_Landing --> Snowpipe
-    Snowpipe --> SF_Raw
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Alteryx fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+
+![Ingestion Layer](diagrams/ingestion_dare.png)
 
 ---
 
@@ -370,28 +273,7 @@ graph LR
 
 Business users receive monthly Illion bureau data files and manually upload them through a designated interface (e.g., Streamlit application or secure file transfer). Files are placed into the Snowflake Internal Stage Landing Layer, where Snowpipe with auto-ingest detects the new files and automatically loads them into the Snowflake QPD Raw Iceberg Layer for subsequent processing.
 
-```mermaid
-graph LR
-    User[Business User]
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Upload[File Upload Interface in Streamlit]
-        SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        SF_Raw[Snowflake QPD Raw Layer]
-    end
-    
-    User --> Upload
-    Upload --> SF_Internal
-    SF_Internal --> Snowpipe
-    Snowpipe --> SF_Raw
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Upload fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/ingestion_illion.png)
 
 ---
 
@@ -400,28 +282,7 @@ graph LR
 
 **Implementation**: Streamlit application for user file uploads
 
-```mermaid
-graph LR
-    User[Business User]
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Streamlit[Streamlit UI App]
-        SF_Internal[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        SF_Raw[Snowflake QPD Raw Layer]
-    end
-    
-    User --> Streamlit
-    Streamlit --> SF_Internal
-    SF_Internal --> Snowpipe
-    Snowpipe --> SF_Raw
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/ingestion_aces.png)
 
 Upon file upload and submission through the Streamlit interface, files are automatically copied into the Snowflake Internal Stage in the landing layer. From there, Snowpipe with auto-ingest detects when a file has been added and automatically loads it into the Snowflake QPD Raw Iceberg Layer table for subsequent processing.
 
@@ -448,32 +309,7 @@ Upon file upload and submission through the Streamlit interface, files are autom
 
 Repoint existing SSIS packages to write CSV file outputs to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads data into Snowflake QPD Raw Iceberg tables.
 
-```mermaid
-graph LR
-    CSV[CSV Files]
-    
-    subgraph AWS["AWS Environment"]
-        SSIS[SSIS Package]
-        S3_Landing[AWS S3 External Landing]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        SF_Raw[Snowflake QPD Raw Layer]
-    end
-    
-    CSV --> SSIS
-    SSIS --> S3_Landing
-    S3_Landing --> Snowpipe
-    Snowpipe --> SF_Raw
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style SSIS fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/ingestion_csv.png)
 
 ---
 
@@ -483,29 +319,8 @@ graph LR
 
 **Implementation**: Repoint AWS SageMaker output to write to AWS S3 External Landing layer, where Snowpipe auto-ingest automatically loads model results into Snowflake QPD Raw Iceberg tables.
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        SageMaker[AWS SageMaker]
-        S3_Landing[AWS S3 External Landing]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        Snowpipe[Snowpipe with Auto-Ingest]
-        SF_Raw[Snowflake QPD Raw Layer]
-    end
-    
-    SageMaker --> S3_Landing
-    S3_Landing --> Snowpipe
-    Snowpipe --> SF_Raw
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style SageMaker fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_Landing fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style SF_Raw fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+
+![Ingestion Layer](diagrams/ingestion_AI_models.png)
 
 ---
 
@@ -1095,107 +910,12 @@ Each data source follows the same orchestration pattern:
 
 **Phase 1: Alteryx Repointing**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source[DARE SQL Server]
-        Alteryx[Alteryx Workflows<br/>Transformation Logic]
-        S3[AWS S3 External Landing]
-        
-        Source --> Alteryx
-        Alteryx --> S3
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe[Snowpipe<br/>Auto-Ingest]
-        Bronze[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
-        Tasks_Silver[Snowflake Tasks<br/>Data Propagation]
-        Silver[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
-        Tasks_Gold[Snowflake Tasks<br/>Data Propagation]
-        Gold[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
-        
-        Snowpipe --> Bronze
-        Bronze --> Tasks_Silver
-        Tasks_Silver --> Silver
-        Silver --> Tasks_Gold
-        Tasks_Gold --> Gold
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        Tableau[Tableau Dashboards<br/>Live Connectivity]
-    end
-    
-    S3 --> Snowpipe
-    Gold --> Tableau
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Alteryx fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Tasks_Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Tasks_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc1_ph1.png)
 
 **Phase 2: dbt Models**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source2[DARE SQL Server]
-        Alteryx2[Alteryx Workflows]
-        S3_2[AWS S3 External Landing]
-        
-        Source2 --> Alteryx2
-        Alteryx2 --> S3_2
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe2[Snowpipe<br/>Auto-Ingest]
-        Bronze2[Bronze Layer<br/>DARE_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Cleansing & Validation]
-        Silver2[Silver Layer<br/>DARE_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Business Logic]
-        Gold2[Gold Layer<br/>MERCHANT_MIGRATION_FACT<br/>MOBILE_USER_DIM<br/>Iceberg Tables]
-        
-        Snowpipe2 --> Bronze2
-        Bronze2 --> dbt_silver
-        dbt_silver --> Silver2
-        Silver2 --> dbt_gold
-        dbt_gold --> Gold2
-    end
-    
-    subgraph Consumption2["Consumption Layer"]
-        direction TB
-        Tableau2[Tableau Dashboards<br/>Live Connectivity]
-    end
-    
-    S3_2 --> Snowpipe2
-    Gold2 --> Tableau2
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Alteryx2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+
+![Ingestion Layer](diagrams/uc1_ph2.png)
 
 ---
 
@@ -1228,91 +948,11 @@ graph LR
 
 **Phase 1: Snowflake SQL Stored Procedures**
 
-```mermaid
-graph LR
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Streamlit[Streamlit Upload Interface]
-        Internal[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe[Snowpipe<br/>Auto-Ingest]
-        Bronze[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
-        Transform_SP[Snowflake SQL<br/>Stored Procedures<br/>Cleansing & Validation]
-        Silver[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
-        Transform_SP_Gold[Snowflake SQL<br/>Stored Procedures<br/>Credit Risk Calculations]
-        Gold[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
-        
-        Streamlit --> Internal
-        Internal --> Snowpipe
-        Snowpipe --> Bronze
-        Bronze --> Transform_SP
-        Transform_SP --> Silver
-        Silver --> Transform_SP_Gold
-        Transform_SP_Gold --> Gold
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        Tableau[Tableau Dashboards<br/>Credit Risk Insights]
-    end
-    
-    Source[Illion Bureau Files] --> Streamlit
-    Gold --> Tableau
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc2_ph1.png)
 
 **Phase 2: dbt Models**
 
-```mermaid
-graph LR
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Streamlit2[Streamlit Upload Interface]
-        Internal2[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe2[Snowpipe<br/>Auto-Ingest]
-        Bronze2[Bronze Layer<br/>ILLION_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Cleansing & Standardization]
-        Silver2[Silver Layer<br/>ILLION_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Credit Risk Calculations]
-        Gold2[Gold Layer<br/>CREDIT_RISK_FACT<br/>BUREAU_INSIGHTS_AGG<br/>Iceberg Tables]
-        
-        Streamlit2 --> Internal2
-        Internal2 --> Snowpipe2
-        Snowpipe2 --> Bronze2
-        Bronze2 --> dbt_silver
-        dbt_silver --> Silver2
-        Silver2 --> dbt_gold
-        dbt_gold --> Gold2
-    end
-    
-    subgraph Consumption2["Consumption Layer"]
-        direction TB
-        Tableau2[Tableau Dashboards<br/>Credit Risk Insights]
-    end
-    
-    Source2[Illion Bureau Files] --> Streamlit2
-    Gold2 --> Tableau2
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Streamlit2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Internal2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc2_ph2.png)
 
 ---
 
@@ -1344,107 +984,11 @@ graph LR
 
 **Phase 1: SSIS Repointing**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source[CSV Files<br/>Shared Folders]
-        SSIS[SSIS Package<br/>Transformation Logic]
-        S3[AWS S3 External Landing]
-        
-        Source --> SSIS
-        SSIS --> S3
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe[Snowpipe<br/>Auto-Ingest]
-        Bronze[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
-        Tasks_Silver[Snowflake Tasks<br/>Data Propagation]
-        Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
-        Tasks_Gold[Snowflake Tasks<br/>Data Propagation]
-        Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
-        
-        Snowpipe --> Bronze
-        Bronze --> Tasks_Silver
-        Tasks_Silver --> Silver
-        Silver --> Tasks_Gold
-        Tasks_Gold --> Gold
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        DDMT[DDMT Tool<br/>Queries Gold Tables Directly]
-    end
-    
-    S3 --> Snowpipe
-    Gold --> DDMT
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style SSIS fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Tasks_Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Tasks_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc3_ph1.png)
 
 **Phase 2: dbt Models**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source2[CSV Files<br/>Shared Folders]
-        SSIS2[SSIS Package<br/>File Movement Only]
-        S3_2[AWS S3 External Landing]
-        
-        Source2 --> SSIS2
-        SSIS2 --> S3_2
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe2[Snowpipe<br/>Auto-Ingest]
-        Bronze2[Bronze Layer<br/>CSV_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Validation & Decryption]
-        Silver[Silver Layer<br/>DDM_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Utilization & Breach Calc]
-        Gold[Gold Layer<br/>DD_UTILIZATION_FACT<br/>DD_BREACH_MONITOR<br/>Iceberg Tables]
-        
-        Snowpipe2 --> Bronze2
-        Bronze2 --> dbt_silver
-        dbt_silver --> Silver
-        Silver --> dbt_gold
-        dbt_gold --> Gold
-    end
-    
-    subgraph Consumption2["Consumption Layer"]
-        direction TB
-        DDMT2[DDMT Tool<br/>Reads from Snowflake via ODBC/JDBC]
-    end
-    
-    S3_2 --> Snowpipe2
-    Gold --> DDMT2
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style SSIS2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc3_ph2.png)
 
 ---
 
@@ -1476,91 +1020,11 @@ graph LR
 
 **Phase 1: Snowflake SQL Stored Procedures**
 
-```mermaid
-graph LR
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Streamlit[Streamlit Upload Interface<br/>BB Data Office]
-        Internal[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe[Snowpipe<br/>Auto-Ingest]
-        Bronze[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
-        Transform_SP[Snowflake SQL<br/>Stored Procedures<br/>Validation & Conflict Resolution]
-        Silver[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
-        Transform_SP_Gold[Snowflake SQL<br/>Stored Procedures<br/>Risk Classification]
-        Gold[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
-        
-        Streamlit --> Internal
-        Internal --> Snowpipe
-        Snowpipe --> Bronze
-        Bronze --> Transform_SP
-        Transform_SP --> Silver
-        Silver --> Transform_SP_Gold
-        Transform_SP_Gold --> Gold
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        Analysis[Analysts & Teams<br/>Ad-hoc Querying & GCS Escalation]
-    end
-    
-    Source[ACES Watchlist<br/>Business Units] --> Streamlit
-    Gold --> Analysis
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Streamlit fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Internal fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc4_ph1.png)
 
 **Phase 2: dbt Models**
 
-```mermaid
-graph LR
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Streamlit2[Streamlit Upload Interface<br/>BB Data Office]
-        Internal2[Snowflake Internal Stage<br/>Landing Layer]
-        Snowpipe2[Snowpipe<br/>Auto-Ingest]
-        Bronze2[Bronze Layer<br/>ACES_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Validation & Conflict Resolution]
-        Silver2[Silver Layer<br/>ACES_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Risk Classification]
-        Gold2[Gold Layer<br/>WATCHLIST_CONSOLIDATED<br/>RISK_CLASSIFICATION_FACT<br/>Iceberg Tables]
-        
-        Streamlit2 --> Internal2
-        Internal2 --> Snowpipe2
-        Snowpipe2 --> Bronze2
-        Bronze2 --> dbt_silver
-        dbt_silver --> Silver2
-        Silver2 --> dbt_gold
-        dbt_gold --> Gold2
-    end
-    
-    subgraph Consumption2["Consumption Layer"]
-        direction TB
-        Analysis2[Analysts & Teams<br/>Ad-hoc Querying & GCS Escalation]
-    end
-    
-    Source2[ACES Watchlist<br/>Business Units] --> Streamlit2
-    Gold2 --> Analysis2
-    
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Streamlit2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Internal2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc4_ph2.png)
 
 ### 5.5 Cashflow Model Output
 
@@ -1593,115 +1057,11 @@ graph LR
 
 **Phase 1: Snowflake Stored Procedures/Notebooks**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source[AWS SageMaker<br/>Cashflow Models]
-        Glue[AWS Glue ETL]
-        S3[AWS S3 External Landing<br/>Inference Outputs]
-        
-        Source --> Glue
-        Glue --> S3
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe[Snowpipe<br/>Auto-Ingest]
-        Bronze[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
-        Transform_SP[Snowflake Stored Procedures<br/>or Notebooks<br/>Quantile Calculations]
-        Silver[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
-        Transform_SP_Gold[Snowflake Stored Procedures<br/>or Notebooks<br/>Shortfall Detection]
-        Gold[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
-        
-        Snowpipe --> Bronze
-        Bronze --> Transform_SP
-        Transform_SP --> Silver
-        Silver --> Transform_SP_Gold
-        Transform_SP_Gold --> Gold
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        BWB[Bankers Workbench<br/>Direct API]
-        Alerts[Cashflow Shortfall Alerts]
-        Advisory[Predictive Advisory]
-    end
-    
-    S3 --> Snowpipe
-    Gold --> BWB
-    Gold --> Alerts
-    Gold --> Advisory
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Glue fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_SP_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc5_ph1.png)
 
 **Phase 2: dbt Models**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        Source2[AWS SageMaker<br/>Cashflow Models]
-        Glue2[AWS Glue ETL]
-        S3_2[AWS S3 External Landing<br/>Inference Outputs]
-        
-        Source2 --> Glue2
-        Glue2 --> S3_2
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction LR
-        Snowpipe2[Snowpipe<br/>Auto-Ingest]
-        Bronze2[Bronze Layer<br/>SAGEMAKER_OUTPUT_RAW<br/>Iceberg Tables]
-        dbt_silver[dbt Models<br/>Quantile Calculations]
-        Silver2[Silver Layer<br/>INFERENCE_CURATED<br/>Iceberg Tables]
-        dbt_gold[dbt Models<br/>Shortfall Detection]
-        Gold2[Gold Layer<br/>CASHFLOW_FORECAST_FACT<br/>CASHFLOW_SHORTFALL_ALERT<br/>Iceberg Tables]
-        
-        Snowpipe2 --> Bronze2
-        Bronze2 --> dbt_silver
-        dbt_silver --> Silver2
-        Silver2 --> dbt_gold
-        dbt_gold --> Gold2
-    end
-    
-    subgraph Consumption2["Consumption Layer"]
-        direction TB
-        BWB2[Bankers Workbench<br/>Direct API]
-        Alerts2[Cashflow Shortfall Alerts]
-        Advisory2[Predictive Advisory]
-    end
-    
-    S3_2 --> Snowpipe2
-    Gold2 --> BWB2
-    Gold2 --> Alerts2
-    Gold2 --> Advisory2
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption2 fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style Source2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Glue2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style S3_2 fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Snowpipe2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Bronze2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style dbt_gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold2 fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc5_ph2.png)
 
 ### 5.6 Customer Value Management (CVM) Insights to Service Domain
 
@@ -1732,54 +1092,7 @@ graph LR
 
 **Use Case Data Flow Diagram:**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        GDW[GDW Iceberg Tables<br/>Customer Data<br/>via Glue Catalog]
-        Omnia[Omnia External Tables<br/>Engagement Data<br/>via Glue Catalog]
-        Aurora[Aurora DB]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction TB
-        Silver_transform[Snowflake Notebooks<br/>or dbt Models<br/>Customer Aggregation]
-        Silver[Silver Layer<br/>CUSTOMER_ENGAGEMENT_CURATED<br/>Iceberg Tables]
-        Transform_Gold[Snowflake Notebooks<br/>or dbt Models<br/>CVM Scoring]
-        Gold[Gold Layer<br/>CVM_INSIGHTS_FACT<br/>CVM_TOP20_RECOMMENDATIONS<br/>Iceberg Tables]
-        DataShare[Snowflake Secure<br/>Data Sharing]
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        API[API Layer<br/>Extract & Load]
-        BWB[Bankers Workbench<br/>Downstream Consumer]
-        ServiceDomain[Service Domain<br/>Applications]
-    end
-    
-    GDW --> Silver_transform
-    Omnia --> Silver_transform
-    Silver_transform --> Silver
-    Silver --> Transform_Gold
-    Transform_Gold --> Gold
-    Gold --> API
-    API --> Aurora
-    Aurora --> BWB
-    Gold --> DataShare
-    DataShare --> ServiceDomain
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style GDW fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Omnia fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Aurora fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Silver_transform fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style DataShare fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc6.png)
 
 ### 5.7 BB Data Quality Platform
 
@@ -1809,47 +1122,6 @@ graph LR
 
 **Use Case Data Flow Diagram:**
 
-```mermaid
-graph LR
-    subgraph AWS["AWS Environment"]
-        direction LR
-        GDW[GDW Iceberg Tables<br/>via Glue Catalog]
-        Omnia[Omnia External Tables<br/>via Glue Catalog]
-    end
-    
-    subgraph Snowflake["Snowflake Environment"]
-        direction TB
-        DQ_Rules[Stored Procedures/Notebooks<br/>or dbt Models<br/>Great Expectations Rules]
-        Silver[Silver Layer<br/>DQ_VALIDATION_RESULTS<br/>Iceberg Tables]
-        Transform_Gold[Stored Procedures/Notebooks<br/>or dbt Models<br/>DQ Scoring & Aggregation]
-        Gold[Gold Layer<br/>DQ_EXCEPTIONS_AGG<br/>DQ_RAG_STATUS<br/>Iceberg Tables]
-    end
-    
-    subgraph Consumption["Consumption Layer"]
-        direction TB
-        Tableau[Tableau Dashboards<br/>RAG Status & Drill-down]
-        Streamlit[Streamlit Portal<br/>Remediation & Self-Service]
-        Alerts[Email Alerts via<br/>Snowflake Alert]
-    end
-    
-    GDW --> DQ_Rules
-    Omnia --> DQ_Rules
-    DQ_Rules --> Silver
-    Silver --> Transform_Gold
-    Transform_Gold --> Gold
-    Gold --> Tableau
-    Gold --> Streamlit
-    Gold --> Alerts
-    
-    style AWS fill:#ff9900,stroke:#232f3e,stroke-width:3px,color:#000
-    style Snowflake fill:#29b5e8,stroke:#0c4d6b,stroke-width:3px,color:#000
-    style Consumption fill:#90ee90,stroke:#006400,stroke-width:2px,color:#000
-    style GDW fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style Omnia fill:#ff9900,stroke:#232f3e,stroke-width:2px,color:#000
-    style DQ_Rules fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Silver fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Transform_Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-    style Gold fill:#29b5e8,stroke:#0c4d6b,stroke-width:2px,color:#000
-```
+![Ingestion Layer](diagrams/uc7.png)
 
 ---
